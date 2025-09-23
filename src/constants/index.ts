@@ -17,88 +17,17 @@ export const ROLES = {
     USER: "USER",
 };
 
-export const VERIFICATION_STATUS = {
-    VERIFIED: "VERIFIED",
-    UNVERIFIED: "UNVERIFIED",
-};
-export const ENTITY_STATUSES = {
-    ACTIVE: "ACTIVE",
-    DELETED: "DELETED",
-    BANNED: "BANNED",
-};
-
-export const USER_STATUSES = {
-    ACTIVE: ENTITY_STATUSES.ACTIVE,
-    DELETED: ENTITY_STATUSES.DELETED,
-    BANNED: ENTITY_STATUSES.BANNED,
-};
-
-export const POST_STATUSES = {
-    ACTIVE: ENTITY_STATUSES.ACTIVE,
-    DELETED: ENTITY_STATUSES.DELETED,
-};
-
-export const GROUP_VISIBILITY = {
-    PUBLIC: "PUBLIC",
-    PRIVATE: "PRIVATE",
-};
-
-// Report Configuration
-export const ENTITY_TYPES = {
-    POST: "POST",
-    COMMENT: "COMMENT",
-    USER: "USER",
-    GROUP: "GROUP",
-    OTHER: "OTHER",
-};
-
-export const REPORT_REASONS = {
-    SPAM: "SPAM",
-    FAKE: "FAKE",
-    INAPPROPRIATE_CONTENT: "INAPPROPRIATE_CONTENT",
-    IDENTITY_BASED_HATE: "IDENTITY_BASED_HATE",
-    UNDERAGE: "UNDERAGE",
-    JUST_NOT_INTERESTED: "JUST_NOT_INTERESTED",
-    OTHER: "OTHER",
-};
-
-export const REPORT_STATUSES = {
-    PENDING: "PENDING",
-    RESOLVED: "RESOLVED",
-    DISMISSED: "DISMISSED",
-};
-
-// OTA Update Configuration
-export const OTA_PLATFORMS = {
-    IOS: "IOS",
-    ANDROID: "ANDROID",
-};
-
-export const OTA_STATUSES = {
-    DRAFT: "DRAFT",
-    PUBLISHED: "PUBLISHED",
-    ARCHIVED: "ARCHIVED",
-};
-
 // Auth Configuration
 export const AUTH_CONFIG = {
-    TOKEN_STORAGE_KEY: "lifebff_access_token",
-    REFRESH_TOKEN_STORAGE_KEY: "lifebff_refresh_token",
-    USER_STORAGE_KEY: "lifebff_user",
+    TOKEN_STORAGE_KEY: "access_token",
+    REFRESH_TOKEN_STORAGE_KEY: "refresh_token",
+    USER_STORAGE_KEY: "user",
     REQUIRED_ROLE: ROLES.ADMIN,
 };
 
 // Route Paths
 export const ROUTES = {
     LOGIN: "/login",
-    DASHBOARD: "/dashboard",
-    USERS: "/users",
-    GROUPS: "/groups",
-    POSTS: "/posts",
-    REPORTS: "/reports",
-    BROADCAST: "/broadcast",
-    MAP: "/map",
-    OTA: "/ota",
     ROOT: "/",
 };
 
@@ -159,14 +88,4 @@ export default {
     ERROR_MESSAGES,
     SUCCESS_MESSAGES,
     ROLES,
-    VERIFICATION_STATUS,
-    ENTITY_STATUSES,
-    USER_STATUSES,
-    POST_STATUSES,
-    GROUP_VISIBILITY,
-    ENTITY_TYPES,
-    REPORT_REASONS,
-    REPORT_STATUSES,
-    OTA_PLATFORMS,
-    OTA_STATUSES,
 };
