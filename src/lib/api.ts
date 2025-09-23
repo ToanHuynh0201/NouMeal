@@ -7,11 +7,11 @@ import {
     setStorageItem,
     shouldLogout,
 } from "@/utils";
-import axios from "axios";
+import axios, {type AxiosInstance} from "axios";
 
 class ApiService {
     private baseUrl: string;
-    private api: any;
+    private api: AxiosInstance;
     constructor(customBaseUrl = null) {
         this.baseUrl = customBaseUrl || API_CONFIG.BASE_URL;
         this.api = this._createAxiosInstance();

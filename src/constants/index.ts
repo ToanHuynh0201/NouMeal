@@ -28,6 +28,7 @@ export const AUTH_CONFIG = {
 // Route Paths
 export const ROUTES = {
     LOGIN: "/login",
+    HOME: "/home",
     ROOT: "/",
 };
 
