@@ -1,68 +1,259 @@
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+        "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+        sans-serif;
+    line-height: 1.6;
+    font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+    color-scheme: light dark;
+    color: rgba(255, 255, 255, 0.87);
+    background-color: #f8fafc;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+* {
+    box-sizing: border-box;
 }
 
 body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    font-family: inherit;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background-attachment: fixed;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+#root {
+    min-height: 100vh;
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 8px;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(45deg, #5a6fd8, #6a4190);
+}
+
+/* Focus styles */
+*:focus {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+}
+
+/* Animation classes */
+.fade-in {
+    animation: fadeIn 0.6s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.pulse {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.8;
+        transform: scale(1.05);
+    }
+}
+
+/* Card hover effects */
+.card-hover {
+    transition: all 0.3s ease;
+}
+
+.card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+        0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Button animations */
+.btn-float {
+    transition: all 0.2s ease;
+}
+
+.btn-float:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.btn-float:active {
+    transform: translateY(0);
+}
+
+/* Glass morphism effect */
+.glass {
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+/* Loading animation */
+@keyframes shimmer {
+    0% {
+        background-position: -468px 0;
+    }
+    100% {
+        background-position: 468px 0;
+    }
+}
+
+.shimmer {
+    animation: shimmer 1.5s ease-in-out infinite;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 1000px 100%;
+}
+
+/* Leaflet Map Custom Styling */
+.leaflet-control-geosearch {
+    border-radius: 12px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(10px) !important;
+}
+
+.leaflet-control-geosearch .glass {
+    border-radius: 12px !important;
+    padding: 8px 12px !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    border: none !important;
+    background: transparent !important;
+    color: #2d3748 !important;
+}
+
+.leaflet-control-geosearch .glass:focus {
+    outline: 2px solid #4299e1 !important;
+    outline-offset: 2px !important;
+    box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.2) !important;
+}
+
+.leaflet-control-geosearch .glass::placeholder {
+    color: #a0aec0 !important;
+    font-weight: 400 !important;
+}
+
+.leaflet-control-geosearch .results {
+    border-radius: 12px !important;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    background: rgba(255, 255, 255, 0.98) !important;
+    backdrop-filter: blur(15px) !important;
+    margin-top: 4px !important;
+    overflow: hidden !important;
+}
+
+.leaflet-control-geosearch .results .result {
+    padding: 12px 16px !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+    transition: all 0.2s ease !important;
+    font-size: 14px !important;
+    color: #2d3748 !important;
+}
+
+.leaflet-control-geosearch .results .result:hover {
+    background: rgba(66, 153, 225, 0.1) !important;
+    color: #2b6cb0 !important;
+    transform: translateX(4px) !important;
+}
+
+.leaflet-control-geosearch .results .result:last-child {
+    border-bottom: none !important;
+}
+
+/* Leaflet Popup Custom Styling */
+.leaflet-popup-content-wrapper {
+    border-radius: 16px !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    background: rgba(255, 255, 255, 0.98) !important;
+    backdrop-filter: blur(15px) !important;
+}
+
+.leaflet-popup-tip {
+    background: rgba(255, 255, 255, 0.98) !important;
+    box-shadow: none !important;
+}
+
+/* Leaflet Zoom Control Styling */
+.leaflet-control-zoom {
+    border-radius: 12px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(10px) !important;
+    overflow: hidden !important;
+}
+
+.leaflet-control-zoom a {
+    background: transparent !important;
+    color: #4a5568 !important;
+    border: none !important;
+    transition: all 0.2s ease !important;
+    font-weight: bold !important;
+}
+
+.leaflet-control-zoom a:hover {
+    background: rgba(66, 153, 225, 0.1) !important;
+    color: #2b6cb0 !important;
+}
+
+/* Map container enhancements */
+.leaflet-container {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+}
+
+/* Custom marker pulse animation */
+@keyframes marker-pulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.marker-pulse {
+    animation: marker-pulse 2s ease-in-out infinite;
 }
