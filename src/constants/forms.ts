@@ -6,10 +6,10 @@
 // Form field presets
 export const FIELD_PRESETS = {
     email: {
-        type: "email",
+        type: "email" as const,
         placeholder: "Enter your email address",
-        autoComplete: "email",
-        inputMode: "email",
+        autoComplete: "email" as const,
+        inputMode: "email" as const,
     },
     password: {
         type: "password",
@@ -45,7 +45,7 @@ export const VALIDATION_MODES = {
     onBlur: "onBlur",
     onSubmit: "onSubmit",
     all: "all",
-};
+} as const;
 
 // Form sizes
 export const FORM_SIZES = {

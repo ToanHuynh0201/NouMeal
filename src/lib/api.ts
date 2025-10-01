@@ -197,23 +197,23 @@ class ApiService {
     }
 
     // Proxy methods to axios instance
-    get(url: any, config: any) {
+    get(url: any, config?: any) {
         return this.api.get(url, config);
     }
 
-    post(url: any, data: any, config: any) {
+    post(url: any, data: any, config?: any) {
         return this.api.post(url, data, config);
     }
 
-    put(url: any, data: any, config: any) {
+    put(url: any, data: any, config?: any) {
         return this.api.put(url, data, config);
     }
 
-    patch(url: any, data: any, config: any) {
+    patch(url: any, data: any, config?: any) {
         return this.api.patch(url, data, config);
     }
 
-    delete(url: any, config: any) {
+    delete(url: any, config?: any) {
         return this.api.delete(url, config);
     }
 }

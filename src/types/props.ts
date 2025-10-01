@@ -1,27 +1,54 @@
 import type {InputProps} from "@chakra-ui/react";
 import type {ReactNode} from "react";
-import type {UseFormRegister} from "react-hook-form";
+import type {FieldValues, UseFormRegister} from "react-hook-form";
 export type MainLayoutProps = {
     children: ReactNode;
     showHeader: boolean;
     showFooter: boolean;
 };
 
+export type LoginPageProps = {
+    onLoginSuccess: () => void;
+};
+
+export type AlertMessageProps = {
+    status: "error" | "warning" | "info" | "success" | "loading" | undefined;
+    title?: string;
+    message: string;
+    isClosable: boolean;
+    onClose?: () => void;
+    variant?: string;
+    size?: string;
+};
+
+export type SubmitButtonProps = {
+    children?: React.ReactNode;
+    isLoading?: boolean;
+    isDisabled?: boolean;
+    loadingText?: string;
+    size?: "sm" | "md" | "lg" | "xl";
+    colorScheme?: "blue" | "red" | "green" | "gray" | "purple" | "pink" | "yellow";
+    // Nếu bạn muốn extend từ HTML button element
+} & React.ButtonHTMLAttributes<HTMLButtonElement>;
+
+export type AuthHeaderProps = {
+    title?: string;
+    subtitle?: string;
+};
+
 export type LoadingSpinnerProps = {
-    size: string;
+    size?: string;
     message: string;
     minHeight: string;
     variant: string;
 };
 
-export interface FormFieldProps extends Omit<InputProps, "name"> {
+export interface FormFieldProps<TFieldValues extends FieldValues = FieldValues>
+    extends Omit<InputProps, "name"> {
     label: string;
     name: string;
-    type?: string;
-    placeholder?: string;
-    register: UseFormRegister<any>; // nếu muốn generic, có thể đổi <any> thành <TFieldValues>
+    register: UseFormRegister<TFieldValues>;
     error?: string;
     isInvalid?: boolean;
     rightElement?: React.ReactNode;
-    size?: string;
 }

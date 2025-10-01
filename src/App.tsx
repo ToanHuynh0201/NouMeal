@@ -3,14 +3,23 @@ import "./App.css";
 import {ROUTES} from "./constants";
 import LoginPage from "./pages/LoginPage";
 import HomePage from "./pages/HomePage";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
+import {AuthProvider} from "./contexts/AuthContext";
 
 function App() {
     return (
-        <>
+        <AuthProvider>
             <Router>
                 <Routes>
                     <Route path={ROUTES.LOGIN} element={<LoginPage />} />
-                    <Route path={ROUTES.HOME} element={<HomePage />} />
+                    <Route
+                        path={ROUTES.HOME}
+                        element={
+                            <ProtectedRoute>
+                                <HomePage />
+                            </ProtectedRoute>
+                        }
+                    />
                     <Route
                         path="/"
                         element={<Navigate to={ROUTES.HOME} replace />}
@@ -21,7 +30,7 @@ function App() {
                     />
                 </Routes>
             </Router>
-        </>
+        </AuthProvider>
     );
 }
 
