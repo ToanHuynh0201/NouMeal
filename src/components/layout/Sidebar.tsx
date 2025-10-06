@@ -67,8 +67,8 @@ function Sidebar() {
                             }}
                         >
                             <img
-                                src="/lifebff.png"
-                                alt="LifeBFF Logo"
+                                src="/vite.svg"
+                                alt="MealGenie Logo"
                                 style={{
                                     width: "24px",
                                     height: "24px",
@@ -92,8 +92,8 @@ function Sidebar() {
                             }}
                         >
                             <img
-                                src="/lifebff.png"
-                                alt="LifeBFF Logo"
+                                src="/vite.svg"
+                                alt="MealGenie Logo"
                                 style={{
                                     width: "32px",
                                     height: "32px",
@@ -108,15 +108,7 @@ function Sidebar() {
                                 color="brand.600"
                                 lineHeight={1}
                             >
-                                LifeBFF
-                            </Text>
-                            <Text
-                                fontSize="xs"
-                                color="gray.500"
-                                fontWeight="medium"
-                                lineHeight={1}
-                            >
-                                Dashboard
+                                MealGenie
                             </Text>
                         </VStack>
                     </HStack>

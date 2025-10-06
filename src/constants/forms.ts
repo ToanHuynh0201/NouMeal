@@ -18,7 +18,7 @@ export const FIELD_PRESETS = {
     },
     newPassword: {
         type: "password",
-        placeholder: "Enter your new password",
+        placeholder: "Create a strong password",
         autoComplete: "new-password",
     },
     confirmPassword: {

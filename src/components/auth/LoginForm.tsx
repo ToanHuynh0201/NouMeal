@@ -1,6 +1,6 @@
 import {useThemeValues} from "@/styles/themeUtils";
 import type {LoginPageProps} from "@/types";
-import {Box, Card, CardBody, Text, VStack} from "@chakra-ui/react";
+import {Box, Card, CardBody, Text, VStack, Link} from "@chakra-ui/react";
 import PasswordToggle from "../common/PasswordToggle";
 import BackgroundDecoration from "../common/BackgroundDecoration";
 import {animationPresets} from "@/styles/animation";
@@ -11,7 +11,7 @@ import {FIELD_PRESETS} from "@/constants/forms";
 import SubmitButton from "../common/SubmitButton";
 import {useLoginForm} from "@/hooks/useLoginForm";
 
-function LoginForm({onLoginSuccess}: LoginPageProps) {
+function LoginForm({onLoginSuccess, onOpenRegister}: LoginPageProps) {
     const {
         isLoading,
         isValid,
@@ -22,8 +22,10 @@ function LoginForm({onLoginSuccess}: LoginPageProps) {
         hasError,
         getError,
     } = useLoginForm(onLoginSuccess);
+
     const {mainBgGradient: bgGradient, cardBg, cardShadow} = useThemeValues();
     const {showPassword, button: passwordToggleButton} = PasswordToggle();
+
     return (
         <Box
             minH="100vh"
@@ -104,7 +106,26 @@ function LoginForm({onLoginSuccess}: LoginPageProps) {
                             </VStack>
                         </form>
 
-                        <Box textAlign="center" mt={6}>
+                        {/* Sign Up Link */}
+                        <Box textAlign="center">
+                            <Text fontSize="sm" color="gray.600">
+                                Don't have an account?{" "}
+                                <Link
+                                    color="blue.500"
+                                    fontWeight="semibold"
+                                    onClick={onOpenRegister}
+                                    cursor="pointer"
+                                    _hover={{
+                                        color: "blue.600",
+                                        textDecoration: "underline",
+                                    }}
+                                >
+                                    Sign up
+                                </Link>
+                            </Text>
+                        </Box>
+
+                        <Box textAlign="center" mt={2}>
                             <Text fontSize="xs" color="gray.500">
                                 Secure authentication powered by MealGenie
                             </Text>

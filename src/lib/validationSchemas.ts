@@ -39,6 +39,27 @@ export const loginSchema = yup.object({
     password: validationRules.loginPassword,
 });
 
+export const registerSchema = yup.object({
+    fullName: yup
+        .string()
+        .required("Full name is required")
+        .min(2, "Name must be at least 2 characters")
+        .max(VALIDATION.NAME_MAX_LENGTH, "Name is too long"),
+
+    email: validationRules.email,
+
+    password: validationRules.password,
+
+    confirmPassword: yup
+        .string()
+        .required("Please confirm your password")
+        .oneOf([yup.ref("password")], "Passwords must match"),
+
+    agreeToTerms: yup
+        .boolean()
+        .oneOf([true], "You must accept the terms and conditions"),
+});
+
 export const changePasswordSchema = yup.object({
     currentPassword: yup.string().required("Current password is required"),
     newPassword: validationRules.password,
@@ -46,53 +67,6 @@ export const changePasswordSchema = yup.object({
         .string()
         .required("Please confirm your new password")
         .oneOf([yup.ref("newPassword")], "Passwords must match"),
-});
-
-// OTA Update validation schema
-export const otaUpdateSchema = yup.object({
-    platform: yup
-        .string()
-        .required("Platform is required")
-        .oneOf(["IOS", "ANDROID"], "Platform must be either IOS or ANDROID"),
-    version: yup
-        .string()
-        .required("Version is required")
-        .matches(
-            /^\d+\.\d+\.\d+$/,
-            "Version must follow semantic versioning (e.g., 1.2.3)"
-        ),
-    buildNumber: yup
-        .string()
-        .required("Build number is required")
-        .matches(/^\d+$/, "Build number must be numeric"),
-    status: yup
-        .string()
-        .required("Status is required")
-        .oneOf(["DRAFT", "PUBLISHED", "ARCHIVED"], "Invalid status"),
-    notes: yup.string().optional(),
-    isForced: yup.boolean().default(false),
-    minVersion: yup
-        .string()
-        .optional()
-        .test(
-            "is-valid-version",
-            "Min version must follow semantic versioning (e.g., 1.0.0)",
-            function (value) {
-                if (!value || value.length === 0) return true;
-                return /^\d+\.\d+\.\d+$/.test(value);
-            }
-        ),
-    downloadUrl: yup
-        .string()
-        .optional()
-        .test(
-            "is-valid-url",
-            "Download URL must be a valid HTTP/HTTPS URL",
-            function (value) {
-                if (!value || value.length === 0) return true;
-                return /^https?:\/\/.+/.test(value);
-            }
-        ),
 });
 
 // Custom validation helpers
@@ -130,7 +104,6 @@ export default {
     validationRules,
     loginSchema,
     changePasswordSchema,
-    otaUpdateSchema,
     createConditionalSchema,
     createArraySchema,
 };

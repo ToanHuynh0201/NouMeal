@@ -1,6 +1,7 @@
 import type {InputProps} from "@chakra-ui/react";
 import type {ReactNode} from "react";
 import type {FieldValues, UseFormRegister} from "react-hook-form";
+
 export type MainLayoutProps = {
     children: ReactNode;
     showHeader: boolean;
@@ -9,6 +10,7 @@ export type MainLayoutProps = {
 
 export type LoginPageProps = {
     onLoginSuccess: () => void;
+    onOpenRegister?: any;
 };
 
 export type AlertMessageProps = {
@@ -28,7 +30,6 @@ export type SubmitButtonProps = {
     loadingText?: string;
     size?: "sm" | "md" | "lg" | "xl";
     colorScheme?: "blue" | "red" | "green" | "gray" | "purple" | "pink" | "yellow";
-    // Nếu bạn muốn extend từ HTML button element
 } & React.ButtonHTMLAttributes<HTMLButtonElement>;
 
 export type AuthHeaderProps = {
