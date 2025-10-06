@@ -11,7 +11,15 @@ import {FIELD_PRESETS} from "@/constants/forms";
 import SubmitButton from "../common/SubmitButton";
 import {useLoginForm} from "@/hooks/useLoginForm";
 
-function LoginForm({onLoginSuccess, onOpenRegister}: LoginPageProps) {
+interface LoginFormProps extends LoginPageProps {
+    onOpenForgotPassword?: () => void;
+}
+
+function LoginForm({
+    onLoginSuccess,
+    onOpenRegister,
+    onOpenForgotPassword,
+}: LoginFormProps) {
     const {
         isLoading,
         isValid,
@@ -87,6 +95,24 @@ function LoginForm({onLoginSuccess, onOpenRegister}: LoginPageProps) {
                                     isInvalid={hasError("password")}
                                     rightElement={passwordToggleButton}
                                 />
+
+                                {onOpenForgotPassword && (
+                                    <Box textAlign="right" w="full" mt={-2}>
+                                        <Link
+                                            fontSize="sm"
+                                            color="blue.500"
+                                            fontWeight="medium"
+                                            onClick={onOpenForgotPassword}
+                                            cursor="pointer"
+                                            _hover={{
+                                                color: "blue.600",
+                                                textDecoration: "underline",
+                                            }}
+                                        >
+                                            Forgot password?
+                                        </Link>
+                                    </Box>
+                                )}
 
                                 {hasFormErrors && (
                                     <AlertMessage

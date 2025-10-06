@@ -1,13 +1,15 @@
-// FIXED VERSION - src/pages/LoginPage.tsx
 import {useState} from "react";
 import {useLocation, useNavigate} from "react-router-dom";
 import LoginForm from "@/components/auth/LoginForm";
 import RegisterModal from "@/components/auth/RegisterModal";
+import ForgotPasswordModal from "@/components/auth/ForgotPasswordModal";
 
 export default function LoginPage() {
     const navigate = useNavigate();
     const location = useLocation();
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+    const [isForgotPasswordModalOpen, setIsForgotPasswordModalOpen] =
+        useState(false);
 
     const handleLoginSuccess = () => {
         const from = location.state?.from?.pathname || "/home";
@@ -15,11 +17,21 @@ export default function LoginPage() {
     };
 
     const handleOpenRegister = () => {
-        setIsModalOpen(true);
+        setIsForgotPasswordModalOpen(false);
+        setIsRegisterModalOpen(true);
     };
 
     const handleCloseRegister = () => {
-        setIsModalOpen(false);
+        setIsRegisterModalOpen(false);
+    };
+
+    const handleOpenForgotPassword = () => {
+        setIsRegisterModalOpen(false);
+        setIsForgotPasswordModalOpen(true);
+    };
+
+    const handleCloseForgotPassword = () => {
+        setIsForgotPasswordModalOpen(false);
     };
 
     return (
@@ -27,12 +39,19 @@ export default function LoginPage() {
             <LoginForm
                 onLoginSuccess={handleLoginSuccess}
                 onOpenRegister={handleOpenRegister}
+                onOpenForgotPassword={handleOpenForgotPassword}
             />
 
             <RegisterModal
-                key={isModalOpen ? "open" : "closed"}
-                isOpen={isModalOpen}
+                key={isRegisterModalOpen ? "register-open" : "register-closed"}
+                isOpen={isRegisterModalOpen}
                 onClose={handleCloseRegister}
+            />
+
+            <ForgotPasswordModal
+                key={isForgotPasswordModalOpen ? "forgot-open" : "forgot-closed"}
+                isOpen={isForgotPasswordModalOpen}
+                onClose={handleCloseForgotPassword}
             />
         </>
     );

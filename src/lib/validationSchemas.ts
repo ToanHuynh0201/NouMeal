@@ -69,19 +69,20 @@ export const changePasswordSchema = yup.object({
         .oneOf([yup.ref("newPassword")], "Passwords must match"),
 });
 
+export const forgotPasswordSchema = yup.object({
+    email: validationRules.email,
+});
+
 // Custom validation helpers
 export const createConditionalSchema = <T extends yup.AnySchema>(
     condition: string,
     schema: T
 ) =>
-    yup.mixed().when(
-        condition,
-        {
-            is: true,
-            then: schema,
-            otherwise: yup.mixed().notRequired(),
-        } as any // bypass type check
-    ) as T | yup.MixedSchema;
+    yup.mixed().when(condition, {
+        is: true,
+        then: schema,
+        otherwise: yup.mixed().notRequired(),
+    } as any) as T | yup.MixedSchema;
 
 export const createArraySchema = (
     itemSchema: any,
@@ -103,7 +104,9 @@ export const createArraySchema = (
 export default {
     validationRules,
     loginSchema,
+    registerSchema,
     changePasswordSchema,
+    forgotPasswordSchema,
     createConditionalSchema,
     createArraySchema,
 };
