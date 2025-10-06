@@ -16,6 +16,7 @@ import {ChevronLeftIcon, ChevronRightIcon} from "@chakra-ui/icons";
 import type {navItem} from "@/types/layout";
 import {ROUTES} from "@/constants";
 import {FiHome} from "react-icons/fi";
+import {CgProfile} from "react-icons/cg";
 
 function Sidebar() {
     const location = useLocation();
@@ -28,6 +29,11 @@ function Sidebar() {
             label: "Home",
             path: ROUTES.HOME,
             icon: FiHome,
+        },
+        {
+            label: "Profile",
+            path: ROUTES.PROFILE,
+            icon: CgProfile,
         },
     ];
 

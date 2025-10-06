@@ -3,6 +3,7 @@ import "./App.css";
 import {ROUTES} from "./constants";
 import LoginPage from "./pages/LoginPage";
 import HomePage from "./pages/HomePage";
+import ProfilePage from "./pages/ProfilePage";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import {AuthProvider} from "./contexts/AuthContext";
 
@@ -17,6 +18,14 @@ function App() {
                         element={
                             <ProtectedRoute>
                                 <HomePage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path={ROUTES.PROFILE}
+                        element={
+                            <ProtectedRoute>
+                                <ProfilePage />
                             </ProtectedRoute>
                         }
                     />

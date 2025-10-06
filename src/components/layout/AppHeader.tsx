@@ -21,8 +21,12 @@ import {
     useColorModeValue,
     VStack,
 } from "@chakra-ui/react";
+import {useNavigate} from "react-router-dom";
+import {ROUTES} from "@/constants";
+
 const AppHeader = ({onLogout}: AppHeaderProps) => {
     const {user} = useAuth();
+    const navigate = useNavigate();
 
     const headerBg = useColorModeValue("white", "gray.800");
     const borderColor = useColorModeValue("gray.200", "gray.600");
@@ -111,8 +115,9 @@ const AppHeader = ({onLogout}: AppHeaderProps) => {
                                         bg: "blue.50",
                                         color: "blue.600",
                                     }}
+                                    onClick={() => navigate(ROUTES.PROFILE)}
                                 >
-                                    Profile
+                                    My Profile
                                 </MenuItem>
                                 <MenuItem
                                     icon={<LockIcon />}

@@ -29,6 +29,7 @@ export const AUTH_CONFIG = {
 export const ROUTES = {
     LOGIN: "/login",
     HOME: "/home",
+    PROFILE: "/profile",
     ROOT: "/",
 };
 
@@ -79,6 +80,9 @@ export const SUCCESS_MESSAGES = {
     DATA_SAVED: "Data saved successfully!",
     ACTION_COMPLETED: "Action completed successfully!",
 };
+
+// Export profile constants
+export * from "./profile";
 
 export default {
     API_CONFIG,
