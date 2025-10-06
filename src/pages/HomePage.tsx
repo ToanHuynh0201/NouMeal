@@ -7,7 +7,14 @@ function HomePage() {
         <MainLayout showHeader={true} showFooter={true}>
             <Container maxW="7xl" py={8}>
                 <VStack spacing={8} align="stretch">
-                    <Box animation={animationPresets.fadeInUp}></Box>
+                    <Box
+                        animation={animationPresets.fadeInUp}
+                        overflow="hidden"
+                        bgGradient="linear(135deg, blue.400 0%, purple.500 50%, pink.400 100%)"
+                        color="white"
+                        py={12}
+                        position="relative"
+                    ></Box>
                 </VStack>
             </Container>
         </MainLayout>

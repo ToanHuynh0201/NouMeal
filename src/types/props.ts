@@ -1,9 +1,8 @@
 import type {InputProps} from "@chakra-ui/react";
-import type {ReactNode} from "react";
 import type {FieldValues, UseFormRegister} from "react-hook-form";
 
 export type MainLayoutProps = {
-    children: ReactNode;
+    children: any;
     showHeader: boolean;
     showFooter: boolean;
 };
@@ -35,6 +34,10 @@ export type SubmitButtonProps = {
 export type AuthHeaderProps = {
     title?: string;
     subtitle?: string;
+};
+
+export type AppHeaderProps = {
+    onLogout: () => void;
 };
 
 export type LoadingSpinnerProps = {

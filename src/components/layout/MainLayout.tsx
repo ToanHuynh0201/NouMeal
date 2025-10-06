@@ -13,12 +13,15 @@ function MainLayout({
 }: MainLayoutProps) {
     const {logout} = useAuth();
     const {mainBgGradient: bgGradient} = useThemeGradients();
+    const handleLogout = () => {
+        logout();
+    };
     return (
         <Flex minH="100vh" bgGradient={bgGradient}>
             <Sidebar />
 
             <Flex direction="column" flex="1">
-                {showHeader && <AppHeader />}
+                {showHeader && <AppHeader onLogout={handleLogout} />}
 
                 <Box as="main" flex="1" p={6}>
                     {children}

@@ -1,7 +1,9 @@
 import {useAuth} from "@/hooks/useAuth";
 import {animationPresets, transitions} from "@/styles/animation";
+import type {AppHeaderProps} from "@/types";
 import {getInitials} from "@/utils";
 import {ChevronDownIcon, LockIcon} from "@chakra-ui/icons";
+import {CgProfile} from "react-icons/cg";
 import {
     Avatar,
     Badge,
@@ -17,12 +19,10 @@ import {
     Spacer,
     Text,
     useColorModeValue,
-    useDisclosure,
     VStack,
 } from "@chakra-ui/react";
-const AppHeader = ({onLogout}: any) => {
+const AppHeader = ({onLogout}: AppHeaderProps) => {
     const {user} = useAuth();
-    const {isOpen, onOpen, onClose} = useDisclosure();
 
     const headerBg = useColorModeValue("white", "gray.800");
     const borderColor = useColorModeValue("gray.200", "gray.600");
@@ -49,6 +49,7 @@ const AppHeader = ({onLogout}: any) => {
                         <Menu>
                             <MenuButton
                                 as={Box}
+                                role="button"
                                 cursor="pointer"
                                 _hover={{transform: "translateY(-1px)"}}
                                 transition={transitions.normal}
@@ -104,13 +105,22 @@ const AppHeader = ({onLogout}: any) => {
                                 p={1}
                             >
                                 <MenuItem
+                                    icon={<CgProfile />}
+                                    borderRadius="md"
+                                    _hover={{
+                                        bg: "blue.50",
+                                        color: "blue.600",
+                                    }}
+                                >
+                                    Profile
+                                </MenuItem>
+                                <MenuItem
                                     icon={<LockIcon />}
                                     borderRadius="md"
                                     _hover={{
                                         bg: "blue.50",
                                         color: "blue.600",
                                     }}
-                                    onClick={onOpen}
                                 >
                                     Change Password
                                 </MenuItem>
@@ -128,9 +138,6 @@ const AppHeader = ({onLogout}: any) => {
                     </HStack>
                 </Flex>
             </Container>
-
-            {/* Change Password Modal */}
-            {/* <ChangePasswordModal isOpen={isOpen} onClose={onClose} /> */}
         </Box>
     );
 };
