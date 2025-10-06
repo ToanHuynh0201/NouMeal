@@ -31,24 +31,12 @@ export const validationRules = {
             `Password must be at least ${VALIDATION.STRONG_PASSWORD_MIN_LENGTH} characters`
         )
         .max(VALIDATION.PASSWORD_MAX_LENGTH, "Password is too long"),
-};
 
-// Pre-built schemas for common forms
-export const loginSchema = yup.object({
-    email: validationRules.email,
-    password: validationRules.loginPassword,
-});
-
-export const registerSchema = yup.object({
     fullName: yup
         .string()
         .required("Full name is required")
         .min(2, "Name must be at least 2 characters")
         .max(VALIDATION.NAME_MAX_LENGTH, "Name is too long"),
-
-    email: validationRules.email,
-
-    password: validationRules.password,
 
     confirmPassword: yup
         .string()
@@ -58,15 +46,30 @@ export const registerSchema = yup.object({
     agreeToTerms: yup
         .boolean()
         .oneOf([true], "You must accept the terms and conditions"),
+};
+
+// Pre-built schemas for common forms
+export const loginSchema = yup.object({
+    email: validationRules.email,
+    password: validationRules.loginPassword,
+});
+
+export const registerSchema = yup.object({
+    fullName: validationRules.fullName,
+
+    email: validationRules.email,
+
+    password: validationRules.password,
+
+    confirmPassword: validationRules.confirmPassword,
+
+    agreeToTerms: validationRules.agreeToTerms,
 });
 
 export const changePasswordSchema = yup.object({
-    currentPassword: yup.string().required("Current password is required"),
+    currentPassword: validationRules.password,
     newPassword: validationRules.password,
-    confirmNewPassword: yup
-        .string()
-        .required("Please confirm your new password")
-        .oneOf([yup.ref("newPassword")], "Passwords must match"),
+    confirmNewPassword: validationRules.confirmPassword,
 });
 
 export const forgotPasswordSchema = yup.object({
