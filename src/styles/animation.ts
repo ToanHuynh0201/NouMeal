@@ -107,6 +107,28 @@ export const animations = {
       transform: scale(1);
     }
   `,
+
+    fadeInDown: keyframes`
+    from { 
+      opacity: 0; 
+      transform: translateY(-20px); 
+    }
+    to { 
+      opacity: 1; 
+      transform: translateY(0); 
+    }
+  `,
+
+    zoomIn: keyframes`
+    from { 
+      opacity: 0; 
+      transform: scale(0.9); 
+    }
+    to { 
+      opacity: 1; 
+      transform: scale(1); 
+    }
+  `,
 };
 
 // Animation presets with duration and easing
@@ -121,6 +143,8 @@ export const animationPresets = {
     shimmer: `${animations.shimmer} 1.5s ease-in-out infinite`,
     spin: `${animations.spin} 1s linear infinite`,
     scale: `${animations.scale} 0.2s ease-out`,
+    fadeInDown: `${animations.fadeInDown} 0.6s ease-out`,
+    zoomIn: `${animations.zoomIn} 0.5s ease-out`,
 };
 
 // Transition presets
