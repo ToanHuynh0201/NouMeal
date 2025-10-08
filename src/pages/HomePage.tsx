@@ -17,14 +17,15 @@ import {
     Flex,
 } from "@chakra-ui/react";
 import {
-    FaAppleAlt,
     FaChartLine,
     FaRobot,
     FaUtensils,
     FaHeart,
     FaCamera,
     FaBullseye,
-    FaUsers,
+    FaLeaf,
+    FaClock,
+    FaShieldAlt,
 } from "react-icons/fa";
 import {useNavigate} from "react-router-dom";
 import {ROUTES} from "@/constants";
@@ -34,7 +35,7 @@ function HomePage() {
 
     // Scroll animation refs
     const featuresSection = useScrollAnimation({threshold: 0.15});
-    const statsSection = useScrollAnimation({threshold: 0.15});
+    const whyChooseSection = useScrollAnimation({threshold: 0.15});
     const howItWorksSection = useScrollAnimation({threshold: 0.15});
     const ctaSection = useScrollAnimation({threshold: 0.2});
 
@@ -69,30 +70,34 @@ function HomePage() {
         },
     ];
 
-    const benefits = [
+    const whyChooseUs = [
         {
-            icon: FaAppleAlt,
-            title: "Healthy Eating Made Easy",
-            stat: "1000+",
-            description: "Nutritious Recipes",
+            icon: FaLeaf,
+            title: "Healthy & Balanced",
+            description:
+                "Every meal recommendation is carefully balanced to meet your nutritional needs and health goals.",
+            color: "green.500",
         },
         {
-            icon: FaUsers,
-            title: "Join Our Community",
-            stat: "50K+",
-            description: "Active Users",
-        },
-        {
-            icon: FaHeart,
-            title: "Improve Your Health",
-            stat: "95%",
-            description: "User Satisfaction",
+            icon: FaClock,
+            title: "Save Time",
+            description:
+                "No more spending hours planning meals. Get instant AI-powered suggestions that fit your lifestyle.",
+            color: "blue.500",
         },
         {
             icon: FaUtensils,
             title: "Diverse Cuisine",
-            stat: "30+",
-            description: "Cuisine Types",
+            description:
+                "Explore meals from various cuisines around the world, all customized to your dietary preferences.",
+            color: "orange.500",
+        },
+        {
+            icon: FaShieldAlt,
+            title: "Safe & Personalized",
+            description:
+                "Your allergies and dietary restrictions are always considered in every recommendation we provide.",
+            color: "purple.500",
         },
     ];
 
@@ -191,7 +196,7 @@ function HomePage() {
                                 }}
                                 onClick={() => navigate(ROUTES.PROFILE)}
                             >
-                                Get Started Free
+                                Get Started Now
                             </Button>
                             <Button
                                 size="lg"
@@ -214,11 +219,11 @@ function HomePage() {
                         <HStack spacing={6} pt={8} fontSize="sm">
                             <HStack>
                                 <Icon as={FaHeart} color="red.300" />
-                                <Text>No Credit Card Required</Text>
+                                <Text>Personalized for You</Text>
                             </HStack>
                             <HStack>
                                 <Icon as={FaBullseye} color="yellow.300" />
-                                <Text>14-Day Free Trial</Text>
+                                <Text>Easy to Use</Text>
                             </HStack>
                         </HStack>
                     </VStack>
@@ -321,16 +326,16 @@ function HomePage() {
                 </VStack>
             </Container>
 
-            {/* Stats Section */}
+            {/* Why Choose Us Section */}
             <Box bg="gray.50" py={{base: 16, md: 20}}>
                 <Container maxW="7xl">
-                    <VStack spacing={12} ref={statsSection.elementRef}>
+                    <VStack spacing={12} ref={whyChooseSection.elementRef}>
                         <VStack
                             spacing={4}
                             textAlign="center"
-                            opacity={statsSection.isVisible ? 1 : 0}
+                            opacity={whyChooseSection.isVisible ? 1 : 0}
                             transform={
-                                statsSection.isVisible
+                                whyChooseSection.isVisible
                                     ? "translateY(0)"
                                     : "translateY(30px)"
                             }
@@ -343,84 +348,85 @@ function HomePage() {
                                 py={1}
                                 borderRadius="full"
                             >
-                                Our Impact
+                                Why Choose MealGenie
                             </Badge>
                             <Heading size="2xl" fontWeight="bold">
-                                Trusted by Thousands
+                                Your Smart Nutrition{" "}
+                                <Text as="span" color="green.500">
+                                    Companion
+                                </Text>
                             </Heading>
-                            <Text fontSize="lg" color="gray.600" maxW="600px">
-                                Join our growing community of health-conscious
-                                individuals who have transformed their eating habits
-                                with MealGenie.
+                            <Text fontSize="lg" color="gray.600" maxW="700px">
+                                MealGenie is designed to make healthy eating simple,
+                                personalized, and accessible for everyone. Here's
+                                why you'll love it.
                             </Text>
                         </VStack>
 
                         <SimpleGrid
-                            columns={{base: 1, sm: 2, lg: 4}}
+                            columns={{base: 1, md: 2}}
                             spacing={8}
                             w="full"
                             pt={8}
                         >
-                            {benefits.map((benefit, index) => (
+                            {whyChooseUs.map((item, index) => (
                                 <Card
                                     key={index}
                                     bg="white"
                                     shadow="md"
                                     borderRadius="2xl"
-                                    textAlign="center"
+                                    border="1px"
+                                    borderColor="gray.100"
                                     transition="all 0.5s ease-out"
-                                    opacity={statsSection.isVisible ? 1 : 0}
+                                    opacity={whyChooseSection.isVisible ? 1 : 0}
                                     transform={
-                                        statsSection.isVisible
-                                            ? "scale(1)"
-                                            : "scale(0.9)"
+                                        whyChooseSection.isVisible
+                                            ? "translateY(0)"
+                                            : "translateY(40px)"
                                     }
                                     style={{
-                                        transitionDelay: statsSection.isVisible
+                                        transitionDelay: whyChooseSection.isVisible
                                             ? `${index * 0.15 + 0.2}s`
                                             : "0s",
                                     }}
                                     _hover={{
-                                        transform: "scale(1.05)",
+                                        transform: "translateY(-4px)",
                                         shadow: "xl",
+                                        borderColor: item.color,
                                     }}
                                 >
                                     <CardBody p={8}>
-                                        <VStack spacing={4}>
+                                        <HStack spacing={6} align="start">
                                             <Box
                                                 p={4}
-                                                bg="purple.50"
-                                                borderRadius="full"
+                                                bg={`${
+                                                    item.color.split(".")[0]
+                                                }.50`}
+                                                borderRadius="xl"
+                                                flexShrink={0}
                                             >
                                                 <Icon
-                                                    as={benefit.icon}
+                                                    as={item.icon}
                                                     boxSize={8}
-                                                    color="purple.500"
+                                                    color={item.color}
                                                 />
                                             </Box>
-                                            <Heading
-                                                size="2xl"
-                                                color="purple.500"
-                                                fontWeight="extrabold"
-                                            >
-                                                {benefit.stat}
-                                            </Heading>
-                                            <VStack spacing={1}>
-                                                <Text
+                                            <VStack align="start" spacing={3}>
+                                                <Heading
+                                                    size="md"
                                                     fontWeight="bold"
-                                                    fontSize="md"
-                                                    color="gray.700"
                                                 >
-                                                    {benefit.title}
-                                                </Text>
+                                                    {item.title}
+                                                </Heading>
                                                 <Text
-                                                    fontSize="sm"
-                                                    color="gray.500"
+                                                    color="gray.600"
+                                                    lineHeight="tall"
+                                                    fontSize="md"
                                                 >
-                                                    {benefit.description}
+                                                    {item.description}
                                                 </Text>
                                             </VStack>
-                                        </VStack>
+                                        </HStack>
                                     </CardBody>
                                 </Card>
                             ))}
@@ -563,11 +569,12 @@ function HomePage() {
                         transition="all 0.6s ease-out"
                     >
                         <Heading size="2xl" fontWeight="bold">
-                            Ready to Transform Your Eating Habits?
+                            Ready to Start Your Healthy Journey?
                         </Heading>
                         <Text fontSize="xl" opacity={0.9}>
-                            Join thousands of users who are already achieving their
-                            health goals with MealGenie's AI-powered meal planning.
+                            Let MealGenie help you make smarter food choices and
+                            achieve your health goals with personalized AI-powered
+                            recommendations.
                         </Text>
                         <Button
                             size="lg"
@@ -583,11 +590,10 @@ function HomePage() {
                             }}
                             onClick={() => navigate(ROUTES.PROFILE)}
                         >
-                            Start Your Free Trial
+                            Get Started Today
                         </Button>
                         <Text fontSize="sm" opacity={0.8}>
-                            No credit card required • 14-day free trial • Cancel
-                            anytime
+                            Simple • Personalized • Effective
                         </Text>
                     </VStack>
                 </Container>
