@@ -11,7 +11,7 @@ interface RegisterFormProps {
     onSwitchToLogin?: () => void;
 }
 
-function RegisterForm({onSuccess, onSwitchToLogin}: RegisterFormProps) {
+const RegisterForm = ({onSuccess, onSwitchToLogin}: RegisterFormProps) => {
     const {
         isLoading,
         isValid,
@@ -140,6 +140,6 @@ function RegisterForm({onSuccess, onSwitchToLogin}: RegisterFormProps) {
             </VStack>
         </form>
     );
-}
+};
 
 export default RegisterForm;

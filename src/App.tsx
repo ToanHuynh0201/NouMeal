@@ -7,7 +7,7 @@ import ProtectedRoute from "./components/auth/ProtectedRoute";
 import {AuthProvider} from "./contexts/AuthContext";
 import RecipeDetailPage from "./pages/RecipeDetailPage";
 
-function App() {
+const App = () => {
     return (
         <AuthProvider>
             <Router>
@@ -41,6 +41,6 @@ function App() {
             </Router>
         </AuthProvider>
     );
-}
+};
 
 export default App;

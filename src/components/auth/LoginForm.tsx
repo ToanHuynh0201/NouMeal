@@ -15,11 +15,11 @@ interface LoginFormProps extends LoginPageProps {
     onOpenForgotPassword?: () => void;
 }
 
-function LoginForm({
+const LoginForm = ({
     onLoginSuccess,
     onOpenRegister,
     onOpenForgotPassword,
-}: LoginFormProps) {
+}: LoginFormProps) => {
     const {
         isLoading,
         isValid,
@@ -161,6 +161,6 @@ function LoginForm({
             </Card>
         </Box>
     );
-}
+};
 
 export default LoginForm;

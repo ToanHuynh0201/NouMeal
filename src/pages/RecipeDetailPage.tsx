@@ -63,7 +63,7 @@ const recipeData = {
     ],
 };
 
-function RecipeDetailPage() {
+const RecipeDetailPage = () => {
     const {cardBg, cardShadow} = useThemeValues();
 
     return (
@@ -404,6 +404,6 @@ function RecipeDetailPage() {
             </Container>
         </MainLayout>
     );
-}
+};
 
 export default RecipeDetailPage;

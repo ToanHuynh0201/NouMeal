@@ -4,14 +4,12 @@ import {Box, Flex} from "@chakra-ui/react";
 import AppHeader from "./AppHeader";
 import AppFooter from "./AppFooter";
 import Sidebar from "./Sidebar";
-import {useAuth} from "@/hooks/useAuth";
 
-function MainLayout({
+const MainLayout = ({
     children,
     showHeader = true,
     showFooter = true,
-}: MainLayoutProps) {
-    const {logout} = useAuth();
+}: MainLayoutProps) => {
     const {mainBgGradient: bgGradient} = useThemeGradients();
     return (
         <Flex minH="100vh" bgGradient={bgGradient}>
@@ -28,6 +26,6 @@ function MainLayout({
             </Flex>
         </Flex>
     );
-}
+};
 
 export default MainLayout;

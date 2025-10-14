@@ -10,7 +10,10 @@ interface ForgotPasswordFormProps {
     onSwitchToLogin?: () => void;
 }
 
-function ForgotPasswordForm({onSuccess, onSwitchToLogin}: ForgotPasswordFormProps) {
+const ForgotPasswordForm = ({
+    onSuccess,
+    onSwitchToLogin,
+}: ForgotPasswordFormProps) => {
     const {
         isLoading,
         isValid,
@@ -85,6 +88,6 @@ function ForgotPasswordForm({onSuccess, onSwitchToLogin}: ForgotPasswordFormProp
             </VStack>
         </form>
     );
-}
+};
 
 export default ForgotPasswordForm;

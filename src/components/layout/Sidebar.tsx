@@ -18,7 +18,7 @@ import {ROUTES} from "@/constants";
 import {FiHome} from "react-icons/fi";
 import {MdFoodBank} from "react-icons/md";
 
-function Sidebar() {
+const Sidebar = () => {
     const location = useLocation();
     const [isCollapsed, setIsCollapsed] = useState(false);
     const sidebarBg = useColorModeValue("white", "gray.800");
@@ -218,6 +218,6 @@ function Sidebar() {
             </VStack>
         </Box>
     );
-}
+};
 
 export default Sidebar;
