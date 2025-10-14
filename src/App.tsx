@@ -5,6 +5,7 @@ import LoginPage from "./pages/LoginPage";
 import HomePage from "./pages/HomePage";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import {AuthProvider} from "./contexts/AuthContext";
+import RecipeDetailPage from "./pages/RecipeDetailPage";
 
 function App() {
     return (
@@ -17,6 +18,14 @@ function App() {
                         element={
                             <ProtectedRoute>
                                 <HomePage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path={ROUTES.RECIPE}
+                        element={
+                            <ProtectedRoute>
+                                <RecipeDetailPage />
                             </ProtectedRoute>
                         }
                     />
