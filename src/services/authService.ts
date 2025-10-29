@@ -7,26 +7,76 @@ import {
     parseError,
     logError,
 } from "../utils";
+import type {UserRegistrationRequest, UserLoginRequest, AuthResponse} from "../types";
 
 class AuthService {
+    /**
+     * Register a new user
+     * @param {UserRegistrationRequest} userData - User registration data
+     * @returns {Promise<AuthResponse>} API response data
+     */
+    async register(userData: UserRegistrationRequest): Promise<AuthResponse> {
+        try {
+            const response = await api.post("/users/register", userData);
+
+            if (response.data.status === "success" || response.data.success) {
+                // Handle both response formats from backend
+                const data = response.data.data || response.data;
+                const {user, accessToken, refreshToken, token} = data;
+
+                // Use either accessToken or token (depending on backend response)
+                const authToken = accessToken || token;
+
+                if (user && authToken) {
+                    this._storeAuthData(user, authToken, refreshToken);
+                }
+
+                return response.data;
+            }
+
+            throw this._createAuthError(response, userData.email);
+        } catch (error: any) {
+            if (error.name === "ApiError") {
+                throw error;
+            }
+
+            const parsedError = parseError(error);
+            logError(parsedError, {
+                context: "auth.register",
+                email: userData.email,
+            });
+            throw parsedError;
+        }
+    }
+
     /**
      * Login user with email and password
      * @param {string} email - User email
      * @param {string} password - User password
-     * @returns {Promise<Object>} API response data
+     * @returns {Promise<AuthResponse>} API response data
      */
-    async login(email: string, password: string) {
+    async login(email: string, password: string): Promise<AuthResponse> {
         try {
-            const response = await api.post("/auth/login", {
+            const loginData: UserLoginRequest = {
                 email,
                 password,
-            });
+            };
 
-            if (response.data.status === "success") {
-                const {user, accessToken, refreshToken} = response.data.data;
+            const response = await api.post("/users/login", loginData);
 
-                this._validateUserRole(user);
-                this._storeAuthData(user, accessToken, refreshToken);
+            if (response.data.status === "success" || response.data.success) {
+                // Handle both response formats from backend
+                const data = response.data.data || response.data;
+                const {user, accessToken, refreshToken, token} = data;
+
+                // Use either accessToken or token (depending on backend response)
+                const authToken = accessToken || token;
+
+                if (user && authToken) {
+                    // Note: Removed role validation to support both USER and ADMIN roles
+                    // If you need role-specific validation, implement it at route level
+                    this._storeAuthData(user, authToken, refreshToken);
+                }
 
                 return response.data;
             }
@@ -63,7 +113,7 @@ class AuthService {
     }
 
     /**
-     * Check if user is authenticated and has admin role
+     * Check if user is authenticated
      * @returns {boolean} Authentication status
      */
     isAuthenticated() {
@@ -71,11 +121,14 @@ class AuthService {
             const token = this.getAccessToken();
             const user = this.getCurrentUser();
 
+            // Check if token and user exist
             if (!token || !user) {
                 return false;
             }
 
-            return this._hasRequiredRole(user);
+            // User is authenticated if they have valid token and user data
+            // Role validation should be done at route/component level if needed
+            return true;
         } catch (error) {
             logError(error, {context: "auth.isAuthenticated"});
             this.logout();
@@ -100,8 +153,8 @@ class AuthService {
     }
 
     /**
-     * Validate user session and role
-     * @returns {boolean} Whether session is valid and user is admin
+     * Validate user session
+     * @returns {boolean} Whether session is valid
      */
     validateSession() {
         const token = this.getAccessToken();
@@ -110,7 +163,7 @@ class AuthService {
         }
 
         const user = this.getCurrentUser();
-        if (!user || !this._hasRequiredRole(user)) {
+        if (!user) {
             this.logout();
             return false;
         }
@@ -202,7 +255,26 @@ class AuthService {
     }
 
     /**
-     * Validate user role during login
+     * Check if current user has admin role
+     * @returns {boolean} Whether user is admin
+     */
+    isAdmin() {
+        const user = this.getCurrentUser();
+        return user?.role === "ADMIN";
+    }
+
+    /**
+     * Check if current user has specific role
+     * @param {string} role - Role to check
+     * @returns {boolean} Whether user has the role
+     */
+    hasRole(role: string) {
+        const user = this.getCurrentUser();
+        return user?.role === role;
+    }
+
+    /**
+     * Validate user role during login (deprecated - kept for backward compatibility)
      * @private
      * @param {Object} user - User object
      * @throws {Error} If user doesn't have required role

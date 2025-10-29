@@ -6,7 +6,6 @@ import {ChevronDownIcon, LockIcon} from "@chakra-ui/icons";
 import {CgProfile} from "react-icons/cg";
 import {
     Avatar,
-    Badge,
     Box,
     Container,
     Flex,
@@ -19,6 +18,7 @@ import {
     Spacer,
     Text,
     useColorModeValue,
+    useDisclosure,
     VStack,
 } from "@chakra-ui/react";
 import {useNavigate} from "react-router-dom";
@@ -27,6 +27,7 @@ import {ROUTES} from "@/constants";
 const AppHeader = ({onLogout}: AppHeaderProps) => {
     const {user} = useAuth();
     const navigate = useNavigate();
+    const {onOpen} = useDisclosure();
 
     const headerBg = useColorModeValue("white", "gray.800");
     const borderColor = useColorModeValue("gray.200", "gray.600");
@@ -85,18 +86,8 @@ const AppHeader = ({onLogout}: AppHeaderProps) => {
                                             fontWeight="bold"
                                             color="gray.800"
                                         >
-                                            {user?.name || "Admin User"}
+                                            {user?.name || "User"}
                                         </Text>
-                                        <Badge
-                                            colorScheme="green"
-                                            size="sm"
-                                            borderRadius="full"
-                                            px={2}
-                                            fontWeight="bold"
-                                            fontSize="xs"
-                                        >
-                                            {user?.role || "ADMIN"}
-                                        </Badge>
                                     </VStack>
                                     <ChevronDownIcon />
                                 </HStack>
