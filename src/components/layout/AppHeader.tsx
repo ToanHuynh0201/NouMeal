@@ -4,7 +4,6 @@ import {getInitials} from "@/utils";
 import {ChevronDownIcon, LockIcon} from "@chakra-ui/icons";
 import {
     Avatar,
-    Badge,
     Box,
     Container,
     Flex,
@@ -87,18 +86,8 @@ const AppHeader = ({onLogout}: any) => {
                                             fontWeight="bold"
                                             color="gray.800"
                                         >
-                                            {user?.name || "Admin User"}
+                                            {user?.name || "User"}
                                         </Text>
-                                        <Badge
-                                            colorScheme="green"
-                                            size="sm"
-                                            borderRadius="full"
-                                            px={2}
-                                            fontWeight="bold"
-                                            fontSize="xs"
-                                        >
-                                            {user?.role || "ADMIN"}
-                                        </Badge>
                                     </VStack>
                                     <ChevronDownIcon />
                                 </HStack>

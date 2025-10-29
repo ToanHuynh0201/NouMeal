@@ -153,7 +153,7 @@ const LoginForm = ({
 
                         <Box textAlign="center" mt={2}>
                             <Text fontSize="xs" color="gray.500">
-                                Secure authentication powered by MealGenie
+                                Secure authentication powered by NouMeal
                             </Text>
                         </Box>
                     </VStack>

@@ -2,25 +2,35 @@ import {registerSchema} from "@/lib/validationSchemas";
 import useFormValidation from "./useFormValidation";
 import {VALIDATION_MODES} from "@/constants/forms";
 import {useCallback, useState} from "react";
+import {authService} from "@/services/authService";
+import type {UserRegistrationRequest} from "@/types";
 
 export const useRegisterForm = (onSuccess: () => void, options: any = {}) => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     const {
-        register,
-        handleSubmit,
-        formState: {errors, isSubmitting, isValid},
-        hasError,
-        getError,
-        reset,
+    register,
+    handleSubmit,
+    formState: {errors, isSubmitting, isValid},
+    hasError,
+    getError,
+    reset,
+    setValue,
     } = useFormValidation(
         registerSchema,
         {
-            fullName: "",
+            name: "",
             email: "",
             password: "",
             confirmPassword: "",
+            age: undefined,
+            gender: "",
+            height: undefined,
+            weight: undefined,
+            goal: "",
+            preferences: [],
+            allergies: [],
             agreeToTerms: false,
         },
         {
@@ -35,19 +45,38 @@ export const useRegisterForm = (onSuccess: () => void, options: any = {}) => {
                 setIsLoading(true);
                 setError(null);
 
-                // Simulate API call
-                await new Promise((resolve) => setTimeout(resolve, 1500));
-
-                console.log("Registration data:", {
-                    fullName: data.fullName,
+                // Prepare registration payload according to API specification
+                const registrationData: UserRegistrationRequest = {
+                    name: data.name,
                     email: data.email,
                     password: data.password,
-                });
+                    age: Number(data.age),
+                    gender: data.gender,
+                    height: Number(data.height),
+                    weight: Number(data.weight),
+                    goal: data.goal,
+                    preferences: data.preferences || [],
+                    allergies: data.allergies || [],
+                };
 
+                console.log("Sending registration data:", registrationData);
+
+                // Call register API
+                const response = await authService.register(registrationData);
+
+                console.log("Registration successful:", response);
+
+                // Reset form after successful registration
                 reset();
+                
+                // Call success callback
                 onSuccess();
             } catch (err: any) {
-                setError(err.message || "Registration failed. Please try again.");
+                const errorMessage =
+                    err.message ||
+                    err.error?.details ||
+                    "Registration failed. Please try again.";
+                setError(errorMessage);
                 console.error("Registration error:", err);
             } finally {
                 setIsLoading(false);
@@ -67,6 +96,7 @@ export const useRegisterForm = (onSuccess: () => void, options: any = {}) => {
         error,
         errors,
         register,
+        setValue,
         handleSubmit: handleSubmit(onSubmit),
         hasError,
         getError,
