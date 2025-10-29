@@ -31,31 +31,27 @@ export const useLoginForm = (onSuccess: any, options: any = {}) => {
         }
     );
 
-    // const onSubmit = useCallback(
-    //     async (data: any) => {
-    //         try {
-    //             // Clear any previous errors
-    //             clearError();
+    const onSubmit = useCallback(
+        async (data: any) => {
+            try {
+                // Clear any previous errors
+                clearError();
 
-    //             await login(data.email, data.password);
+                await login(data.email, data.password);
 
-    //             // Reset form on successful login
-    //             reset();
+                // Reset form on successful login
+                reset();
 
-    //             if (onSuccess) {
-    //                 onSuccess();
-    //             }
-    //         } catch (err) {
-    //             // Error is handled by the auth context
-    //             console.error("Login error:", err);
-    //         }
-    //     },
-    //     [login, clearError, reset, onSuccess]
-    // );
-
-    const onSubmit = () => {
-        onSuccess();
-    };
+                if (onSuccess) {
+                    onSuccess();
+                }
+            } catch (err) {
+                // Error is handled by the auth context
+                console.error("Login error:", err);
+            }
+        },
+        [login, clearError, reset, onSuccess]
+    );
 
     // Check if form has validation errors
     const hasFormErrors = Object.keys(errors).length > 0 && !isValid;

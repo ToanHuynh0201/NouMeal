@@ -29,6 +29,8 @@ export const ROUTES = {
     RECIPE: "/recipe",
     HOME: "/home",
     MENU_SUGGESTION: "/menu-suggestion",
+    AI_MEAL_SUGGESTION: "/ai-meal-suggestion",
+    IMAGE_RECOGNITION: "/image-recognition",
     PROFILE: "/profile",
     ROOT: "/",
 };

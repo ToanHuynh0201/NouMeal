@@ -7,6 +7,8 @@ import ProtectedRoute from "./components/auth/ProtectedRoute";
 import {AuthProvider} from "./contexts/AuthContext";
 import RecipeDetailPage from "./pages/RecipeDetailPage";
 import MenuSuggestionPage from "./pages/MenuSuggestionPage";
+import AIMealSuggestionPage from "./pages/AIMealSuggestionPage";
+import ImageRecognitionPage from "./pages/ImageRecognitionPage";
 
 const App = () => {
     return (
@@ -27,6 +29,22 @@ const App = () => {
                         element={
                             <ProtectedRoute>
                                 <MenuSuggestionPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path={ROUTES.AI_MEAL_SUGGESTION}
+                        element={
+                            <ProtectedRoute>
+                                <AIMealSuggestionPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path={ROUTES.IMAGE_RECOGNITION}
+                        element={
+                            <ProtectedRoute>
+                                <ImageRecognitionPage />
                             </ProtectedRoute>
                         }
                     />

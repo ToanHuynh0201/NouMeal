@@ -15,8 +15,9 @@ import {Link as RouterLink, useLocation} from "react-router-dom";
 import {ChevronLeftIcon, ChevronRightIcon} from "@chakra-ui/icons";
 import type {navItem} from "@/types/layout";
 import {ROUTES} from "@/constants";
-import {FiHome} from "react-icons/fi";
+import {FiHome, FiCamera} from "react-icons/fi";
 import {MdFoodBank, MdRestaurantMenu} from "react-icons/md";
+import {BsStars} from "react-icons/bs";
 
 const Sidebar = () => {
     const location = useLocation();
@@ -34,6 +35,16 @@ const Sidebar = () => {
             label: "My Menu",
             path: ROUTES.MENU_SUGGESTION,
             icon: MdRestaurantMenu,
+        },
+        {
+            label: "AI Suggestion",
+            path: ROUTES.AI_MEAL_SUGGESTION,
+            icon: BsStars,
+        },
+        {
+            label: "Scan Food",
+            path: ROUTES.IMAGE_RECOGNITION,
+            icon: FiCamera,
         },
         {
             label: "Recipe",

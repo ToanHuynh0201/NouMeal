@@ -450,3 +450,231 @@ export const mockWeeklyMenu: DailyMenu[] = [
         totalFat: "66g",
     },
 ];
+
+// Mock AI Meal Suggestion Data
+export const mockMealSuggestions = {
+    "healthy breakfast": [
+        {
+            id: "suggestion-001",
+            recipe: mockRecipes[0], // Avocado Sunrise Toast
+            matchScore: 95,
+            matchReason:
+                "Perfect match! High in healthy fats, protein, and fiber. Great for a nutritious start to your day.",
+            alternativeOptions: [mockRecipes[1]], // Greek Yogurt Parfait
+        },
+        {
+            id: "suggestion-002",
+            recipe: mockRecipes[1], // Greek Yogurt Parfait
+            matchScore: 90,
+            matchReason:
+                "Excellent protein source with probiotics. Quick to prepare and very nutritious.",
+            alternativeOptions: [mockRecipes[0]],
+        },
+    ],
+    "high protein lunch": [
+        {
+            id: "suggestion-003",
+            recipe: mockRecipes[2], // Grilled Chicken Caesar Salad
+            matchScore: 98,
+            matchReason:
+                "Outstanding protein content (38g) with balanced macros. Perfect for muscle building and satiety.",
+            alternativeOptions: [mockRecipes[3]],
+        },
+    ],
+    "low carb dinner": [
+        {
+            id: "suggestion-004",
+            recipe: mockRecipes[4], // Baked Salmon with Asparagus
+            matchScore: 97,
+            matchReason:
+                "Excellent choice! Only 8g carbs with high protein and omega-3 fatty acids. Great for keto or low-carb diets.",
+            alternativeOptions: [mockRecipes[2]],
+        },
+    ],
+    "vegan meal": [
+        {
+            id: "suggestion-005",
+            recipe: mockRecipes[3], // Quinoa Buddha Bowl
+            matchScore: 100,
+            matchReason:
+                "Perfect vegan meal! Complete protein from quinoa, high in fiber, and packed with nutrients.",
+            alternativeOptions: [],
+        },
+        {
+            id: "suggestion-006",
+            recipe: mockRecipes[7], // Hummus with Veggie Sticks
+            matchScore: 85,
+            matchReason:
+                "Great vegan snack option with plant-based protein and healthy fats.",
+            alternativeOptions: [mockRecipes[6]],
+        },
+    ],
+    "quick and easy": [
+        {
+            id: "suggestion-007",
+            recipe: mockRecipes[1], // Greek Yogurt Parfait
+            matchScore: 95,
+            matchReason: "Ready in just 10 minutes with no cooking required!",
+            alternativeOptions: [mockRecipes[7]],
+        },
+        {
+            id: "suggestion-008",
+            recipe: mockRecipes[5], // Chicken Stir-Fry
+            matchScore: 88,
+            matchReason:
+                "Quick 25-minute meal with minimal prep and cleanup.",
+            alternativeOptions: [mockRecipes[2]],
+        },
+    ],
+    default: [
+        {
+            id: "suggestion-009",
+            recipe: mockRecipes[0],
+            matchScore: 85,
+            matchReason:
+                "Balanced and nutritious meal option that fits most dietary preferences.",
+            alternativeOptions: [mockRecipes[1], mockRecipes[2]],
+        },
+        {
+            id: "suggestion-010",
+            recipe: mockRecipes[3],
+            matchScore: 82,
+            matchReason:
+                "Colorful and nutrient-dense meal with great variety.",
+            alternativeOptions: [mockRecipes[4], mockRecipes[5]],
+        },
+    ],
+};
+
+// Mock Image Recognition Results
+export const mockImageRecognitionResults = [
+    {
+        id: "recognition-001",
+        imageUrl:
+            "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&h=600&fit=crop",
+        recognizedFoods: [
+            {
+                name: "Grilled Chicken Breast",
+                confidence: 94,
+                category: "Protein",
+                estimatedWeight: "150g",
+            },
+            {
+                name: "Mixed Green Salad",
+                confidence: 89,
+                category: "Vegetables",
+                estimatedWeight: "100g",
+            },
+            {
+                name: "Cherry Tomatoes",
+                confidence: 92,
+                category: "Vegetables",
+                estimatedWeight: "50g",
+            },
+        ],
+        overallNutrition: {
+            calories: 285,
+            protein: "42g",
+            fat: "8g",
+            satFat: "2g",
+            carbs: "12g",
+            cholesterol: "85mg",
+            fiber: "4g",
+            sugar: "5g",
+            sodium: "180mg",
+        },
+        suggestions: [
+            "Great protein-rich meal! Consider adding complex carbs like quinoa or brown rice for more energy.",
+            "This meal is low in calories - perfect for weight loss goals.",
+            "High in protein and low in fat - excellent post-workout meal.",
+        ],
+        timestamp: new Date().toISOString(),
+        processingTime: "1.2s",
+    },
+    {
+        id: "recognition-002",
+        imageUrl:
+            "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=800&h=600&fit=crop",
+        recognizedFoods: [
+            {
+                name: "Fresh Garden Salad",
+                confidence: 96,
+                category: "Vegetables",
+                estimatedWeight: "200g",
+            },
+            {
+                name: "Avocado",
+                confidence: 93,
+                category: "Healthy Fats",
+                estimatedWeight: "80g",
+            },
+            {
+                name: "Mixed Nuts",
+                confidence: 88,
+                category: "Protein & Fats",
+                estimatedWeight: "30g",
+            },
+        ],
+        overallNutrition: {
+            calories: 380,
+            protein: "12g",
+            fat: "32g",
+            satFat: "5g",
+            carbs: "18g",
+            cholesterol: "0mg",
+            fiber: "12g",
+            sugar: "4g",
+            sodium: "95mg",
+        },
+        suggestions: [
+            "Excellent source of healthy fats from avocado and nuts!",
+            "High fiber content will keep you full for longer.",
+            "Consider adding a protein source like grilled chicken or tofu.",
+        ],
+        timestamp: new Date().toISOString(),
+        processingTime: "1.5s",
+    },
+    {
+        id: "recognition-003",
+        imageUrl:
+            "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=800&h=600&fit=crop",
+        recognizedFoods: [
+            {
+                name: "Pancakes",
+                confidence: 97,
+                category: "Carbohydrates",
+                estimatedWeight: "150g",
+            },
+            {
+                name: "Fresh Berries",
+                confidence: 95,
+                category: "Fruits",
+                estimatedWeight: "100g",
+            },
+            {
+                name: "Maple Syrup",
+                confidence: 91,
+                category: "Sweetener",
+                estimatedWeight: "30ml",
+            },
+        ],
+        overallNutrition: {
+            calories: 450,
+            protein: "8g",
+            fat: "12g",
+            satFat: "3g",
+            carbs: "78g",
+            cholesterol: "45mg",
+            fiber: "5g",
+            sugar: "35g",
+            sodium: "520mg",
+        },
+        suggestions: [
+            "High in carbohydrates - great for an energy boost before activities.",
+            "Consider adding protein like Greek yogurt or nuts for better balance.",
+            "The berries provide good antioxidants and vitamins!",
+        ],
+        timestamp: new Date().toISOString(),
+        processingTime: "1.0s",
+    },
+];
