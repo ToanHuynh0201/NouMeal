@@ -6,6 +6,7 @@ import HomePage from "./pages/HomePage";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import {AuthProvider} from "./contexts/AuthContext";
 import RecipeDetailPage from "./pages/RecipeDetailPage";
+import MenuSuggestionPage from "./pages/MenuSuggestionPage";
 
 const App = () => {
     return (
@@ -18,6 +19,14 @@ const App = () => {
                         element={
                             <ProtectedRoute>
                                 <HomePage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path={ROUTES.MENU_SUGGESTION}
+                        element={
+                            <ProtectedRoute>
+                                <MenuSuggestionPage />
                             </ProtectedRoute>
                         }
                     />

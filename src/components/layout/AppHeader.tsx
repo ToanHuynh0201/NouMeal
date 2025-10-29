@@ -22,22 +22,25 @@ import {
 } from "@chakra-ui/react";
 const AppHeader = ({onLogout}: any) => {
     const {user} = useAuth();
-    const {isOpen, onOpen, onClose} = useDisclosure();
+    const {onOpen} = useDisclosure();
 
-    const headerBg = useColorModeValue("white", "gray.800");
     const borderColor = useColorModeValue("gray.200", "gray.600");
 
     return (
         <Box
-            bg={headerBg}
-            shadow="xl"
+            bg="whiteAlpha.800"
+            shadow="sm"
             borderBottom="1px"
             borderColor={borderColor}
             position="sticky"
             top={0}
             zIndex={10}
-            backdropFilter="blur(10px)"
+            backdropFilter="blur(12px)"
             animation={animationPresets.slideInLeft}
+            sx={{
+                backdropFilter: "blur(12px) saturate(180%)",
+                WebkitBackdropFilter: "blur(12px) saturate(180%)",
+            }}
         >
             <Container maxW="7xl" py={3}>
                 <Flex align="center">
@@ -56,13 +59,17 @@ const AppHeader = ({onLogout}: any) => {
                                 <HStack
                                     spacing={3}
                                     p={2}
-                                    bg="gray.50"
+                                    bg="whiteAlpha.700"
                                     borderRadius="lg"
                                     transition={transitions.normal}
+                                    backdropFilter="blur(8px)"
+                                    border="1px solid"
+                                    borderColor="whiteAlpha.300"
                                     _hover={{
-                                        bg: "gray.100",
+                                        bg: "whiteAlpha.800",
                                         transform: "translateY(-1px)",
-                                        shadow: "md",
+                                        shadow: "lg",
+                                        borderColor: "whiteAlpha.400",
                                     }}
                                 >
                                     <Avatar

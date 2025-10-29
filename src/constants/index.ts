@@ -30,6 +30,8 @@ export const ROUTES = {
     LOGIN: "/login",
     RECIPE: "/recipe",
     HOME: "/home",
+    MENU_SUGGESTION: "/menu-suggestion",
+    PROFILE: "/profile",
     ROOT: "/",
 };
 

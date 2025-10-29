@@ -16,7 +16,7 @@ import {ChevronLeftIcon, ChevronRightIcon} from "@chakra-ui/icons";
 import type {navItem} from "@/types/layout";
 import {ROUTES} from "@/constants";
 import {FiHome} from "react-icons/fi";
-import {MdFoodBank} from "react-icons/md";
+import {MdFoodBank, MdRestaurantMenu} from "react-icons/md";
 
 const Sidebar = () => {
     const location = useLocation();
@@ -29,6 +29,11 @@ const Sidebar = () => {
             label: "Home",
             path: ROUTES.HOME,
             icon: FiHome,
+        },
+        {
+            label: "My Menu",
+            path: ROUTES.MENU_SUGGESTION,
+            icon: MdRestaurantMenu,
         },
         {
             label: "Recipe",
