@@ -22,43 +22,68 @@ import {
     WrapItem,
     Avatar,
     HStack,
-    Progress,
     Stat,
     StatLabel,
     StatNumber,
     StatHelpText,
     IconButton,
+    useToast,
 } from "@chakra-ui/react";
 import {EditIcon} from "@chakra-ui/icons";
-import {useState} from "react";
-import type {UserProfile} from "@/types/profile";
-import {
-    ACTIVITY_LEVELS,
-    DIETARY_PREFERENCES,
-    HEALTH_GOALS,
-    ALLERGENS,
-} from "@/constants/profile";
-import {
-    mockUserProfile,
-    calculateBMI,
-    calculateBMR,
-    calculateAge,
-} from "@/mocks/profileData";
+import {useState, useEffect} from "react";
+import {useAuth} from "@/hooks/useAuth";
+import {userService} from "@/services/userService";
+import {HEALTH_GOALS} from "@/constants/profile";
+import {calculateBMI, calculateBMR} from "@/mocks/profileData";
 import {animationPresets} from "@/styles/animation";
 
 const UserInfoSection = () => {
-    const [profile, setProfile] = useState<UserProfile>(mockUserProfile);
+    const {user, updateUser} = useAuth();
+    const toast = useToast();
     const [isEditing, setIsEditing] = useState(false);
-    const [editedProfile, setEditedProfile] = useState<UserProfile>(profile);
+    const [editedData, setEditedData] = useState({
+        name: "",
+        email: "",
+        age: 0,
+        gender: "",
+        height: 0,
+        weight: 0,
+        goal: "",
+        preferences: [] as string[],
+        allergies: [] as string[],
+    });
 
-    const age = profile.dateOfBirth ? calculateAge(profile.dateOfBirth) : 0;
-    const bmi =
-        profile.height && profile.weight
-            ? calculateBMI(profile.weight, profile.height)
-            : 0;
+    // Initialize editedData when user data changes
+    useEffect(() => {
+        if (user) {
+            setEditedData({
+                name: user.name || "",
+                email: user.email || "",
+                age: user.age || 0,
+                gender: user.gender || "",
+                height: user.height || 0,
+                weight: user.weight || 0,
+                goal: user.goal || "",
+                preferences: user.preferences || [],
+                allergies: user.allergies || [],
+            });
+        }
+    }, [user]);
+
+    if (!user) {
+        return (
+            <Card>
+                <CardBody>
+                    <Text>Loading user data...</Text>
+                </CardBody>
+            </Card>
+        );
+    }
+
+    const bmi = user.height && user.weight ? calculateBMI(user.weight, user.height) : 0;
     const bmr =
-        profile.height && profile.weight && profile.dateOfBirth && profile.gender
-            ? calculateBMR(profile.weight, profile.height, age, profile.gender)
+        user.height && user.weight && user.age && user.gender
+            ? calculateBMR(user.weight, user.height, user.age, user.gender)
             : 0;
 
     const getBMIStatus = (bmi: number) => {
@@ -68,40 +93,171 @@ const UserInfoSection = () => {
         return {label: "Obese", color: "red"};
     };
 
-    const handleSave = () => {
-        setProfile(editedProfile);
-        setIsEditing(false);
+    const handleSave = async () => {
+        try {
+            setIsEditing(false); // Close edit mode immediately for better UX
+            
+            // Prepare update payload
+            const updatePayload = {
+                name: editedData.name,
+                age: editedData.age,
+                gender: editedData.gender as "male" | "female" | "other",
+                height: editedData.height,
+                weight: editedData.weight,
+                goal: editedData.goal as any,
+                preferences: editedData.preferences,
+                allergies: editedData.allergies,
+            };
+
+            // Call API to update profile
+            const result = await userService.updateProfile(updatePayload);
+
+            if (result.success) {
+                toast({
+                    title: "Profile Updated",
+                    description: result.message || "Your profile has been updated successfully.",
+                    status: "success",
+                    duration: 3000,
+                    isClosable: true,
+                    position: "top",
+                });
+
+                // Update user in AuthContext
+                if (result.data?.user) {
+                    updateUser(result.data.user);
+                } else {
+                    // If no user data in response, update with edited data
+                    updateUser({
+                        ...user,
+                        ...updatePayload,
+                    });
+                }
+            } else {
+                // Revert to original data on failure
+                if (user) {
+                    setEditedData({
+                        name: user.name || "",
+                        email: user.email || "",
+                        age: user.age || 0,
+                        gender: user.gender || "",
+                        height: user.height || 0,
+                        weight: user.weight || 0,
+                        goal: user.goal || "",
+                        preferences: user.preferences || [],
+                        allergies: user.allergies || [],
+                    });
+                }
+
+                toast({
+                    title: "Update Failed",
+                    description: result.error || "Failed to update profile. Please try again.",
+                    status: "error",
+                    duration: 3000,
+                    isClosable: true,
+                    position: "top",
+                });
+            }
+        } catch (error: any) {
+            // Revert to original data on error
+            if (user) {
+                setEditedData({
+                    name: user.name || "",
+                    email: user.email || "",
+                    age: user.age || 0,
+                    gender: user.gender || "",
+                    height: user.height || 0,
+                    weight: user.weight || 0,
+                    goal: user.goal || "",
+                    preferences: user.preferences || [],
+                    allergies: user.allergies || [],
+                });
+            }
+
+            toast({
+                title: "Update Failed",
+                description: error?.message || "An error occurred while updating profile.",
+                status: "error",
+                duration: 3000,
+                isClosable: true,
+                position: "top",
+            });
+        }
     };
 
     const handleCancel = () => {
-        setEditedProfile(profile);
+        // Reset to original user data
+        if (user) {
+            setEditedData({
+                name: user.name || "",
+                email: user.email || "",
+                age: user.age || 0,
+                gender: user.gender || "",
+                height: user.height || 0,
+                weight: user.weight || 0,
+                goal: user.goal || "",
+                preferences: user.preferences || [],
+                allergies: user.allergies || [],
+            });
+        }
         setIsEditing(false);
     };
 
     const addAllergen = (allergen: string) => {
-        if (!editedProfile.allergens?.includes(allergen)) {
-            setEditedProfile({
-                ...editedProfile,
-                allergens: [...(editedProfile.allergens || []), allergen],
+        if (!editedData.allergies.includes(allergen)) {
+            setEditedData({
+                ...editedData,
+                allergies: [...editedData.allergies, allergen],
             });
         }
     };
 
     const removeAllergen = (allergen: string) => {
-        setEditedProfile({
-            ...editedProfile,
-            allergens: editedProfile.allergens?.filter((a) => a !== allergen) || [],
+        setEditedData({
+            ...editedData,
+            allergies: editedData.allergies.filter((a) => a !== allergen),
         });
     };
 
+    const togglePreference = (preference: string) => {
+        if (editedData.preferences.includes(preference)) {
+            setEditedData({
+                ...editedData,
+                preferences: editedData.preferences.filter((p) => p !== preference),
+            });
+        } else {
+            setEditedData({
+                ...editedData,
+                preferences: [...editedData.preferences, preference],
+            });
+        }
+    };
+
     const bmiStatus = getBMIStatus(bmi);
-    const progressToTarget =
-        profile.weight && profile.targetWeight
-            ? Math.min(
-                  100,
-                  ((profile.weight - profile.targetWeight) / profile.weight) * 100
-              )
-            : 0;
+
+    // Format goal label
+    const getGoalLabel = (goal: string) => {
+        const goalMap: Record<string, string> = {
+            lose_weight: "Lose Weight",
+            maintain_weight: "Maintain Weight",
+            gain_weight: "Gain Weight",
+            build_muscle: "Build Muscle",
+            improve_health: "Improve Health",
+        };
+        return goalMap[goal] || goal;
+    };
+
+    // Get display data based on edit mode
+    const displayData = isEditing ? editedData : {
+        name: user.name,
+        email: user.email,
+        age: user.age,
+        gender: user.gender,
+        height: user.height,
+        weight: user.weight,
+        goal: user.goal,
+        preferences: user.preferences || [],
+        allergies: user.allergies || [],
+    };
 
     return (
         <VStack spacing={6} align="stretch">
@@ -111,14 +267,13 @@ const UserInfoSection = () => {
                     <HStack spacing={6} align="start">
                         <Avatar
                             size="2xl"
-                            name={profile.name}
-                            src={profile.avatar}
+                            name={displayData.name}
                             bg="brand.500"
                             color="white"
                         />
                         <VStack align="start" spacing={2} flex={1}>
                             <HStack justify="space-between" w="full">
-                                <Heading size="lg">{profile.name}</Heading>
+                                <Heading size="lg">{displayData.name}</Heading>
                                 <IconButton
                                     aria-label="Edit profile"
                                     icon={<EditIcon />}
@@ -127,30 +282,16 @@ const UserInfoSection = () => {
                                     onClick={() => setIsEditing(!isEditing)}
                                 />
                             </HStack>
-                            <Text color="gray.600">{profile.email}</Text>
-                            <Text color="gray.500">{profile.phone}</Text>
+                            <Text color="gray.600">{displayData.email}</Text>
                             <HStack spacing={2} mt={2}>
-                                {profile.healthGoal && (
+                                {displayData.goal && (
                                     <Tag colorScheme="purple" size="sm">
-                                        {
-                                            HEALTH_GOALS.find(
-                                                (g) =>
-                                                    g.value === profile.healthGoal
-                                            )?.label
-                                        }
+                                        {getGoalLabel(displayData.goal)}
                                     </Tag>
                                 )}
-                                {profile.activityLevel && (
-                                    <Tag colorScheme="green" size="sm">
-                                        {
-                                            ACTIVITY_LEVELS.find(
-                                                (a) =>
-                                                    a.value ===
-                                                    profile.activityLevel
-                                            )?.label.split(" ")[0]
-                                        }
-                                    </Tag>
-                                )}
+                                <Tag colorScheme="green" size="sm">
+                                    {displayData.age} years
+                                </Tag>
                             </HStack>
                         </VStack>
                     </HStack>
@@ -166,17 +307,10 @@ const UserInfoSection = () => {
                     <SimpleGrid columns={{base: 1, md: 2, lg: 4}} spacing={6}>
                         <Stat>
                             <StatLabel>Current Weight</StatLabel>
-                            <StatNumber>{profile.weight} kg</StatNumber>
+                            <StatNumber>{displayData.weight} kg</StatNumber>
                             <StatHelpText>
-                                Target: {profile.targetWeight} kg
+                                {displayData.gender === "male" ? "Male" : displayData.gender === "female" ? "Female" : "Other"}
                             </StatHelpText>
-                            <Progress
-                                value={progressToTarget}
-                                colorScheme="blue"
-                                size="sm"
-                                mt={2}
-                                borderRadius="full"
-                            />
                         </Stat>
 
                         <Stat>
@@ -191,8 +325,8 @@ const UserInfoSection = () => {
 
                         <Stat>
                             <StatLabel>Height</StatLabel>
-                            <StatNumber>{profile.height} cm</StatNumber>
-                            <StatHelpText>Age: {age} years</StatHelpText>
+                            <StatNumber>{displayData.height} cm</StatNumber>
+                            <StatHelpText>Age: {displayData.age} years</StatHelpText>
                         </Stat>
 
                         <Stat>
@@ -219,14 +353,10 @@ const UserInfoSection = () => {
                             <FormControl>
                                 <FormLabel>Full Name</FormLabel>
                                 <Input
-                                    value={
-                                        isEditing
-                                            ? editedProfile.name
-                                            : profile.name
-                                    }
+                                    value={displayData.name}
                                     onChange={(e) =>
-                                        setEditedProfile({
-                                            ...editedProfile,
+                                        setEditedData({
+                                            ...editedData,
                                             name: e.target.value,
                                         })
                                     }
@@ -240,14 +370,10 @@ const UserInfoSection = () => {
                             <FormControl>
                                 <FormLabel>Email</FormLabel>
                                 <Input
-                                    value={
-                                        isEditing
-                                            ? editedProfile.email
-                                            : profile.email
-                                    }
+                                    value={displayData.email}
                                     onChange={(e) =>
-                                        setEditedProfile({
-                                            ...editedProfile,
+                                        setEditedData({
+                                            ...editedData,
                                             email: e.target.value,
                                         })
                                     }
@@ -259,39 +385,14 @@ const UserInfoSection = () => {
 
                         <GridItem>
                             <FormControl>
-                                <FormLabel>Phone</FormLabel>
+                                <FormLabel>Age</FormLabel>
                                 <Input
-                                    value={
-                                        isEditing
-                                            ? editedProfile.phone
-                                            : profile.phone
-                                    }
+                                    type="number"
+                                    value={displayData.age}
                                     onChange={(e) =>
-                                        setEditedProfile({
-                                            ...editedProfile,
-                                            phone: e.target.value,
-                                        })
-                                    }
-                                    isReadOnly={!isEditing}
-                                    bg={isEditing ? "white" : "gray.50"}
-                                />
-                            </FormControl>
-                        </GridItem>
-
-                        <GridItem>
-                            <FormControl>
-                                <FormLabel>Date of Birth</FormLabel>
-                                <Input
-                                    type="date"
-                                    value={
-                                        isEditing
-                                            ? editedProfile.dateOfBirth
-                                            : profile.dateOfBirth
-                                    }
-                                    onChange={(e) =>
-                                        setEditedProfile({
-                                            ...editedProfile,
-                                            dateOfBirth: e.target.value,
+                                        setEditedData({
+                                            ...editedData,
+                                            age: Number(e.target.value),
                                         })
                                     }
                                     isReadOnly={!isEditing}
@@ -304,15 +405,11 @@ const UserInfoSection = () => {
                             <FormControl>
                                 <FormLabel>Gender</FormLabel>
                                 <Select
-                                    value={
-                                        isEditing
-                                            ? editedProfile.gender
-                                            : profile.gender
-                                    }
+                                    value={displayData.gender}
                                     onChange={(e) =>
-                                        setEditedProfile({
-                                            ...editedProfile,
-                                            gender: e.target.value as any,
+                                        setEditedData({
+                                            ...editedData,
+                                            gender: e.target.value,
                                         })
                                     }
                                     isDisabled={!isEditing}
@@ -330,14 +427,10 @@ const UserInfoSection = () => {
                                 <FormLabel>Height (cm)</FormLabel>
                                 <Input
                                     type="number"
-                                    value={
-                                        isEditing
-                                            ? editedProfile.height
-                                            : profile.height
-                                    }
+                                    value={displayData.height}
                                     onChange={(e) =>
-                                        setEditedProfile({
-                                            ...editedProfile,
+                                        setEditedData({
+                                            ...editedData,
                                             height: Number(e.target.value),
                                         })
                                     }
@@ -352,37 +445,11 @@ const UserInfoSection = () => {
                                 <FormLabel>Current Weight (kg)</FormLabel>
                                 <Input
                                     type="number"
-                                    value={
-                                        isEditing
-                                            ? editedProfile.weight
-                                            : profile.weight
-                                    }
+                                    value={displayData.weight}
                                     onChange={(e) =>
-                                        setEditedProfile({
-                                            ...editedProfile,
+                                        setEditedData({
+                                            ...editedData,
                                             weight: Number(e.target.value),
-                                        })
-                                    }
-                                    isReadOnly={!isEditing}
-                                    bg={isEditing ? "white" : "gray.50"}
-                                />
-                            </FormControl>
-                        </GridItem>
-
-                        <GridItem>
-                            <FormControl>
-                                <FormLabel>Target Weight (kg)</FormLabel>
-                                <Input
-                                    type="number"
-                                    value={
-                                        isEditing
-                                            ? editedProfile.targetWeight
-                                            : profile.targetWeight
-                                    }
-                                    onChange={(e) =>
-                                        setEditedProfile({
-                                            ...editedProfile,
-                                            targetWeight: Number(e.target.value),
                                         })
                                     }
                                     isReadOnly={!isEditing}
@@ -408,23 +475,19 @@ const UserInfoSection = () => {
             {/* Health & Fitness Goals Card */}
             <Card animation={animationPresets.fadeIn}>
                 <CardHeader>
-                    <Heading size="md">Health & Fitness Goals</Heading>
+                    <Heading size="md">Health & Fitness Goal</Heading>
                 </CardHeader>
                 <Divider />
                 <CardBody>
                     <VStack spacing={4} align="stretch">
                         <FormControl>
-                            <FormLabel>Health Goal</FormLabel>
+                            <FormLabel>Current Goal</FormLabel>
                             <Select
-                                value={
-                                    isEditing
-                                        ? editedProfile.healthGoal
-                                        : profile.healthGoal
-                                }
+                                value={displayData.goal}
                                 onChange={(e) =>
-                                    setEditedProfile({
-                                        ...editedProfile,
-                                        healthGoal: e.target.value,
+                                    setEditedData({
+                                        ...editedData,
+                                        goal: e.target.value,
                                     })
                                 }
                                 isDisabled={!isEditing}
@@ -433,31 +496,6 @@ const UserInfoSection = () => {
                                 {HEALTH_GOALS.map((goal) => (
                                     <option key={goal.value} value={goal.value}>
                                         {goal.icon} {goal.label}
-                                    </option>
-                                ))}
-                            </Select>
-                        </FormControl>
-
-                        <FormControl>
-                            <FormLabel>Activity Level</FormLabel>
-                            <Select
-                                value={
-                                    isEditing
-                                        ? editedProfile.activityLevel
-                                        : profile.activityLevel
-                                }
-                                onChange={(e) =>
-                                    setEditedProfile({
-                                        ...editedProfile,
-                                        activityLevel: e.target.value,
-                                    })
-                                }
-                                isDisabled={!isEditing}
-                                bg={isEditing ? "white" : "gray.50"}
-                            >
-                                {ACTIVITY_LEVELS.map((level) => (
-                                    <option key={level.value} value={level.value}>
-                                        {level.label}
                                     </option>
                                 ))}
                             </Select>
@@ -477,75 +515,87 @@ const UserInfoSection = () => {
                         <Box>
                             <FormLabel>Dietary Preferences</FormLabel>
                             <Wrap spacing={2}>
-                                {DIETARY_PREFERENCES.map((pref) => {
-                                    const isSelected =
-                                        profile.dietaryPreferences?.includes(
-                                            pref.value
-                                        );
-                                    return (
-                                        <WrapItem key={pref.value}>
+                                {displayData.preferences && displayData.preferences.length > 0 ? (
+                                    displayData.preferences.map((pref: string) => (
+                                        <WrapItem key={pref}>
                                             <Tag
                                                 size="md"
-                                                variant={
-                                                    isSelected ? "solid" : "outline"
-                                                }
-                                                colorScheme={
-                                                    isSelected ? "green" : "gray"
-                                                }
+                                                variant="solid"
+                                                colorScheme="green"
                                             >
-                                                {pref.label}
+                                                <TagLabel>{pref}</TagLabel>
+                                                {isEditing && (
+                                                    <TagCloseButton
+                                                        onClick={() => togglePreference(pref)}
+                                                    />
+                                                )}
                                             </Tag>
                                         </WrapItem>
-                                    );
-                                })}
+                                    ))
+                                ) : (
+                                    <Text color="gray.500" fontSize="sm">
+                                        No dietary preferences set
+                                    </Text>
+                                )}
                             </Wrap>
+                            {isEditing && (
+                                <Input
+                                    placeholder="Type a preference and press Enter"
+                                    mt={3}
+                                    onKeyPress={(e) => {
+                                        if (e.key === "Enter" && e.currentTarget.value.trim()) {
+                                            const value = e.currentTarget.value.trim();
+                                            if (!editedData.preferences.includes(value)) {
+                                                setEditedData({
+                                                    ...editedData,
+                                                    preferences: [...editedData.preferences, value],
+                                                });
+                                            }
+                                            e.currentTarget.value = "";
+                                        }
+                                    }}
+                                />
+                            )}
                         </Box>
 
                         <Box>
                             <FormLabel>Allergens</FormLabel>
+                            <Wrap spacing={2}>
+                                {displayData.allergies && displayData.allergies.length > 0 ? (
+                                    displayData.allergies.map((allergen: string) => (
+                                        <WrapItem key={allergen}>
+                                            <Tag
+                                                size="md"
+                                                colorScheme="red"
+                                                variant="solid"
+                                            >
+                                                <TagLabel>{allergen}</TagLabel>
+                                                {isEditing && (
+                                                    <TagCloseButton
+                                                        onClick={() => removeAllergen(allergen)}
+                                                    />
+                                                )}
+                                            </Tag>
+                                        </WrapItem>
+                                    ))
+                                ) : (
+                                    <Text color="gray.500" fontSize="sm">
+                                        No allergens reported
+                                    </Text>
+                                )}
+                            </Wrap>
                             {isEditing && (
-                                <Select
-                                    placeholder="Add allergen"
-                                    onChange={(e) => {
-                                        if (e.target.value) {
-                                            addAllergen(e.target.value);
-                                            e.target.value = "";
+                                <Input
+                                    placeholder="Type an allergen and press Enter"
+                                    mt={3}
+                                    onKeyPress={(e) => {
+                                        if (e.key === "Enter" && e.currentTarget.value.trim()) {
+                                            addAllergen(e.currentTarget.value.trim());
+                                            e.currentTarget.value = "";
                                         }
                                     }}
-                                    mb={3}
-                                >
-                                    {ALLERGENS.filter(
-                                        (a) => !editedProfile.allergens?.includes(a)
-                                    ).map((allergen) => (
-                                        <option key={allergen} value={allergen}>
-                                            {allergen}
-                                        </option>
-                                    ))}
-                                </Select>
+                                />
                             )}
-                            <Wrap spacing={2}>
-                                {(isEditing
-                                    ? editedProfile.allergens
-                                    : profile.allergens
-                                )?.map((allergen) => (
-                                    <WrapItem key={allergen}>
-                                        <Tag
-                                            size="md"
-                                            colorScheme="red"
-                                            variant="solid"
-                                        >
-                                            <TagLabel>{allergen}</TagLabel>
-                                            {isEditing && (
-                                                <TagCloseButton
-                                                    onClick={() =>
-                                                        removeAllergen(allergen)
-                                                    }
-                                                />
-                                            )}
-                                        </Tag>
-                                    </WrapItem>
-                                ))}
-                            </Wrap>
                         </Box>
                     </VStack>
                 </CardBody>

@@ -18,7 +18,7 @@ import {
     Spacer,
     Text,
     useColorModeValue,
-    useDisclosure,
+    // useDisclosure,
     VStack,
 } from "@chakra-ui/react";
 import {useNavigate} from "react-router-dom";
@@ -27,7 +27,7 @@ import {ROUTES} from "@/constants";
 const AppHeader = ({onLogout}: AppHeaderProps) => {
     const {user} = useAuth();
     const navigate = useNavigate();
-    const {onOpen} = useDisclosure();
+    // const {onOpen} = useDisclosure();
 
     const headerBg = useColorModeValue("white", "gray.800");
     const borderColor = useColorModeValue("gray.200", "gray.600");

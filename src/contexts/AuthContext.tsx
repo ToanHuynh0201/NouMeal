@@ -14,6 +14,7 @@ interface AuthContextType extends AuthState {
     login: (email: string, password: string) => Promise<any>;
     logout: () => void;
     clearError: () => void;
+    updateUser: (user: any) => void;
     changePassword: (
         currentPassword: string,
         newPassword: string,
@@ -37,6 +38,7 @@ const AUTH_ACTIONS = {
     LOGOUT: "LOGOUT",
     SET_LOADING: "SET_LOADING",
     CLEAR_ERROR: "CLEAR_ERROR",
+    UPDATE_USER: "UPDATE_USER",
 };
 
 // Reducer
@@ -81,6 +83,11 @@ const authReducer = (state: any, action: any) => {
             return {
                 ...state,
                 error: null,
+            };
+        case AUTH_ACTIONS.UPDATE_USER:
+            return {
+                ...state,
+                user: action.payload.user,
             };
         default:
             return state;
@@ -127,9 +134,10 @@ export const AuthProvider = ({children}: any) => {
 
         try {
             const response = await authService.login(email, password);
+            const userData = response.data?.user;
             dispatch({
                 type: AUTH_ACTIONS.LOGIN_SUCCESS,
-                payload: {user: response.data.user},
+                payload: {user: userData},
             });
             return response;
         } catch (error: any) {
@@ -153,6 +161,14 @@ export const AuthProvider = ({children}: any) => {
         dispatch({type: AUTH_ACTIONS.CLEAR_ERROR});
     };
 
+    // Update user function
+    const updateUser = (user: any) => {
+        dispatch({
+            type: AUTH_ACTIONS.UPDATE_USER,
+            payload: {user},
+        });
+    };
+
     // Change password function
     const changePassword = async (
         currentPassword: string,
@@ -172,6 +188,7 @@ export const AuthProvider = ({children}: any) => {
         changePassword,
         logout,
         clearError,
+        updateUser,
     };
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

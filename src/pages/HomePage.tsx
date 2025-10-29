@@ -29,10 +29,16 @@ import {
 } from "react-icons/fa";
 import {useNavigate} from "react-router-dom";
 import {ROUTES} from "@/constants";
+import { useAuth } from "@/hooks/useAuth";
+import { useEffect } from "react";
 
 function HomePage() {
     const navigate = useNavigate();
 
+    const {user} = useAuth();
+    useEffect(() => {
+        console.log(user);
+    }, [user]);
     // Scroll animation refs
     const featuresSection = useScrollAnimation({threshold: 0.15});
     const whyChooseSection = useScrollAnimation({threshold: 0.15});
