@@ -61,11 +61,19 @@ export const withErrorHandling = <TArgs extends any[], TReturn>(
         try {
             const response = await asyncFn(...args);
 
-            // If response is successful, return it
-            if ((response as any).data?.status === "success") {
+            // Check if response is successful (support multiple formats)
+            // Format 1: response.data.status === "success"
+            // Format 2: response.data.success === true
+            // Format 3: response.status in 2xx range (axios default)
+            const isSuccess = 
+                (response as any).data?.status === "success" || 
+                (response as any).data?.success === true ||
+                ((response as any).status >= 200 && (response as any).status < 300);
+
+            if (isSuccess) {
                 return {
                     success: true,
-                    data: (response as any).data.data,
+                    data: (response as any).data.data || (response as any).data,
                     pagination: (response as any).data.pagination,
                     message: (response as any).data.message,
                 };

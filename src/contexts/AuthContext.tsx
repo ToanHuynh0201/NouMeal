@@ -1,5 +1,6 @@
 import {authService} from "@/services";
 import {createContext, useReducer, useEffect} from "react";
+import {setStorageItem} from "@/utils";
 // import {authService} from "../services/authService";
 
 // AuthState type
@@ -163,6 +164,9 @@ export const AuthProvider = ({children}: any) => {
 
     // Update user function
     const updateUser = (user: any) => {
+        // Update localStorage with new user data
+        setStorageItem("user", user);
+        
         dispatch({
             type: AUTH_ACTIONS.UPDATE_USER,
             payload: {user},
