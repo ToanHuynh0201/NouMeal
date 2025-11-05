@@ -1,30 +1,37 @@
 import {animationPresets, transitions} from "@/styles/animation";
 import {
     Box,
-    HStack,
-    Icon,
+    Flex,
     IconButton,
-    Link,
-    Text,
-    Tooltip,
     useColorModeValue,
     VStack,
 } from "@chakra-ui/react";
 import {useState} from "react";
-import {Link as RouterLink, useLocation} from "react-router-dom";
+import {useLocation} from "react-router-dom";
 import {ChevronLeftIcon, ChevronRightIcon} from "@chakra-ui/icons";
 import type {navItem} from "@/types/layout";
 import {ROUTES} from "@/constants";
 import {FiHome, FiCamera} from "react-icons/fi";
 import {MdFoodBank, MdRestaurantMenu} from "react-icons/md";
 import {BsStars} from "react-icons/bs";
+import {useAuth} from "@/hooks/useAuth";
+import {SidebarItem} from "./SidebarItem";
+import {SidebarUserProfile} from "./SidebarUserProfile";
+import {SidebarLogo} from "./SidebarLogo";
 
 const Sidebar = () => {
     const location = useLocation();
+    const {user, logout} = useAuth();
     const [isCollapsed, setIsCollapsed] = useState(false);
-    const sidebarBg = useColorModeValue("white", "gray.800");
-    const borderColor = useColorModeValue("gray.200", "gray.600");
+    
+    // Color mode values
+    const sidebarBg = useColorModeValue(
+        "linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)", 
+        "linear-gradient(180deg, #1a202c 0%, #171923 100%)"
+    );
+    const borderColor = useColorModeValue("gray.200", "gray.700");
 
+    // Navigation items without sections
     const navItems: navItem[] = [
         {
             label: "Home",
@@ -56,183 +63,93 @@ const Sidebar = () => {
     const isActivePath = (path: string) => location.pathname === path;
 
     return (
-        <Box
-            w={isCollapsed ? "80px" : "240px"}
+        <Flex
+            direction="column"
+            w={isCollapsed ? "80px" : "260px"}
             h="100vh"
-            bg={sidebarBg}
+            bgGradient={sidebarBg}
             borderRight="1px"
             borderColor={borderColor}
             position="sticky"
             top={0}
-            shadow="lg"
+            shadow="xl"
             animation={animationPresets.slideInLeft}
-            transition={transitions.normal}
+            transition={transitions.smooth}
+            overflow="hidden"
         >
-            {/*Logo Section*/}
-            <Box
-                p={isCollapsed ? 3 : 6}
-                borderBottom="1px"
-                borderColor={borderColor}
-            >
-                {isCollapsed ? (
-                    <Box display="flex" justifyContent="center">
-                        <Box
-                            p={2}
-                            bg="white"
-                            borderRadius="lg"
-                            shadow="md"
-                            animation={animationPresets.float}
-                            transition={transitions.normal}
-                            _hover={{
-                                transform: "scale(1.05)",
-                                shadow: "lg",
-                            }}
-                        >
-                            <img
-                                src="/vite.svg"
-                                alt="MealGenie Logo"
-                                style={{
-                                    width: "24px",
-                                    height: "24px",
-                                    objectFit: "contain",
-                                }}
-                            />
-                        </Box>
-                    </Box>
-                ) : (
-                    <HStack spacing={3}>
-                        <Box
-                            p={2}
-                            bg="white"
-                            borderRadius="lg"
-                            shadow="md"
-                            animation={animationPresets.float}
-                            transition={transitions.normal}
-                            _hover={{
-                                transform: "scale(1.05)",
-                                shadow: "lg",
-                            }}
-                        >
-                            <img
-                                src="/vite.svg"
-                                alt="MealGenie Logo"
-                                style={{
-                                    width: "32px",
-                                    height: "32px",
-                                    objectFit: "contain",
-                                }}
-                            />
-                        </Box>
-                        <VStack spacing={0} align="start">
-                            <Text
-                                fontSize="lg"
-                                fontWeight="bold"
-                                color="brand.600"
-                                lineHeight={1}
-                            >
-                                MealGenie
-                            </Text>
-                        </VStack>
-                    </HStack>
-                )}
-            </Box>
+            {/* Logo Section */}
+            <SidebarLogo isCollapsed={isCollapsed} />
+
             {/* Collapse Toggle Button */}
             <Box
-                p={2}
+                px={3}
+                py={2}
                 display="flex"
                 justifyContent={isCollapsed ? "center" : "flex-end"}
             >
                 <IconButton
                     aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-                    icon={isCollapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+                    icon={isCollapsed ? <ChevronRightIcon boxSize={5} /> : <ChevronLeftIcon boxSize={5} />}
                     size="sm"
                     variant="ghost"
+                    colorScheme="brand"
                     onClick={() => setIsCollapsed(!isCollapsed)}
+                    borderRadius="lg"
+                    transition={transitions.smooth}
                     _hover={{
-                        bg: "brand.50",
-                        color: "brand.600",
+                        bg: "brand.100",
+                        transform: "scale(1.1)",
+                    }}
+                    _active={{
+                        transform: "scale(0.95)",
                     }}
                 />
             </Box>
 
-            {/* Navigation */}
-            <VStack spacing={2} p={2} align="stretch">
-                {navItems.map((item) => (
-                    <Tooltip
-                        key={item.path}
-                        label={isCollapsed ? item.label : ""}
-                        placement="right"
-                        isDisabled={!isCollapsed}
-                    >
-                        <Link
-                            as={RouterLink}
-                            to={item.path}
-                            _hover={{textDecoration: "none"}}
-                        >
-                            <HStack
-                                px={isCollapsed ? 2 : 4}
-                                py={3}
-                                borderRadius="lg"
-                                spacing={isCollapsed ? 0 : 3}
-                                justify={isCollapsed ? "center" : "flex-start"}
-                                color={
-                                    isActivePath(item.path)
-                                        ? "brand.600"
-                                        : "gray.600"
-                                }
-                                bg={
-                                    isActivePath(item.path)
-                                        ? "brand.50"
-                                        : "transparent"
-                                }
-                                borderWidth={1}
-                                borderColor={
-                                    isActivePath(item.path)
-                                        ? "brand.200"
-                                        : "transparent"
-                                }
-                                transition={transitions.normal}
-                                _hover={{
-                                    color: "brand.600",
-                                    bg: "brand.50",
-                                    borderColor: "brand.200",
-                                    transform: isCollapsed
-                                        ? "scale(1.05)"
-                                        : "translateX(4px)",
-                                }}
-                                _active={{
-                                    transform: isCollapsed
-                                        ? "scale(1)"
-                                        : "translateX(2px)",
-                                }}
-                            >
-                                <Icon
-                                    as={item.icon}
-                                    boxSize={isCollapsed ? 6 : 5}
-                                    color={
-                                        isActivePath(item.path)
-                                            ? "brand.500"
-                                            : "gray.500"
-                                    }
-                                />
-                                {!isCollapsed && (
-                                    <Text
-                                        fontSize="md"
-                                        fontWeight={
-                                            isActivePath(item.path)
-                                                ? "semibold"
-                                                : "medium"
-                                        }
-                                    >
-                                        {item.label}
-                                    </Text>
-                                )}
-                            </HStack>
-                        </Link>
-                    </Tooltip>
-                ))}
+            {/* Navigation Sections */}
+            <VStack
+                flex={1}
+                spacing={1}
+                px={3}
+                py={2}
+                align="stretch"
+                overflowY="auto"
+                overflowX="hidden"
+                css={{
+                    "&::-webkit-scrollbar": {
+                        width: "4px",
+                    },
+                    "&::-webkit-scrollbar-track": {
+                        background: "transparent",
+                    },
+                    "&::-webkit-scrollbar-thumb": {
+                        background: "var(--chakra-colors-brand-300)",
+                        borderRadius: "20px",
+                    },
+                }}
+            >
+                {/* Navigation Items */}
+                <VStack spacing={1} align="stretch">
+                    {navItems.map((item) => (
+                        <SidebarItem
+                            key={item.path}
+                            item={item}
+                            isActive={isActivePath(item.path)}
+                            isCollapsed={isCollapsed}
+                        />
+                    ))}
+                </VStack>
             </VStack>
-        </Box>
+
+            {/* User Profile Section */}
+            {user && (
+                <SidebarUserProfile
+                    user={user}
+                    isCollapsed={isCollapsed}
+                    onLogout={logout}
+                />
+            )}
+        </Flex>
     );
 };
 
