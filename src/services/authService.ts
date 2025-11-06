@@ -95,13 +95,26 @@ class AuthService {
 
     /**
      * Logout user and clear stored data
+     * Also calls the backend logout endpoint to invalidate refresh token
      */
-    logout() {
-        clearStorageItems([
-            AUTH_CONFIG.TOKEN_STORAGE_KEY,
-            AUTH_CONFIG.REFRESH_TOKEN_STORAGE_KEY,
-            AUTH_CONFIG.USER_STORAGE_KEY,
-        ]);
+    async logout() {
+        try {
+            // Call backend logout endpoint to invalidate refresh token
+            const token = this.getAccessToken();
+            if (token) {
+                await api.post("/auth/logout", {});
+            }
+        } catch (error) {
+            // Log error but continue with local logout
+            logError(parseError(error), {context: "auth.logout"});
+        } finally {
+            // Always clear local storage
+            clearStorageItems([
+                AUTH_CONFIG.TOKEN_STORAGE_KEY,
+                AUTH_CONFIG.REFRESH_TOKEN_STORAGE_KEY,
+                AUTH_CONFIG.USER_STORAGE_KEY,
+            ]);
+        }
     }
 
     /**
@@ -184,13 +197,12 @@ class AuthService {
         confirmNewPassword: string
     ) {
         try {
-            const response = await api.post("/auth/password/change", {
+            const response = await api.patch("/users/change-password", {
                 currentPassword,
                 newPassword,
-                confirmNewPassword,
             });
 
-            if (response.data.status === "success") {
+            if (response.data.status === "success" || response.data.success) {
                 return response.data;
             }
 

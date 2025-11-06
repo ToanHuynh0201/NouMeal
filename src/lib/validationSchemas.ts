@@ -119,9 +119,23 @@ export const registerSchema = yup.object({
 });
 
 export const changePasswordSchema = yup.object({
-    currentPassword: validationRules.password,
-    newPassword: validationRules.password,
-    confirmNewPassword: validationRules.confirmPassword,
+    currentPassword: yup
+        .string()
+        .required("Current password is required"),
+    newPassword: yup
+        .string()
+        .required("New password is required")
+        .min(6, "New password must be at least 6 characters long")
+        .max(VALIDATION.PASSWORD_MAX_LENGTH, "Password is too long")
+        .matches(
+            /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+            "Password must contain at least one lowercase letter, one uppercase letter, and one number"
+        )
+        .notOneOf([yup.ref("currentPassword")], "New password must be different from current password"),
+    confirmNewPassword: yup
+        .string()
+        .required("Please confirm your new password")
+        .oneOf([yup.ref("newPassword")], "Passwords must match"),
 });
 
 export const forgotPasswordSchema = yup.object({
