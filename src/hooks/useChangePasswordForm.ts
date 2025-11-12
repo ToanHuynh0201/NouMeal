@@ -44,8 +44,7 @@ export const useChangePasswordForm = (onSuccess: () => void, options: any = {}) 
                 // Call the change password API
                 await changePassword(
                     data.currentPassword,
-                    data.newPassword,
-                    data.confirmNewPassword
+                    data.newPassword
                 );
 
                 // Reset form on successful password change

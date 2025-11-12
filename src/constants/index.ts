@@ -78,6 +78,51 @@ export const SUCCESS_MESSAGES = {
     ACTION_COMPLETED: "Action completed successfully!",
 };
 
+// User Options
+export const ACTIVITY_LEVELS = [
+    { value: "sedentary", label: "Sedentary (little or no exercise)" },
+    { value: "lightly_active", label: "Lightly active (1-3 days/week)" },
+    { value: "moderately_active", label: "Moderately active (3-5 days/week)" },
+    { value: "very_active", label: "Very active (6-7 days/week)" },
+    { value: "extra_active", label: "Extra active (intense daily exercise)" },
+];
+
+export const GOALS = [
+    { value: "lose_weight", label: "Lose weight" },
+    { value: "maintain_weight", label: "Maintain weight" },
+    { value: "gain_weight", label: "Gain weight" },
+    { value: "build_muscle", label: "Build muscle" },
+    { value: "improve_health", label: "Improve health" },
+];
+
+export const GENDERS = [
+    { value: "male", label: "Male" },
+    { value: "female", label: "Female" },
+    { value: "other", label: "Other" },
+];
+
+export const ALLERGIES = [
+    { value: "peanuts", label: "Peanuts" },
+    { value: "tree_nuts", label: "Tree nuts" },
+    { value: "milk", label: "Milk" },
+    { value: "eggs", label: "Eggs" },
+    { value: "wheat_gluten", label: "Wheat/Gluten" },
+    { value: "fish", label: "Fish" },
+    { value: "shellfish", label: "Shellfish" },
+    { value: "soy", label: "Soy" },
+    { value: "corn", label: "Corn" },
+    { value: "sesame", label: "Sesame" },
+    { value: "pineapple", label: "Pineapple" },
+    { value: "strawberry", label: "Strawberry" },
+    { value: "banana", label: "Banana" },
+    { value: "tomato", label: "Tomato" },
+    { value: "apple", label: "Apple" },
+    { value: "chocolate", label: "Chocolate" },
+    { value: "honey", label: "Honey" },
+    { value: "mustard", label: "Mustard" },
+    { value: "other", label: "Other" },
+];
+
 export default {
     API_CONFIG,
     AUTH_CONFIG,
@@ -87,4 +132,8 @@ export default {
     ERROR_MESSAGES,
     SUCCESS_MESSAGES,
     ROLES,
+    ACTIVITY_LEVELS,
+    GOALS,
+    GENDERS,
+    ALLERGIES,
 };

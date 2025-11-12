@@ -16,8 +16,7 @@ interface AuthContextType extends AuthState {
     clearError: () => void;
     changePassword: (
         currentPassword: string,
-        newPassword: string,
-        confirmNewPassword: string
+        newPassword: string
     ) => Promise<any>;
 }
 
@@ -156,13 +155,11 @@ export const AuthProvider = ({children}: any) => {
     // Change password function
     const changePassword = async (
         currentPassword: string,
-        newPassword: string,
-        confirmNewPassword: string
+        newPassword: string
     ) => {
         return await authService.changePassword(
             currentPassword,
-            newPassword,
-            confirmNewPassword
+            newPassword
         );
     };
 

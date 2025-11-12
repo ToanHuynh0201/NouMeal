@@ -12,6 +12,7 @@ import type {UserRegistrationRequest, UserLoginRequest, AuthResponse} from "../t
 class AuthService {
     /**
      * Register a new user
+     * Note: Does NOT auto-login. User must verify email first.
      * @param {UserRegistrationRequest} userData - User registration data
      * @returns {Promise<AuthResponse>} API response data
      */
@@ -20,17 +21,8 @@ class AuthService {
             const response = await api.post("/users/register", userData);
 
             if (response.data.status === "success" || response.data.success) {
-                // Handle both response formats from backend
-                const data = response.data.data || response.data;
-                const {user, accessToken, refreshToken, token} = data;
-
-                // Use either accessToken or token (depending on backend response)
-                const authToken = accessToken || token;
-
-                if (user && authToken) {
-                    this._storeAuthData(user, authToken, refreshToken);
-                }
-
+                // Don't store auth data yet - user needs to verify email first
+                // Backend will send OTP email automatically
                 return response.data;
             }
 
@@ -188,13 +180,11 @@ class AuthService {
      * Change user password
      * @param {string} currentPassword - Current password
      * @param {string} newPassword - New password
-     * @param {string} confirmNewPassword - Confirm new password
      * @returns {Promise<Object>} API response data
      */
     async changePassword(
         currentPassword: string,
-        newPassword: string,
-        confirmNewPassword: string
+        newPassword: string
     ) {
         try {
             const response = await api.patch("/users/change-password", {
@@ -214,6 +204,130 @@ class AuthService {
 
             const parsedError = parseError(error);
             logError(parsedError, {context: "auth.changePassword"});
+            throw parsedError;
+        }
+    }
+
+    /**
+     * Verify email with OTP
+     * @param {string} email - User email
+     * @param {string} otp - 6-digit OTP
+     * @returns {Promise<Object>} API response data
+     */
+    async verifyEmail(email: string, otp: string) {
+        try {
+            const response = await api.post("/auth/verify-email", {
+                email,
+                otp,
+            });
+
+            if (response.data.status === "success" || response.data.success) {
+                return response.data;
+            }
+
+            throw parseError({response});
+        } catch (error: any) {
+            if (error.name === "ApiError") {
+                throw error;
+            }
+
+            const parsedError = parseError(error);
+            logError(parsedError, {context: "auth.verifyEmail", email});
+            throw parsedError;
+        }
+    }
+
+    /**
+     * Resend email verification OTP
+     * @param {string} email - User email
+     * @returns {Promise<Object>} API response data
+     */
+    async resendVerificationEmail(email: string) {
+        try {
+            const response = await api.post("/auth/resend-verification", {
+                email,
+            });
+
+            if (response.data.status === "success" || response.data.success) {
+                return response.data;
+            }
+
+            throw parseError({response});
+        } catch (error: any) {
+            if (error.name === "ApiError") {
+                throw error;
+            }
+
+            const parsedError = parseError(error);
+            logError(parsedError, {context: "auth.resendVerification", email});
+            throw parsedError;
+        }
+    }
+
+    /**
+     * Request password reset OTP
+     * @param {string} email - User email
+     * @returns {Promise<Object>} API response data
+     */
+    async forgotPassword(email: string) {
+        try {
+            const response = await api.post("/auth/forgot-password", {
+                email,
+            });
+
+            if (response.data.status === "success" || response.data.success) {
+                return response.data;
+            }
+
+            throw parseError({response});
+        } catch (error: any) {
+            if (error.name === "ApiError") {
+                throw error;
+            }
+
+            const parsedError = parseError(error);
+            logError(parsedError, {context: "auth.forgotPassword", email});
+            throw parsedError;
+        }
+    }
+
+    /**
+     * Reset password with OTP
+     * @param {string} email - User email
+     * @param {string} otp - 6-digit OTP
+     * @param {string} newPassword - New password
+     * @returns {Promise<AuthResponse>} API response data with new tokens
+     */
+    async resetPassword(email: string, otp: string, newPassword: string): Promise<AuthResponse> {
+        try {
+            const response = await api.post("/auth/reset-password", {
+                email,
+                otp,
+                newPassword,
+            });
+
+            if (response.data.status === "success" || response.data.success) {
+                const data = response.data.data || response.data;
+                const {user, accessToken, refreshToken, token} = data;
+
+                // Use either accessToken or token (depending on backend response)
+                const authToken = accessToken || token;
+
+                if (user && authToken) {
+                    this._storeAuthData(user, authToken, refreshToken);
+                }
+
+                return response.data;
+            }
+
+            throw parseError({response});
+        } catch (error: any) {
+            if (error.name === "ApiError") {
+                throw error;
+            }
+
+            const parsedError = parseError(error);
+            logError(parsedError, {context: "auth.resetPassword", email});
             throw parsedError;
         }
     }
