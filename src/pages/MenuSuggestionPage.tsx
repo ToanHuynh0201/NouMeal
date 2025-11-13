@@ -31,9 +31,9 @@ import WeeklySummaryCard from "@/components/menu/WeeklySummaryCard";
 import DayHeader from "@/components/menu/DayHeader";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import useScrollAnimation from "@/hooks/useScrollAnimation";
-import {foodService} from "@/services";
+import {authService, foodService} from "@/services";
 import type {Recipe, DailyMenu, FoodRecommendationResponse} from "@/types";
-import {mockUserProfile, mockWeeklyMenu} from "@/data/mockData";
+import {mockWeeklyMenu} from "@/data/mockData";
 import {convertRecommendationsToDailyMenu} from "@/utils/food";
 
 const MenuSuggestionPage = () => {
@@ -42,6 +42,7 @@ const MenuSuggestionPage = () => {
     const [selectedDayMenu, setSelectedDayMenu] = useState<DailyMenu | null>(null);
     const headerSection = useScrollAnimation({threshold: 0.1});
     const toast = useToast();
+    const user = authService.getCurrentUser();
 
     // State for food recommendations
     const [recommendations, setRecommendations] =
@@ -127,7 +128,7 @@ const MenuSuggestionPage = () => {
                         }
                         transition="all 0.6s ease-out"
                     >
-                        <UserProfileHeader userProfile={mockUserProfile} />
+                        <UserProfileHeader userProfile={user} />
                     </Box>
 
                     {/* Tabs for Today and This Week */}
