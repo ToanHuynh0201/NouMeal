@@ -16,7 +16,7 @@ const MainLayout = ({
             <Sidebar />
 
             <Flex direction="column" flex="1">
-                {showHeader && <AppHeader />}
+                {showHeader && <AppHeader onLogout={logout} />}
 
                 <Box as="main" flex="1" p={6}>
                     {children}

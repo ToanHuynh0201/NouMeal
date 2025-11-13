@@ -19,9 +19,11 @@ import {
     useDisclosure,
     VStack,
 } from "@chakra-ui/react";
+import ChangePasswordModal from "../auth/ChangePasswordModal";
+
 const AppHeader = ({onLogout}: any) => {
     const {user} = useAuth();
-    const {onOpen} = useDisclosure();
+    const {isOpen, onOpen, onClose} = useDisclosure();
 
     const borderColor = useColorModeValue("gray.200", "gray.600");
 
@@ -126,7 +128,7 @@ const AppHeader = ({onLogout}: any) => {
             </Container>
 
             {/* Change Password Modal */}
-            {/* <ChangePasswordModal isOpen={isOpen} onClose={onClose} /> */}
+            <ChangePasswordModal isOpen={isOpen} onClose={onClose} />
         </Box>
     );
 };

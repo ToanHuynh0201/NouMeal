@@ -16,8 +16,7 @@ interface AuthContextType extends AuthState {
     clearError: () => void;
     changePassword: (
         currentPassword: string,
-        newPassword: string,
-        confirmNewPassword: string
+        newPassword: string
     ) => Promise<any>;
 }
 
@@ -129,7 +128,7 @@ export const AuthProvider = ({children}: any) => {
             const response = await authService.login(email, password);
             dispatch({
                 type: AUTH_ACTIONS.LOGIN_SUCCESS,
-                payload: {user: response.data.user},
+                payload: {user: response?.data?.user},
             });
             return response;
         } catch (error: any) {
@@ -143,8 +142,8 @@ export const AuthProvider = ({children}: any) => {
     };
 
     // Logout function
-    const logout = () => {
-        authService.logout();
+    const logout = async () => {
+        await authService.logout();
         dispatch({type: AUTH_ACTIONS.LOGOUT});
     };
 
@@ -156,13 +155,11 @@ export const AuthProvider = ({children}: any) => {
     // Change password function
     const changePassword = async (
         currentPassword: string,
-        newPassword: string,
-        confirmNewPassword: string
+        newPassword: string
     ) => {
         return await authService.changePassword(
             currentPassword,
-            newPassword,
-            confirmNewPassword
+            newPassword
         );
     };
 

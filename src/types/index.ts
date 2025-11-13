@@ -12,6 +12,7 @@ export interface UserRegistrationRequest {
     gender: "male" | "female" | "other";
     height: number;
     weight: number;
+    activity: "sedentary" | "lightly_active" | "moderately_active" | "very_active" | "extra_active";
     goal:
         | "lose_weight"
         | "maintain_weight"
@@ -35,6 +36,7 @@ export interface User {
     gender: "male" | "female" | "other";
     height: number;
     weight: number;
+    activity: "sedentary" | "lightly_active" | "moderately_active" | "very_active" | "extra_active";
     goal:
         | "lose_weight"
         | "maintain_weight"
@@ -45,6 +47,7 @@ export interface User {
     allergies?: string[];
     favoriteFoods?: string[];
     isActive: boolean;
+    isEmailVerified?: boolean;
     role?: string;
     lastLogin?: string;
     createdAt: string;

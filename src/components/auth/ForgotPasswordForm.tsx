@@ -6,7 +6,7 @@ import {FIELD_PRESETS} from "@/constants/forms";
 import {useForgotPasswordForm} from "@/hooks/useForgotPasswordForm";
 
 interface ForgotPasswordFormProps {
-    onSuccess: () => void;
+    onSuccess: (email: string) => void;
     onSwitchToLogin?: () => void;
 }
 
@@ -38,7 +38,7 @@ const ForgotPasswordForm = ({
 
                 <Box w="full">
                     <Text fontSize="sm" color="gray.600" mb={4} textAlign="center">
-                        Enter your email address and we'll send you a link to reset
+                        Enter your email address and we'll send you a verification code to reset
                         your password.
                     </Text>
                 </Box>
@@ -62,10 +62,10 @@ const ForgotPasswordForm = ({
 
                 <SubmitButton
                     isLoading={isLoading}
-                    loadingText="Sending Reset Link..."
+                    loadingText="Sending Code..."
                     isDisabled={!isValid}
                 >
-                    Send Reset Link
+                    Send Verification Code
                 </SubmitButton>
 
                 {onSwitchToLogin && (
