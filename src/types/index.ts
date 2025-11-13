@@ -76,3 +76,77 @@ export interface ErrorResponse {
         details?: string;
     };
 }
+
+// Food Types (matching backend API)
+export interface FoodNutritionalInfo {
+    calories: number;
+    protein: number;
+    carbohydrates: number;
+    fat: number;
+    fiber?: number;
+    sugar?: number;
+    sodium?: number;
+    cholesterol?: number;
+}
+
+export interface FoodIngredient {
+    name: string;
+    amount: string;
+}
+
+export type FoodCategory =
+    | "fruits"
+    | "vegetables"
+    | "grains"
+    | "protein"
+    | "dairy"
+    | "fats"
+    | "beverages"
+    | "snacks"
+    | "desserts"
+    | "spices";
+
+export type MealType = "breakfast" | "lunch" | "dinner" | "snack";
+
+export type AllergenType =
+    | "peanuts"
+    | "tree_nuts"
+    | "milk"
+    | "eggs"
+    | "wheat_gluten"
+    | "fish"
+    | "shellfish"
+    | "soy"
+    | "corn"
+    | "sesame"
+    | "pineapple"
+    | "strawberry"
+    | "banana"
+    | "tomato"
+    | "apple"
+    | "chocolate"
+    | "honey"
+    | "mustard"
+    | "other";
+
+export interface Food {
+    _id: string;
+    name: string;
+    description?: string;
+    category: FoodCategory;
+    meal?: MealType;
+    ingredients?: FoodIngredient[];
+    nutritionalInfo?: FoodNutritionalInfo;
+    allergens?: AllergenType[];
+    isActive: boolean;
+    tags?: string[];
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface FoodRecommendationResponse {
+    breakfast: Food[];
+    lunch: Food[];
+    dinner: Food[];
+    snack: Food[];
+}
