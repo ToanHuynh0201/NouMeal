@@ -1,10 +1,14 @@
-import {forgotPasswordSchema} from "@/lib/validationSchemas";
+import {verifyEmailSchema} from "@/lib/validationSchemas";
 import useFormValidation from "./useFormValidation";
 import {VALIDATION_MODES} from "@/constants/forms";
 import {useCallback, useState} from "react";
 import {authService} from "@/services/authService";
 
-export const useForgotPasswordForm = (onSuccess: (email: string) => void, options: any = {}) => {
+export const useVerifyEmailForm = (
+    email: string,
+    onSuccess: () => void,
+    options: any = {}
+) => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -15,10 +19,12 @@ export const useForgotPasswordForm = (onSuccess: (email: string) => void, option
         hasError,
         getError,
         reset,
+        setValue,
     } = useFormValidation(
-        forgotPasswordSchema,
+        verifyEmailSchema,
         {
-            email: "",
+            email: email,
+            otp: "",
         },
         {
             mode: options.validationMode || VALIDATION_MODES.onChange,
@@ -32,19 +38,20 @@ export const useForgotPasswordForm = (onSuccess: (email: string) => void, option
                 setIsLoading(true);
                 setError(null);
 
-                await authService.forgotPassword(data.email);
+                await authService.verifyEmail(data.email, data.otp);
 
-                onSuccess(data.email);
+                reset();
+                onSuccess();
             } catch (err: any) {
                 setError(
-                    err.message || "Failed to send reset email. Please try again."
+                    err.message || "Invalid or expired OTP. Please try again."
                 );
-                console.error("Forgot password error:", err);
+                console.error("Verify email error:", err);
             } finally {
                 setIsLoading(false);
             }
         },
-        [onSuccess]
+        [reset, onSuccess]
     );
 
     const clearError = () => setError(null);
@@ -63,5 +70,6 @@ export const useForgotPasswordForm = (onSuccess: (email: string) => void, option
         getError,
         clearError,
         reset,
+        setValue,
     };
 };

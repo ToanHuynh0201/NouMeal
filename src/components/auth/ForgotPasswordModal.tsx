@@ -10,39 +10,98 @@ import {
     Divider,
     Text,
     useToast,
+    Progress,
+    HStack,
+    Circle,
 } from "@chakra-ui/react";
 import {animationPresets} from "@/styles/animation";
 import {useThemeValues} from "@/styles/themeUtils";
 import ForgotPasswordForm from "./ForgotPasswordForm";
-import {LockIcon} from "@chakra-ui/icons";
+import ResetPasswordForm from "./ResetPasswordForm";
+import {LockIcon, CheckIcon} from "@chakra-ui/icons";
+import {useState} from "react";
+import {useNavigate} from "react-router-dom";
 
 interface ForgotPasswordModalProps {
     isOpen: boolean;
     onClose: () => void;
 }
 
+type ForgotPasswordStep = "email" | "reset";
+
 const ForgotPasswordModal = ({isOpen, onClose}: ForgotPasswordModalProps) => {
     const {cardBg} = useThemeValues();
     const toast = useToast();
+    const navigate = useNavigate();
+    const [currentStep, setCurrentStep] = useState<ForgotPasswordStep>("email");
+    const [email, setEmail] = useState("");
 
-    const handleSuccess = () => {
+    const handleEmailSuccess = (userEmail: string) => {
+        setEmail(userEmail);
+        setCurrentStep("reset");
         toast({
-            title: "Reset Link Sent!",
-            description: "Please check your email for password reset instructions.",
+            title: "Verification Code Sent!",
+            description: "Please check your email for the verification code.",
+            status: "success",
+            duration: 5000,
+            isClosable: true,
+            position: "top",
+        });
+    };
+
+    const handleResetSuccess = () => {
+        toast({
+            title: "Password Reset Successful!",
+            description: "Your password has been reset. You are now logged in.",
             status: "success",
             duration: 5000,
             isClosable: true,
             position: "top",
         });
         onClose();
+        navigate("/home");
     };
+
+    const handleClose = () => {
+        setCurrentStep("email");
+        setEmail("");
+        onClose();
+    };
+
+    const handleBack = () => {
+        setCurrentStep("email");
+    };
+
+    const getStepTitle = () => {
+        switch (currentStep) {
+            case "email":
+                return "Forgot Password?";
+            case "reset":
+                return "Reset Password";
+            default:
+                return "Forgot Password?";
+        }
+    };
+
+    const getStepSubtitle = () => {
+        switch (currentStep) {
+            case "email":
+                return "No worries, we'll send you reset instructions";
+            case "reset":
+                return "Enter the code and create a new password";
+            default:
+                return "";
+        }
+    };
+
+    const progressValue = currentStep === "email" ? 50 : 100;
 
     if (!isOpen) return null;
 
     return (
         <Modal
             isOpen={isOpen}
-            onClose={onClose}
+            onClose={handleClose}
             size="md"
             isCentered
             motionPreset="slideInBottom"
@@ -77,12 +136,71 @@ const ForgotPasswordModal = ({isOpen, onClose}: ForgotPasswordModalProps) => {
                         </Box>
                         <Box>
                             <Text fontSize="2xl" fontWeight="bold" color="gray.700">
-                                Forgot Password?
+                                {getStepTitle()}
                             </Text>
                             <Text fontSize="sm" color="gray.500" mt={1}>
-                                No worries, we'll send you reset instructions
+                                {getStepSubtitle()}
                             </Text>
                         </Box>
+
+                        {/* Step Indicator */}
+                        <HStack spacing={4} mt={4} w="full" justify="center">
+                            <HStack spacing={2}>
+                                <Circle
+                                    size="32px"
+                                    bg={currentStep === "email" ? "blue.500" : "green.500"}
+                                    color="white"
+                                    fontWeight="bold"
+                                    fontSize="sm"
+                                >
+                                    {currentStep === "email" ? "1" : <CheckIcon boxSize={4} />}
+                                </Circle>
+                                <Text fontSize="xs" fontWeight="medium" color="gray.600">
+                                    Email
+                                </Text>
+                            </HStack>
+
+                            <Box w="40px" h="2px" bg="gray.300" position="relative">
+                                <Box
+                                    position="absolute"
+                                    top={0}
+                                    left={0}
+                                    h="100%"
+                                    w={currentStep === "reset" ? "100%" : "0%"}
+                                    bg="blue.500"
+                                    transition="width 0.3s ease"
+                                />
+                            </Box>
+
+                            <HStack spacing={2}>
+                                <Circle
+                                    size="32px"
+                                    bg={currentStep === "reset" ? "blue.500" : "gray.200"}
+                                    color={currentStep === "reset" ? "white" : "gray.500"}
+                                    fontWeight="bold"
+                                    fontSize="sm"
+                                >
+                                    2
+                                </Circle>
+                                <Text
+                                    fontSize="xs"
+                                    fontWeight="medium"
+                                    color={currentStep === "reset" ? "gray.600" : "gray.400"}
+                                >
+                                    Reset
+                                </Text>
+                            </HStack>
+                        </HStack>
+
+                        {/* Progress Bar */}
+                        <Progress
+                            value={progressValue}
+                            size="xs"
+                            colorScheme="blue"
+                            w="full"
+                            borderRadius="full"
+                            bg="gray.200"
+                        />
                     </VStack>
                 </ModalHeader>
 
@@ -93,17 +211,27 @@ const ForgotPasswordModal = ({isOpen, onClose}: ForgotPasswordModalProps) => {
                     _hover={{bg: "gray.100"}}
                     onClick={(e) => {
                         e.stopPropagation();
-                        onClose();
+                        handleClose();
                     }}
                 />
 
                 <Divider />
 
                 <ModalBody py={6} px={8}>
-                    <ForgotPasswordForm
-                        onSuccess={handleSuccess}
-                        onSwitchToLogin={onClose}
-                    />
+                    {currentStep === "email" && (
+                        <ForgotPasswordForm
+                            onSuccess={handleEmailSuccess}
+                            onSwitchToLogin={handleClose}
+                        />
+                    )}
+
+                    {currentStep === "reset" && (
+                        <ResetPasswordForm
+                            email={email}
+                            onSuccess={handleResetSuccess}
+                            onBack={handleBack}
+                        />
+                    )}
                 </ModalBody>
             </ModalContent>
         </Modal>
