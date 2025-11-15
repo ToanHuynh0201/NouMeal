@@ -19,7 +19,7 @@ import SubmitButton from "../common/SubmitButton";
 import AlertMessage from "../common/AlertMessage";
 import PasswordToggle from "../common/PasswordToggle";
 import {FIELD_PRESETS} from "@/constants/forms";
-import {ACTIVITY_LEVELS, GOALS, GENDERS, ALLERGIES} from "@/constants";
+import {ACTIVITY_LEVELS, HEALTH_GOALS, GENDERS, ALLERGIES} from "@/constants/profile";
 import {useRegisterForm} from "@/hooks/useRegisterForm";
 import {useState} from "react";
 
@@ -154,7 +154,7 @@ function RegisterForm({onSuccess, onSwitchToLogin}: RegisterFormProps) {
                     </FormLabel>
                     <Select id="goal" {...(register as any)("goal")} bg="gray.50">
                         <option value="">Select goal</option>
-                        {GOALS.map((g) => (
+                        {HEALTH_GOALS.map((g) => (
                             <option key={g.value} value={g.value}>{g.label}</option>
                         ))}
                     </Select>

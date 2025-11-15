@@ -1,29 +1,24 @@
-// Profile related constants
+/**
+ * Profile related constants
+ * All constants related to user profile, health, fitness, and dietary preferences
+ */
+
+// Profile Tabs
 export const PROFILE_TABS = {
     USER_INFO: "user-info",
     TRACKING: "tracking",
 } as const;
 
+// Activity Levels
 export const ACTIVITY_LEVELS = [
-    {
-        value: "sedentary",
-        label: "Sedentary (little or no exercise)",
-        multiplier: 1.2,
-    },
-    {value: "light", label: "Light (exercise 1-3 days/week)", multiplier: 1.375},
-    {
-        value: "moderate",
-        label: "Moderate (exercise 3-5 days/week)",
-        multiplier: 1.55,
-    },
-    {value: "active", label: "Active (exercise 6-7 days/week)", multiplier: 1.725},
-    {
-        value: "very-active",
-        label: "Very Active (intense exercise daily)",
-        multiplier: 1.9,
-    },
+    {value: "sedentary", label: "Sedentary (little or no exercise)"},
+    {value: "lightly_active", label: "Lightly active (1-3 days/week)"},
+    {value: "moderately_active", label: "Moderately active (3-5 days/week)"},
+    {value: "very_active", label: "Very active (6-7 days/week)"},
+    {value: "extra_active", label: "Extra active (intense daily exercise)"},
 ];
 
+// Dietary Preferences
 export const DIETARY_PREFERENCES = [
     {value: "none", label: "No Restrictions"},
     {value: "vegetarian", label: "Vegetarian"},
@@ -35,24 +30,43 @@ export const DIETARY_PREFERENCES = [
     {value: "paleo", label: "Paleo"},
 ];
 
+// Health & Fitness Goals
 export const HEALTH_GOALS = [
-    {value: "maintain", label: "Maintain Weight", icon: "⚖️"},
-    {value: "lose", label: "Lose Weight", icon: "📉"},
-    {value: "gain", label: "Gain Weight", icon: "📈"},
-    {value: "muscle", label: "Build Muscle", icon: "💪"},
-    {value: "health", label: "Improve Health", icon: "❤️"},
+    {value: "maintain_weight", label: "Maintain Weight", icon: "⚖️"},
+    {value: "lose_weight", label: "Lose Weight", icon: "📉"},
+    {value: "gain_weight", label: "Gain Weight", icon: "📈"},
+    {value: "build_muscle", label: "Build Muscle", icon: "💪"},
+    {value: "improve_health", label: "Improve Health", icon: "❤️"},
 ];
 
-export const ALLERGENS = [
-    "Peanuts",
-    "Tree Nuts",
-    "Milk",
-    "Eggs",
-    "Fish",
-    "Shellfish",
-    "Soy",
-    "Wheat",
-    "Sesame",
+// Gender Options
+export const GENDERS = [
+    { value: "male", label: "Male" },
+    { value: "female", label: "Female" },
+    { value: "other", label: "Other" },
+];
+
+// Allergens
+export const ALLERGIES = [
+    { value: "peanuts", label: "Peanuts" },
+    { value: "tree_nuts", label: "Tree nuts" },
+    { value: "milk", label: "Milk" },
+    { value: "eggs", label: "Eggs" },
+    { value: "wheat_gluten", label: "Wheat/Gluten" },
+    { value: "fish", label: "Fish" },
+    { value: "shellfish", label: "Shellfish" },
+    { value: "soy", label: "Soy" },
+    { value: "corn", label: "Corn" },
+    { value: "sesame", label: "Sesame" },
+    { value: "pineapple", label: "Pineapple" },
+    { value: "strawberry", label: "Strawberry" },
+    { value: "banana", label: "Banana" },
+    { value: "tomato", label: "Tomato" },
+    { value: "apple", label: "Apple" },
+    { value: "chocolate", label: "Chocolate" },
+    { value: "honey", label: "Honey" },
+    { value: "mustard", label: "Mustard" },
+    { value: "other", label: "Other" },
 ];
 
 export default {
@@ -60,5 +74,6 @@ export default {
     ACTIVITY_LEVELS,
     DIETARY_PREFERENCES,
     HEALTH_GOALS,
-    ALLERGENS,
+    GENDERS,
+    ALLERGIES,
 };

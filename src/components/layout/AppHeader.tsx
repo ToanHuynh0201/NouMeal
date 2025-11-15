@@ -18,14 +18,17 @@ import {
     Spacer,
     Text,
     useColorModeValue,
-    // useDisclosure,
+    useDisclosure,
     VStack,
 } from "@chakra-ui/react";
 import ChangePasswordModal from "../auth/ChangePasswordModal";
+import { ROUTES } from "@/constants";
+import { useNavigate } from "react-router-dom";
 
-const AppHeader = ({onLogout}: any) => {
+const AppHeader = ({onLogout}: AppHeaderProps) => {
     const {user} = useAuth();
     const {isOpen, onOpen, onClose} = useDisclosure();
+    const navigate = useNavigate();
 
     const headerBg = useColorModeValue("white", "gray.800");
     const borderColor = useColorModeValue("gray.200", "gray.600");
