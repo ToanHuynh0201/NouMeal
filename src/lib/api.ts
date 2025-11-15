@@ -138,8 +138,9 @@ class ApiService {
             const refreshResponse = await this._performTokenRefresh(refreshToken);
 
             if (refreshResponse.data.success === true) {
-                const accessToken = refreshResponse.data.accessToken;
-                const newRefreshToken = refreshResponse.data.refreshToken;
+                // Tokens are inside the `data` object
+                const accessToken = refreshResponse.data.data.accessToken;
+                const newRefreshToken = refreshResponse.data.data.refreshToken;
                 setStorageItem(AUTH_CONFIG.TOKEN_STORAGE_KEY, accessToken);
 
                 if (newRefreshToken) {
