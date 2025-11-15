@@ -9,6 +9,7 @@ import RecipeDetailPage from "./pages/RecipeDetailPage";
 import MenuSuggestionPage from "./pages/MenuSuggestionPage";
 import AIMealSuggestionPage from "./pages/AIMealSuggestionPage";
 import ImageRecognitionPage from "./pages/ImageRecognitionPage";
+import MyRecipesPage from "./pages/MyRecipesPage";
 
 const App = () => {
     return (
@@ -45,6 +46,14 @@ const App = () => {
                         element={
                             <ProtectedRoute>
                                 <ImageRecognitionPage />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path={ROUTES.MY_RECIPES}
+                        element={
+                            <ProtectedRoute>
+                                <MyRecipesPage />
                             </ProtectedRoute>
                         }
                     />
