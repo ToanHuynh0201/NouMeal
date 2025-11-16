@@ -1,5 +1,6 @@
 import {useState} from "react";
 import {useLocation, useNavigate} from "react-router-dom";
+import {ROUTES} from "@/constants";
 import LoginForm from "@/components/auth/LoginForm";
 import RegisterModal from "@/components/auth/RegisterModal";
 import ForgotPasswordModal from "@/components/auth/ForgotPasswordModal";
@@ -12,7 +13,7 @@ export default function LoginPage() {
         useState(false);
 
     const handleLoginSuccess = () => {
-        const from = location.state?.from?.pathname || "/home";
+        const from = location.state?.from?.pathname || ROUTES.DASHBOARD;
         navigate(from, {replace: true});
     };
 

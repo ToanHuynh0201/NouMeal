@@ -26,7 +26,9 @@ export const AUTH_CONFIG = {
 // Route Paths
 export const ROUTES = {
     LOGIN: "/login",
-    HOME: "/home",
+    LANDING: "/",
+    DASHBOARD: "/dashboard",
+    HOME: "/home", // Deprecated, use DASHBOARD instead
     PROFILE: "/profile",
     ROOT: "/",
 };

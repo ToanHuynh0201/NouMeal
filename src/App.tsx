@@ -2,7 +2,8 @@ import {Navigate, Route, BrowserRouter as Router, Routes} from "react-router-dom
 import "./App.css";
 import {ROUTES} from "./constants";
 import LoginPage from "./pages/LoginPage";
-import HomePage from "./pages/HomePage";
+import LandingPage from "./pages/LandingPage";
+import DashboardPage from "./pages/DashboardPage";
 import ProfilePage from "./pages/ProfilePage";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import {AuthProvider} from "./contexts/AuthContext";
@@ -12,12 +13,16 @@ function App() {
         <AuthProvider>
             <Router>
                 <Routes>
+                    {/* Public Routes */}
+                    <Route path={ROUTES.LANDING} element={<LandingPage />} />
                     <Route path={ROUTES.LOGIN} element={<LoginPage />} />
+                    
+                    {/* Protected Routes */}
                     <Route
-                        path={ROUTES.HOME}
+                        path={ROUTES.DASHBOARD}
                         element={
                             <ProtectedRoute>
-                                <HomePage />
+                                <DashboardPage />
                             </ProtectedRoute>
                         }
                     />
@@ -29,13 +34,11 @@ function App() {
                             </ProtectedRoute>
                         }
                     />
-                    <Route
-                        path="/"
-                        element={<Navigate to={ROUTES.HOME} replace />}
-                    />
+                    
+                    {/* Fallback Routes */}
                     <Route
                         path="*"
-                        element={<Navigate to={ROUTES.HOME} replace />}
+                        element={<Navigate to={ROUTES.LANDING} replace />}
                     />
                 </Routes>
             </Router>
