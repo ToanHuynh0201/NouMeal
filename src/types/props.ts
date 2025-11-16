@@ -3,8 +3,9 @@ import type {FieldValues, UseFormRegister} from "react-hook-form";
 
 export type MainLayoutProps = {
     children: any;
-    showHeader: boolean;
-    showFooter: boolean;
+    showHeader?: boolean;
+    showFooter?: boolean;
+    showSidebar?: boolean;
 };
 
 export type LoginPageProps = {
@@ -37,7 +38,8 @@ export type AuthHeaderProps = {
 };
 
 export type AppHeaderProps = {
-    onLogout: () => void;
+    onLogout?: () => void;
+    showAuthButtons?: boolean;
 };
 
 export type LoadingSpinnerProps = {

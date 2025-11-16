@@ -15,7 +15,7 @@ import {Link as RouterLink, useLocation} from "react-router-dom";
 import {ChevronLeftIcon, ChevronRightIcon} from "@chakra-ui/icons";
 import type {navItem} from "@/types/layout";
 import {ROUTES} from "@/constants";
-import {FiHome} from "react-icons/fi";
+import {MdDashboard} from "react-icons/md";
 import {CgProfile} from "react-icons/cg";
 
 function Sidebar() {
@@ -26,9 +26,9 @@ function Sidebar() {
 
     const navItems: navItem[] = [
         {
-            label: "Home",
-            path: ROUTES.HOME,
-            icon: FiHome,
+            label: "Dashboard",
+            path: ROUTES.DASHBOARD,
+            icon: MdDashboard,
         },
         {
             label: "Profile",

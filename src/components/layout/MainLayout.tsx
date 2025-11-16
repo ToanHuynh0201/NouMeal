@@ -10,6 +10,7 @@ function MainLayout({
     children,
     showHeader = true,
     showFooter = true,
+    showSidebar = true,
 }: MainLayoutProps) {
     const {logout} = useAuth();
     const {mainBgGradient: bgGradient} = useThemeGradients();
@@ -18,7 +19,7 @@ function MainLayout({
     };
     return (
         <Flex minH="100vh" bgGradient={bgGradient}>
-            <Sidebar />
+            {showSidebar && <Sidebar />}
 
             <Flex direction="column" flex="1">
                 {showHeader && <AppHeader onLogout={logout} />}
