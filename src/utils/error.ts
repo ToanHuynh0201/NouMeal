@@ -1,13 +1,17 @@
-import {ERROR_CODES, ERROR_MESSAGES} from "../constants";
+import { ERROR_CODES, ERROR_MESSAGES } from "../constants";
 export class ApiError extends Error {
-    status: number;
-    code: string;
-    constructor(message: string, status = 500, code = ERROR_CODES.INTERNAL_ERROR) {
-        super(message);
-        this.name = "ApiError";
-        this.status = status;
-        this.code = code;
-    }
+	status: number;
+	code: string;
+	constructor(
+		message: string,
+		status = 500,
+		code = ERROR_CODES.INTERNAL_ERROR,
+	) {
+		super(message);
+		this.name = "ApiError";
+		this.status = status;
+		this.code = code;
+	}
 }
 
 /**
@@ -15,38 +19,39 @@ export class ApiError extends Error {
  * @returns {ApiError} Parsed error
  */
 export const parseError = (error: any) => {
-    // Network error (no response)
-    if (!error.response) {
-        return new ApiError(
-            ERROR_MESSAGES.NETWORK_ERROR,
-            0,
-            ERROR_CODES.NETWORK_ERROR
-        );
-    }
+	// Network error (no response)
+	if (!error.response) {
+		return new ApiError(
+			ERROR_MESSAGES.NETWORK_ERROR,
+			0,
+			ERROR_CODES.NETWORK_ERROR,
+		);
+	}
 
-    const {status, data} = error.response;
+	const { status, data } = error.response;
 
-    // Extract error details from various response formats
-    const errorCode = data?.error?.code || data?.code || ERROR_CODES.INTERNAL_ERROR;
-    const errorMessage =
-        data?.error?.message ||
-        data?.message ||
-        data?.error ||
-        ERROR_MESSAGES.GENERIC_ERROR;
+	// Extract error details from various response formats
+	const errorCode =
+		data?.error?.code || data?.code || ERROR_CODES.INTERNAL_ERROR;
+	const errorMessage =
+		data?.error?.message ||
+		data?.message ||
+		data?.error ||
+		ERROR_MESSAGES.GENERIC_ERROR;
 
-    // Validate error code
-    const validCode = Object.values(ERROR_CODES).includes(errorCode)
-        ? errorCode
-        : ERROR_CODES.INTERNAL_ERROR;
+	// Validate error code
+	const validCode = Object.values(ERROR_CODES).includes(errorCode)
+		? errorCode
+		: ERROR_CODES.INTERNAL_ERROR;
 
-    // Use backend message if available, otherwise fall back to predefined message
-    const finalMessage =
-        errorMessage && errorMessage !== ERROR_MESSAGES.GENERIC_ERROR
-            ? errorMessage
-            : ERROR_MESSAGES[validCode as keyof typeof ERROR_MESSAGES] ||
-              errorMessage;
+	// Use backend message if available, otherwise fall back to predefined message
+	const finalMessage =
+		errorMessage && errorMessage !== ERROR_MESSAGES.GENERIC_ERROR
+			? errorMessage
+			: ERROR_MESSAGES[validCode as keyof typeof ERROR_MESSAGES] ||
+			  errorMessage;
 
-    return new ApiError(finalMessage, status, validCode);
+	return new ApiError(finalMessage, status, validCode);
 };
 
 /**
@@ -55,46 +60,47 @@ export const parseError = (error: any) => {
  * @returns {Function} Wrapped function that returns standardized response
  */
 export const withErrorHandling = <TArgs extends any[], TReturn>(
-    asyncFn: (...args: TArgs) => Promise<TReturn>
+	asyncFn: (...args: TArgs) => Promise<TReturn>,
 ) => {
-    return async (...args: TArgs) => {
-        try {
-            const response = await asyncFn(...args);
+	return async (...args: TArgs) => {
+		try {
+			const response = await asyncFn(...args);
 
-            // Check if response is successful (support multiple formats)
-            // Format 1: response.data.status === "success"
-            // Format 2: response.data.success === true
-            // Format 3: response.status in 2xx range (axios default)
-            const isSuccess = 
-                (response as any).data?.status === "success" || 
-                (response as any).data?.success === true ||
-                ((response as any).status >= 200 && (response as any).status < 300);
+			// Check if response is successful (support multiple formats)
+			// Format 1: response.data.status === "success"
+			// Format 2: response.data.success === true
+			// Format 3: response.status in 2xx range (axios default)
+			const isSuccess =
+				(response as any).data?.status === "success" ||
+				(response as any).data?.success === true ||
+				((response as any).status >= 200 &&
+					(response as any).status < 300);
 
-            if (isSuccess) {
-                return {
-                    success: true,
-                    data: (response as any).data.data || (response as any).data,
-                    pagination: (response as any).data.pagination,
-                    message: (response as any).data.message,
-                };
-            }
+			if (isSuccess) {
+				return {
+					success: true,
+					data: (response as any).data.data || (response as any).data,
+					pagination: (response as any).data.pagination,
+					message: (response as any).data.message,
+				};
+			}
 
-            // Handle error response
-            const error = parseError({response});
-            return {
-                success: false,
-                error: error.message,
-                code: error.code,
-            };
-        } catch (error) {
-            const parsedError = parseError(error);
-            return {
-                success: false,
-                error: parsedError.message,
-                code: parsedError.code,
-            };
-        }
-    };
+			// Handle error response
+			const error = parseError({ response });
+			return {
+				success: false,
+				error: error.message,
+				code: error.code,
+			};
+		} catch (error) {
+			const parsedError = parseError(error);
+			return {
+				success: false,
+				error: parsedError.message,
+				code: parsedError.code,
+			};
+		}
+	};
 };
 
 /**
@@ -103,13 +109,13 @@ export const withErrorHandling = <TArgs extends any[], TReturn>(
  * @param {Object} context - Additional context
  */
 export const logError = (error: any, context = {}) => {
-    console.error("Application Error:", {
-        message: error.message,
-        code: error.code,
-        status: error.status,
-        timestamp: new Date().toISOString(),
-        ...context,
-    });
+	console.error("Application Error:", {
+		message: error.message,
+		code: error.code,
+		status: error.status,
+		timestamp: new Date().toISOString(),
+		...context,
+	});
 };
 
 /**
@@ -118,10 +124,10 @@ export const logError = (error: any, context = {}) => {
  * @returns {boolean} Whether error should trigger logout
  */
 export const shouldLogout = (error: any) => {
-    return (
-        error.status === 401 ||
-        error.status === 403 ||
-        error.code === ERROR_CODES.UNAUTHORIZED ||
-        error.code === ERROR_CODES.FORBIDDEN
-    );
+	return (
+		error.status === 401 ||
+		error.status === 403 ||
+		error.code === ERROR_CODES.UNAUTHORIZED ||
+		error.code === ERROR_CODES.FORBIDDEN
+	);
 };

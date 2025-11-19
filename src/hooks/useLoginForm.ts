@@ -53,10 +53,6 @@ export const useLoginForm = (onSuccess: any, options: any = {}) => {
         [login, clearError, reset, onSuccess]
     );
 
-    // const onSubmit = () => {
-    //     onSuccess();
-    // };
-
     // Check if form has validation errors
     const hasFormErrors = Object.keys(errors).length > 0 && !isValid;
 

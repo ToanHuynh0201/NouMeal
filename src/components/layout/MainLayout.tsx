@@ -4,9 +4,9 @@ import {Box, Flex} from "@chakra-ui/react";
 import AppHeader from "./AppHeader";
 import AppFooter from "./AppFooter";
 import Sidebar from "./Sidebar";
-import {useAuth} from "@/hooks/useAuth";
+import { useAuth } from "@/hooks/useAuth";
 
-function MainLayout({
+const MainLayout = ({
     children,
     showHeader = true,
     showFooter = true,
@@ -32,6 +32,6 @@ function MainLayout({
             </Flex>
         </Flex>
     );
-}
+};
 
 export default MainLayout;

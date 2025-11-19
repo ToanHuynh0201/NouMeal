@@ -9,7 +9,7 @@ import {
     CloseButton,
 } from "@chakra-ui/react";
 
-function AlertMessage({
+const AlertMessage = ({
     status = "info",
     title,
     message,
@@ -17,7 +17,7 @@ function AlertMessage({
     onClose,
     variant = "subtle",
     size = "md",
-}: AlertMessageProps) {
+}: AlertMessageProps) => {
     const getSizeProps = () => {
         switch (size) {
             case "sm":
@@ -58,6 +58,6 @@ function AlertMessage({
             )}
         </Alert>
     );
-}
+};
 
 export default AlertMessage;
