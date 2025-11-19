@@ -31,7 +31,6 @@ export const ROUTES = {
 	LANDING: "/",
 	DASHBOARD: "/dashboard",
 	PROFILE: "/profile",
-	RECIPE: "/recipe",
 	MENU_SUGGESTION: "/menu-suggestion",
 	AI_MEAL_SUGGESTION: "/ai-meal-suggestion",
 	IMAGE_RECOGNITION: "/image-recognition",

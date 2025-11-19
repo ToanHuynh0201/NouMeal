@@ -17,7 +17,7 @@ import { SidebarItem } from "./SidebarItem";
 import { SidebarUserProfile } from "./SidebarUserProfile";
 import { FiCamera, FiBook } from "react-icons/fi";
 import { BsStars } from "react-icons/bs";
-import { MdFoodBank, MdRestaurantMenu } from "react-icons/md";
+import { MdRestaurantMenu } from "react-icons/md";
 import { MdDashboard } from "react-icons/md";
 import { CgProfile } from "react-icons/cg";
 function Sidebar() {
@@ -25,12 +25,17 @@ function Sidebar() {
 	const { user, logout } = useAuth();
 	const [isCollapsed, setIsCollapsed] = useState(false);
 
+	const toggleSidebar = () => setIsCollapsed(!isCollapsed);
+
 	// Color mode values
 	const sidebarBg = useColorModeValue(
-		"linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)",
-		"linear-gradient(180deg, #1a202c 0%, #171923 100%)",
+		"linear(to-b, rgba(100, 181, 246, 0.1), rgba(236, 72, 153, 0.1))",
+		"linear(to-b, rgba(26, 32, 44, 0.95), rgba(23, 25, 35, 0.95))",
 	);
-	const borderColor = useColorModeValue("gray.200", "gray.700");
+	const borderColor = useColorModeValue(
+		"rgba(159, 122, 234, 0.1)",
+		"gray.700",
+	);
 
 	// Navigation items without sections
 	const navItems: navItem[] = [
@@ -64,11 +69,6 @@ function Sidebar() {
 			path: ROUTES.IMAGE_RECOGNITION,
 			icon: FiCamera,
 		},
-		{
-			label: "Recipe",
-			path: ROUTES.RECIPE,
-			icon: MdFoodBank,
-		},
 	];
 
 	const isActivePath = (path: string) => location.pathname === path;
@@ -86,7 +86,11 @@ function Sidebar() {
 			shadow="xl"
 			animation={animationPresets.slideInLeft}
 			transition={transitions.smooth}
-			overflow="hidden">
+			overflow="hidden"
+			sx={{
+				backdropFilter: "blur(12px) saturate(180%)",
+				WebkitBackdropFilter: "blur(12px) saturate(180%)",
+			}}>
 			{/* Logo Section */}
 			<SidebarLogo isCollapsed={isCollapsed} />
 
@@ -110,7 +114,7 @@ function Sidebar() {
 					size="sm"
 					variant="ghost"
 					colorScheme="brand"
-					onClick={() => setIsCollapsed(!isCollapsed)}
+					onClick={toggleSidebar}
 					borderRadius="lg"
 					transition={transitions.smooth}
 					_hover={{
@@ -165,6 +169,7 @@ function Sidebar() {
 					user={user}
 					isCollapsed={isCollapsed}
 					onLogout={logout}
+					onToggleSidebar={toggleSidebar}
 				/>
 			)}
 		</Flex>

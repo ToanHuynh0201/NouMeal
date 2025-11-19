@@ -12,7 +12,6 @@ import DashboardPage from "./pages/DashboardPage";
 import ProfilePage from "./pages/ProfilePage";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import { AuthProvider } from "./contexts/AuthContext";
-import RecipeDetailPage from "./pages/RecipeDetailPage";
 import MenuSuggestionPage from "./pages/MenuSuggestionPage";
 import AIMealSuggestionPage from "./pages/AIMealSuggestionPage";
 import ImageRecognitionPage from "./pages/ImageRecognitionPage";
@@ -71,14 +70,6 @@ const App = () => {
 						element={
 							<ProtectedRoute>
 								<MyRecipesPage />
-							</ProtectedRoute>
-						}
-					/>
-					<Route
-						path={ROUTES.RECIPE}
-						element={
-							<ProtectedRoute>
-								<RecipeDetailPage />
 							</ProtectedRoute>
 						}
 					/>
