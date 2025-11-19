@@ -1,37 +1,44 @@
-import {useThemeGradients} from "@/styles/themeUtils";
-import type {MainLayoutProps} from "@/types/props";
-import {Box, Flex} from "@chakra-ui/react";
+import { useThemeGradients } from "@/styles/themeUtils";
+import type { MainLayoutProps } from "@/types/props";
+import { Box, Flex } from "@chakra-ui/react";
 import AppHeader from "./AppHeader";
 import AppFooter from "./AppFooter";
 import Sidebar from "./Sidebar";
 import { useAuth } from "@/hooks/useAuth";
 
 const MainLayout = ({
-    children,
-    showHeader = true,
-    showFooter = true,
-    showSidebar = true,
-}: MainLayoutProps) {
-    const {logout} = useAuth();
-    const {mainBgGradient: bgGradient} = useThemeGradients();
-    const handleLogout = () => {
-        logout();
-    };
-    return (
-        <Flex minH="100vh" bgGradient={bgGradient}>
-            {showSidebar && <Sidebar />}
+	children,
+	showHeader = true,
+	showFooter = true,
+	showSidebar = true,
+}: MainLayoutProps) => {
+	const { logout } = useAuth();
+	const { mainBgGradient: bgGradient } = useThemeGradients();
+	const handleLogout = () => {
+		logout();
+	};
+	return (
+		<Flex
+			minH="100vh"
+			bgGradient={bgGradient}>
+			{showSidebar && <Sidebar />}
 
-            <Flex direction="column" flex="1">
-                {showHeader && <AppHeader onLogout={logout} />}
+			<Flex
+				direction="column"
+				flex="1">
+				{showHeader && <AppHeader onLogout={handleLogout} />}
 
-                <Box as="main" flex="1" p={6}>
-                    {children}
-                </Box>
+				<Box
+					as="main"
+					flex="1"
+					p={6}>
+					{children}
+				</Box>
 
-                {showFooter && <AppFooter />}
-            </Flex>
-        </Flex>
-    );
+				{showFooter && <AppFooter />}
+			</Flex>
+		</Flex>
+	);
 };
 
 export default MainLayout;

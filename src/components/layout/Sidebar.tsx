@@ -11,8 +11,15 @@ import { useLocation } from "react-router-dom";
 import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import type { navItem } from "@/types/layout";
 import { ROUTES } from "@/constants";
-import { FiHome } from "react-icons/fi";
-
+import { useAuth } from "@/hooks/useAuth";
+import { SidebarLogo } from "./SidebarLogo";
+import { SidebarItem } from "./SidebarItem";
+import { SidebarUserProfile } from "./SidebarUserProfile";
+import { FiCamera, FiBook } from "react-icons/fi";
+import { BsStars } from "react-icons/bs";
+import { MdFoodBank, MdRestaurantMenu } from "react-icons/md";
+import { MdDashboard } from "react-icons/md";
+import { CgProfile } from "react-icons/cg";
 function Sidebar() {
 	const location = useLocation();
 	const { user, logout } = useAuth();

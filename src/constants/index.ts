@@ -28,6 +28,14 @@ export const AUTH_CONFIG = {
 export const ROUTES = {
 	LOGIN: "/login",
 	HOME: "/home",
+	LANDING: "/",
+	DASHBOARD: "/dashboard",
+	PROFILE: "/profile",
+	RECIPE: "/recipe",
+	MENU_SUGGESTION: "/menu-suggestion",
+	AI_MEAL_SUGGESTION: "/ai-meal-suggestion",
+	IMAGE_RECOGNITION: "/image-recognition",
+	MY_RECIPES: "/my-recipes",
 	ROOT: "/",
 };
 
