@@ -16,6 +16,10 @@ import MenuSuggestionPage from "./pages/MenuSuggestionPage";
 import AIMealSuggestionPage from "./pages/AIMealSuggestionPage";
 import ImageRecognitionPage from "./pages/ImageRecognitionPage";
 import MyRecipesPage from "./pages/MyRecipesPage";
+import OverallPage from "./pages/admin/OverallPage";
+import UsersPage from "./pages/admin/UsersPage";
+import FoodPage from "./pages/admin/FoodPage";
+import CommunityPage from "./pages/admin/CommunityPage";
 
 const App = () => {
 	return (
@@ -32,7 +36,7 @@ const App = () => {
 						element={<LoginPage />}
 					/>
 
-					{/* Protected Routes */}
+					{/* Protected Routes - Regular Users */}
 					<Route
 						path={ROUTES.DASHBOARD}
 						element={
@@ -78,6 +82,40 @@ const App = () => {
 						element={
 							<ProtectedRoute>
 								<ProfilePage />
+							</ProtectedRoute>
+						}
+					/>
+
+					{/* Protected Routes - Admin */}
+					<Route
+						path={ROUTES.ADMIN_OVERALL}
+						element={
+							<ProtectedRoute>
+								<OverallPage />
+							</ProtectedRoute>
+						}
+					/>
+					<Route
+						path={ROUTES.ADMIN_USERS}
+						element={
+							<ProtectedRoute>
+								<UsersPage />
+							</ProtectedRoute>
+						}
+					/>
+					<Route
+						path={ROUTES.ADMIN_FOOD}
+						element={
+							<ProtectedRoute>
+								<FoodPage />
+							</ProtectedRoute>
+						}
+					/>
+					<Route
+						path={ROUTES.ADMIN_COMMUNITY}
+						element={
+							<ProtectedRoute>
+								<CommunityPage />
 							</ProtectedRoute>
 						}
 					/>

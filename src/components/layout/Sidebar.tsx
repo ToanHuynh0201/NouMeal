@@ -15,11 +15,12 @@ import { useAuth } from "@/hooks/useAuth";
 import { SidebarLogo } from "./SidebarLogo";
 import { SidebarItem } from "./SidebarItem";
 import { SidebarUserProfile } from "./SidebarUserProfile";
-import { FiCamera, FiBook } from "react-icons/fi";
+import { FiCamera, FiBook, FiUsers } from "react-icons/fi";
 import { BsStars } from "react-icons/bs";
-import { MdRestaurantMenu } from "react-icons/md";
-import { MdDashboard } from "react-icons/md";
+import { MdRestaurantMenu, MdDashboard, MdFastfood } from "react-icons/md";
 import { CgProfile } from "react-icons/cg";
+import { RiCommunityLine } from "react-icons/ri";
+
 function Sidebar() {
 	const location = useLocation();
 	const { user, logout } = useAuth();
@@ -37,8 +38,11 @@ function Sidebar() {
 		"gray.700",
 	);
 
-	// Navigation items without sections
-	const navItems: navItem[] = [
+	// Check if user is admin
+	const isAdmin = user?.role === "ADMIN";
+
+	// Navigation items for regular users
+	const userNavItems: navItem[] = [
 		{
 			label: "Dashboard",
 			path: ROUTES.DASHBOARD,
@@ -70,6 +74,33 @@ function Sidebar() {
 			icon: FiCamera,
 		},
 	];
+
+	// Navigation items for admin
+	const adminNavItems: navItem[] = [
+		{
+			label: "Overall",
+			path: ROUTES.ADMIN_OVERALL,
+			icon: MdDashboard,
+		},
+		{
+			label: "Users",
+			path: ROUTES.ADMIN_USERS,
+			icon: FiUsers,
+		},
+		{
+			label: "Food",
+			path: ROUTES.ADMIN_FOOD,
+			icon: MdFastfood,
+		},
+		{
+			label: "Community",
+			path: ROUTES.ADMIN_COMMUNITY,
+			icon: RiCommunityLine,
+		},
+	];
+
+	// Select nav items based on user role
+	const navItems = isAdmin ? adminNavItems : userNavItems;
 
 	const isActivePath = (path: string) => location.pathname === path;
 

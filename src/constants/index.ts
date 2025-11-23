@@ -36,6 +36,11 @@ export const ROUTES = {
 	IMAGE_RECOGNITION: "/image-recognition",
 	MY_RECIPES: "/my-recipes",
 	ROOT: "/",
+	// Admin routes
+	ADMIN_OVERALL: "/admin/overall",
+	ADMIN_USERS: "/admin/users",
+	ADMIN_FOOD: "/admin/food",
+	ADMIN_COMMUNITY: "/admin/community",
 };
 
 // Form Validation
