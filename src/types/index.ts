@@ -3,6 +3,7 @@ export * from "./props";
 export * from "./ai";
 export * from "./recipe";
 export * from "./myRecipe";
+export * from "./admin";
 // Auth Types
 export interface UserRegistrationRequest {
 	email: string;
