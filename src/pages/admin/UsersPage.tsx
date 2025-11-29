@@ -72,7 +72,7 @@ const UsersPage = () => {
 					size="lg"
 					mb={6}
 					color="gray.700">
-					Quản lý người dùng
+					User Management
 				</Heading>
 				<Flex
 					mb={6}
@@ -83,7 +83,7 @@ const UsersPage = () => {
 							<FiSearch color="gray.400" />
 						</InputLeftElement>
 						<Input
-							placeholder="Tìm kiếm theo tên hoặc email..."
+							placeholder="Search by name or email..."
 							value={search}
 							onChange={(e) => setSearch(e.target.value)}
 							bg="white"
@@ -96,9 +96,9 @@ const UsersPage = () => {
 						onChange={(e) => setFilterStatus(e.target.value)}
 						bg="white"
 						borderRadius="lg">
-						<option value="all">Tất cả trạng thái</option>
-						<option value="active">Hoạt động</option>
-						<option value="inactive">Vô hiệu hóa</option>
+						<option value="all">All</option>
+						<option value="active">Active</option>
+						<option value="inactive">Inactive</option>
 					</Select>
 				</Flex>
 				{loading ? (

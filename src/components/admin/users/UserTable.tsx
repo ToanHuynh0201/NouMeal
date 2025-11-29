@@ -36,12 +36,12 @@ export const UserTable = ({
 				size={isMobile ? "sm" : "md"}>
 				<Thead bg="gray.50">
 					<Tr>
-						<Th>Họ tên</Th>
+						<Th>Name</Th>
 						<Th>Email</Th>
-						<Th>Giới tính</Th>
-						<Th>Tuổi</Th>
-						<Th>Trạng thái</Th>
-						<Th textAlign="center">Thao tác</Th>
+						<Th>Gender</Th>
+						<Th>Age</Th>
+						<Th>Status</Th>
+						<Th textAlign="center">Action</Th>
 					</Tr>
 				</Thead>
 				<Tbody>
@@ -51,16 +51,16 @@ export const UserTable = ({
 							<Td>{user.email}</Td>
 							<Td>
 								{user.gender === "male"
-									? "Nam"
+									? "Male"
 									: user.gender === "female"
-									? "Nữ"
-									: "Khác"}
+									? "Female"
+									: "Order"}
 							</Td>
 							<Td>{user.age}</Td>
 							<Td
 								color={user.isActive ? "green.500" : "red.500"}
 								fontWeight="bold">
-								{user.isActive ? "Hoạt động" : "Vô hiệu hóa"}
+								{user.isActive ? "Active" : "Inactive"}
 							</Td>
 							<Td textAlign="center">
 								<Button
@@ -70,10 +70,11 @@ export const UserTable = ({
 									colorScheme="blue"
 									mr={2}
 									onClick={() => onView(user)}>
-									Xem
+									View Detail
 								</Button>
 								<Button
 									size="sm"
+									minW={{ base: "100%", sm: "100px" }}
 									variant={
 										user.isActive ? "outline" : "solid"
 									}
