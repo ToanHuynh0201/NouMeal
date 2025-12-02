@@ -31,10 +31,18 @@ import WeeklySummaryCard from "@/components/menu/WeeklySummaryCard";
 import WeeklyDayDetailView from "@/components/menu/WeeklyDayDetailView";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import useScrollAnimation from "@/hooks/useScrollAnimation";
+import useDailyCalorieNeeds from "@/hooks/useDailyCalorieNeeds";
 import { authService, foodService } from "@/services";
-import type { Recipe, DailyMenu, FoodRecommendationResponse } from "@/types";
-import { mockWeeklyMenu } from "@/data/mockData";
-import { convertRecommendationsToDailyMenu } from "@/utils/food";
+import type {
+	Recipe,
+	DailyMenu,
+	FoodRecommendationResponse,
+	WeeklyMenuData,
+} from "@/types";
+import {
+	convertRecommendationsToDailyMenu,
+	convertWeeklyMenuToDailyMenus,
+} from "@/utils/food";
 
 const MenuSuggestionPage = () => {
 	const { isOpen, onOpen, onClose } = useDisclosure();
@@ -46,11 +54,22 @@ const MenuSuggestionPage = () => {
 	const toast = useToast();
 	const user = authService.getCurrentUser();
 
+	// Fetch daily calorie needs
+	const { data: dailyCalorieNeeds, isLoading: isLoadingCalories } =
+		useDailyCalorieNeeds();
+
 	// State for food recommendations
 	const [recommendations, setRecommendations] =
 		useState<FoodRecommendationResponse | null>(null);
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const [error, setError] = useState<string | null>(null);
+
+	// State for weekly menu
+	const [weeklyMenuData, setWeeklyMenuData] = useState<WeeklyMenuData | null>(
+		null,
+	);
+	const [isLoadingWeekly, setIsLoadingWeekly] = useState<boolean>(true);
+	const [weeklyError, setWeeklyError] = useState<string | null>(null);
 
 	// Fetch food recommendations
 	const fetchRecommendations = async () => {
@@ -68,9 +87,26 @@ const MenuSuggestionPage = () => {
 		setIsLoading(false);
 	};
 
+	// Fetch weekly menu
+	const fetchWeeklyMenu = async () => {
+		setIsLoadingWeekly(true);
+		setWeeklyError(null);
+
+		const result = await foodService.getWeeklyMenu();
+
+		if (result.success) {
+			setWeeklyMenuData(result.data);
+		} else {
+			setWeeklyError(result.error || "Failed to fetch weekly menu");
+		}
+
+		setIsLoadingWeekly(false);
+	};
+
 	// Fetch on component mount
 	useEffect(() => {
 		fetchRecommendations();
+		fetchWeeklyMenu();
 	}, []);
 
 	// Convert API recommendations to DailyMenu format
@@ -78,6 +114,12 @@ const MenuSuggestionPage = () => {
 		if (!recommendations) return null;
 		return convertRecommendationsToDailyMenu(recommendations);
 	}, [recommendations]);
+
+	// Convert API weekly menu to DailyMenu[] format
+	const weeklyMenu = useMemo(() => {
+		if (!weeklyMenuData) return [];
+		return convertWeeklyMenuToDailyMenus(weeklyMenuData);
+	}, [weeklyMenuData]);
 
 	const handleRecipeClick = (recipe: Recipe) => {
 		setSelectedRecipe(recipe);
@@ -105,15 +147,21 @@ const MenuSuggestionPage = () => {
 	};
 
 	// Calculate weekly totals
-	const weeklyTotals = mockWeeklyMenu.reduce(
-		(acc, day) => ({
-			calories: acc.calories + day.totalCalories,
-			protein: acc.protein + parseInt(day.totalProtein),
-			carbs: acc.carbs + parseInt(day.totalCarbs),
-			fat: acc.fat + parseInt(day.totalFat),
-		}),
-		{ calories: 0, protein: 0, carbs: 0, fat: 0 },
-	);
+	const weeklyTotals = useMemo(() => {
+		if (!weeklyMenu || weeklyMenu.length === 0) {
+			return { calories: 0, protein: 0, carbs: 0, fat: 0 };
+		}
+
+		return weeklyMenu.reduce(
+			(acc, day) => ({
+				calories: acc.calories + day.totalCalories,
+				protein: acc.protein + parseInt(day.totalProtein),
+				carbs: acc.carbs + parseInt(day.totalCarbs),
+				fat: acc.fat + parseInt(day.totalFat),
+			}),
+			{ calories: 0, protein: 0, carbs: 0, fat: 0 },
+		);
+	}, [weeklyMenu]);
 
 	return (
 		<MainLayout
@@ -135,7 +183,11 @@ const MenuSuggestionPage = () => {
 								: "translateY(30px)"
 						}
 						transition="all 0.6s ease-out">
-						<UserProfileHeader userProfile={user} />
+						<UserProfileHeader
+							userProfile={user}
+							dailyCalorieNeeds={dailyCalorieNeeds}
+							isLoadingCalories={isLoadingCalories}
+						/>
 					</Box>
 
 					{/* Tabs for Today and This Week */}
@@ -340,86 +392,184 @@ const MenuSuggestionPage = () => {
 
 							{/* Weekly Menu */}
 							<TabPanel p={0}>
-								<VStack
-									spacing={6}
-									align="stretch">
-									{selectedDayMenu ? (
-										// Detailed view for selected day
-										<>
-											{/* Back Button */}
-											<Button
-												leftIcon={
-													<Icon as={FiArrowLeft} />
-												}
-												variant="ghost"
-												colorScheme="purple"
-												alignSelf="flex-start"
-												onClick={() =>
-													setSelectedDayMenu(null)
-												}
-												size="md"
-												_hover={{
-													bg: "purple.50",
-													transform:
-														"translateX(-4px)",
-												}}
-												transition="all 0.2s">
-												Back to Weekly Overview
-											</Button>
-
-											{/* Weekly Day Detail View */}
-											<WeeklyDayDetailView
-												dailyMenu={selectedDayMenu}
-												onRecipeClick={
-													handleRecipeClick
-												}
-												formatDate={formatDate}
-											/>
-										</>
-									) : (
-										// Weekly overview
-										<>
-											{/* Weekly Summary */}
-											<WeeklySummaryCard
-												totalCalories={
-													weeklyTotals.calories
-												}
-												totalProtein={
-													weeklyTotals.protein
-												}
-												totalCarbs={weeklyTotals.carbs}
-												totalFat={weeklyTotals.fat}
-											/>
-
-											{/* Weekly Menu Cards */}
-											<SimpleGrid
-												columns={{
-													base: 1,
-													md: 2,
-													lg: 3,
-												}}
-												spacing={6}>
-												{mockWeeklyMenu.map(
-													(day, index) => (
-														<WeeklyMenuCard
-															key={index}
-															day={day}
-															formatDate={
-																formatDate
-															}
-															onRecipeClick={
-																handleRecipeClick
-															}
-															onViewDetails={
-																setSelectedDayMenu
-															}
+								{isLoadingWeekly ? (
+									<LoadingSpinner
+										message="Loading your weekly menu..."
+										minHeight="400px"
+										variant="primary"
+									/>
+								) : weeklyError ? (
+									<Alert
+										status="error"
+										variant="subtle"
+										flexDirection="column"
+										alignItems="center"
+										justifyContent="center"
+										textAlign="center"
+										minH="400px"
+										borderRadius="xl">
+										<AlertIcon
+											boxSize="40px"
+											mr={0}
+										/>
+										<AlertTitle
+											mt={4}
+											mb={1}
+											fontSize="lg">
+											Unable to load weekly menu
+										</AlertTitle>
+										<AlertDescription maxWidth="sm">
+											{weeklyError}
+										</AlertDescription>
+										<Button
+											mt={4}
+											colorScheme="red"
+											onClick={fetchWeeklyMenu}
+											leftIcon={
+												<Icon as={FiRefreshCw} />
+											}>
+											Try Again
+										</Button>
+									</Alert>
+								) : weeklyMenu.length > 0 ? (
+									<VStack
+										spacing={6}
+										align="stretch">
+										{selectedDayMenu ? (
+											// Detailed view for selected day
+											<>
+												{/* Back Button */}
+												<Button
+													leftIcon={
+														<Icon
+															as={FiArrowLeft}
 														/>
-													),
-												)}
-											</SimpleGrid>
-										</>
-									)}
-								</VStack>
+													}
+													variant="ghost"
+													colorScheme="purple"
+													alignSelf="flex-start"
+													onClick={() =>
+														setSelectedDayMenu(null)
+													}
+													size="md"
+													_hover={{
+														bg: "purple.50",
+														transform:
+															"translateX(-4px)",
+													}}
+													transition="all 0.2s">
+													Back to Weekly Overview
+												</Button>
+
+												{/* Weekly Day Detail View */}
+												<WeeklyDayDetailView
+													dailyMenu={selectedDayMenu}
+													onRecipeClick={
+														handleRecipeClick
+													}
+													formatDate={formatDate}
+												/>
+											</>
+										) : (
+											// Weekly overview
+											<>
+												{/* Weekly Summary */}
+												<WeeklySummaryCard
+													totalCalories={
+														weeklyTotals.calories
+													}
+													totalProtein={
+														weeklyTotals.protein
+													}
+													totalCarbs={
+														weeklyTotals.carbs
+													}
+													totalFat={weeklyTotals.fat}
+												/>
+
+												{/* Refresh Button */}
+												<HStack justify="flex-end">
+													<Button
+														size="sm"
+														variant="outline"
+														colorScheme="purple"
+														leftIcon={
+															<Icon
+																as={FiRefreshCw}
+															/>
+														}
+														onClick={async () => {
+															await fetchWeeklyMenu();
+															toast({
+																title: "Weekly menu refreshed",
+																description:
+																	"Your weekly menu has been updated.",
+																status: "success",
+																duration: 2000,
+																isClosable:
+																	true,
+																position: "top",
+															});
+														}}>
+														Refresh Weekly Menu
+													</Button>
+												</HStack>
+
+												{/* Weekly Menu Cards */}
+												<SimpleGrid
+													columns={{
+														base: 1,
+														md: 2,
+														lg: 3,
+													}}
+													spacing={6}>
+													{weeklyMenu.map(
+														(day, index) => (
+															<WeeklyMenuCard
+																key={index}
+																day={day}
+																formatDate={
+																	formatDate
+																}
+																onRecipeClick={
+																	handleRecipeClick
+																}
+																onViewDetails={
+																	setSelectedDayMenu
+																}
+															/>
+														),
+													)}
+												</SimpleGrid>
+											</>
+										)}
+									</VStack>
+								) : (
+									<Alert
+										status="info"
+										variant="subtle"
+										flexDirection="column"
+										alignItems="center"
+										justifyContent="center"
+										textAlign="center"
+										minH="400px"
+										borderRadius="xl">
+										<AlertIcon
+											boxSize="40px"
+											mr={0}
+										/>
+										<AlertTitle
+											mt={4}
+											mb={1}
+											fontSize="lg">
+											No weekly menu available
+										</AlertTitle>
+										<AlertDescription maxWidth="sm">
+											We couldn't generate your weekly
+											menu at this time.
+										</AlertDescription>
+									</Alert>
+								)}
 							</TabPanel>
 						</TabPanels>
 					</Tabs>

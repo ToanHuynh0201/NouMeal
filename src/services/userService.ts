@@ -67,15 +67,21 @@ class UserService {
 	// });
 
 	/**
+	 * Get daily calorie needs and macro distribution
+	 * @returns {Promise<Object>} Standardized response with daily calorie needs data
+	 */
+	getDailyCalorieNeeds = withErrorHandling(async () => {
+		return api.get("/users/daily-calorie-needs");
+	});
+
+	/**
 	 * Update user profile
 	 * @param {Object} profileData - Profile data to update
 	 * @returns {Promise<Object>} Standardized response with updated user data
 	 */
 	updateProfile = withErrorHandling(async (profileData) => {
 		return api.patch("/profile", profileData);
-	});
-
-	// Lấy danh sách user (mock)
+	}); // Lấy danh sách user (mock)
 	getUsers = async (): Promise<User[]> => {
 		return new Promise((resolve) => {
 			setTimeout(() => resolve(users), 500);

@@ -4,6 +4,14 @@ export * from "./ai";
 export * from "./recipe";
 export * from "./myRecipe";
 export * from "./admin";
+// Export specific types from profile to avoid conflict with recipe UserProfile
+export type {
+	DailyCalorieNeeds,
+	MacroDistribution,
+	DailyTracking,
+	WeeklyStats,
+	NutritionGoals,
+} from "./profile";
 // Auth Types
 export interface UserRegistrationRequest {
 	email: string;
@@ -143,10 +151,17 @@ export type AllergenType =
 	| "mustard"
 	| "other";
 
+export interface FoodInstruction {
+	step: number;
+	description: string;
+}
+
 export interface Food {
 	_id: string;
 	name: string;
 	description?: string;
+	instructions?: FoodInstruction[];
+	imageUrl?: string;
 	category: FoodCategory;
 	meal?: MealType;
 	ingredients?: FoodIngredient[];
@@ -163,4 +178,36 @@ export interface FoodRecommendationResponse {
 	lunch: Food[];
 	dinner: Food[];
 	snack: Food[];
+}
+
+// Weekly Menu Types
+export interface NutritionTarget {
+	dailyCalories: number;
+	protein: number;
+	carbs: number;
+	fat: number;
+}
+
+export interface DayMeals {
+	breakfast: Food[];
+	lunch: Food[];
+	dinner: Food[];
+	snacks: Food[];
+}
+
+export interface WeekDayMenu {
+	date: string;
+	dayOfWeek: string;
+	meals: DayMeals;
+}
+
+export interface WeeklyMenuData {
+	week: WeekDayMenu[];
+	nutritionTarget: NutritionTarget;
+	cached: boolean;
+}
+
+export interface WeeklyMenuResponse {
+	success: boolean;
+	data: WeeklyMenuData;
 }

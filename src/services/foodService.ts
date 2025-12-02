@@ -1,22 +1,30 @@
 import api from "@/lib/api";
-import {withErrorHandling} from "@/utils";
+import { withErrorHandling } from "@/utils";
 
 class FoodService {
-    /**
-     * Get recommended foods for the current user
-     * @returns {Promise} Standardized response with success flag and data
-     */
-    getRecommendedFoods = withErrorHandling(async () => {
-        return await api.get("/foods/recommended");
-    });
+	/**
+	 * Get recommended foods for the current user
+	 * @returns {Promise} Standardized response with success flag and data
+	 */
+	getRecommendedFoods = withErrorHandling(async () => {
+		return await api.get("/foods/recommended");
+	});
 
-    /**
-     * Get daily calorie needs for the current user
-     * @returns {Promise} Standardized response with success flag and data
-     */
-    getDailyCalorieNeeds = withErrorHandling(async () => {
-        return await api.get("/foods/daily-calorie-needs");
-    });
+	/**
+	 * Get daily calorie needs for the current user
+	 * @returns {Promise} Standardized response with success flag and data
+	 */
+	getDailyCalorieNeeds = withErrorHandling(async () => {
+		return await api.get("/foods/daily-calorie-needs");
+	});
+
+	/**
+	 * Get weekly menu for the current user
+	 * @returns {Promise} Standardized response with success flag and data
+	 */
+	getWeeklyMenu = withErrorHandling(async () => {
+		return await api.get("/foods/weekly");
+	});
 }
 
 export const foodService = new FoodService();

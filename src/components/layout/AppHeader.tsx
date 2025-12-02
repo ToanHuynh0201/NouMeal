@@ -178,12 +178,11 @@ const AppHeader = ({ onLogout, showAuthButtons = false }: AppHeaderProps) => {
 									</HStack>
 								</MenuButton>
 								<MenuList
-									bg="whiteAlpha.950"
+									bg="white"
 									borderColor="purple.100"
 									shadow="xl"
 									borderRadius="xl"
 									p={2}
-									mt={2}
 									sx={{
 										backdropFilter: "blur(10px)",
 										WebkitBackdropFilter: "blur(10px)",
