@@ -28,7 +28,7 @@ import UserProfileHeader from "@/components/menu/UserProfileHeader";
 import NutritionSummaryCard from "@/components/menu/NutritionSummaryCard";
 import WeeklyMenuCard from "@/components/menu/WeeklyMenuCard";
 import WeeklySummaryCard from "@/components/menu/WeeklySummaryCard";
-import DayHeader from "@/components/menu/DayHeader";
+import WeeklyDayDetailView from "@/components/menu/WeeklyDayDetailView";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import useScrollAnimation from "@/hooks/useScrollAnimation";
 import { authService, foodService } from "@/services";
@@ -357,22 +357,23 @@ const MenuSuggestionPage = () => {
 												onClick={() =>
 													setSelectedDayMenu(null)
 												}
-												mb={2}>
+												size="md"
+												_hover={{
+													bg: "purple.50",
+													transform:
+														"translateX(-4px)",
+												}}
+												transition="all 0.2s">
 												Back to Weekly Overview
 											</Button>
 
-											{/* Selected Day Header */}
-											<DayHeader
-												dayMenu={selectedDayMenu}
-												formatDate={formatDate}
-											/>
-
-											{/* Detailed Menu View */}
-											<DayMenuView
+											{/* Weekly Day Detail View */}
+											<WeeklyDayDetailView
 												dailyMenu={selectedDayMenu}
 												onRecipeClick={
 													handleRecipeClick
 												}
+												formatDate={formatDate}
 											/>
 										</>
 									) : (

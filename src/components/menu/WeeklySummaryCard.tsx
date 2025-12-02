@@ -1,85 +1,111 @@
-import {Card, CardBody, VStack, Heading, Text, SimpleGrid} from "@chakra-ui/react";
+import {
+	Card,
+	CardBody,
+	VStack,
+	Heading,
+	Text,
+	SimpleGrid,
+	HStack,
+} from "@chakra-ui/react";
 
 interface WeeklySummaryCardProps {
-    totalCalories: number;
-    totalProtein: number;
-    totalCarbs: number;
-    totalFat: number;
+	totalCalories: number;
+	totalProtein: number;
+	totalCarbs: number;
+	totalFat: number;
 }
 
 const WeeklySummaryCard = ({
-    totalCalories,
-    totalProtein,
-    totalCarbs,
-    totalFat,
+	totalCalories,
+	totalProtein,
+	totalCarbs,
+	totalFat,
 }: WeeklySummaryCardProps) => {
-    return (
-        <Card
-            bg="white"
-            shadow="md"
-            borderRadius="xl"
-            border="1px"
-            borderColor="gray.200"
-        >
-            <CardBody p={6}>
-                <VStack spacing={4}>
-                    <Heading size="md" color="gray.700">
-                        Weekly Overview
-                    </Heading>
-                    <SimpleGrid columns={{base: 2, md: 4}} spacing={4} w="full">
-                        <VStack>
-                            <Text
-                                fontSize="2xl"
-                                fontWeight="bold"
-                                color="brand.600"
-                            >
-                                {totalCalories}
-                            </Text>
-                            <Text fontSize="sm" color="gray.600">
-                                Total Calories
-                            </Text>
-                        </VStack>
-                        <VStack>
-                            <Text
-                                fontSize="2xl"
-                                fontWeight="bold"
-                                color="green.600"
-                            >
-                                {totalProtein}g
-                            </Text>
-                            <Text fontSize="sm" color="gray.600">
-                                Protein
-                            </Text>
-                        </VStack>
-                        <VStack>
-                            <Text
-                                fontSize="2xl"
-                                fontWeight="bold"
-                                color="orange.600"
-                            >
-                                {totalCarbs}g
-                            </Text>
-                            <Text fontSize="sm" color="gray.600">
-                                Carbs
-                            </Text>
-                        </VStack>
-                        <VStack>
-                            <Text
-                                fontSize="2xl"
-                                fontWeight="bold"
-                                color="purple.600"
-                            >
-                                {totalFat}g
-                            </Text>
-                            <Text fontSize="sm" color="gray.600">
-                                Fat
-                            </Text>
-                        </VStack>
-                    </SimpleGrid>
-                </VStack>
-            </CardBody>
-        </Card>
-    );
+	return (
+		<Card
+			bg="white"
+			shadow="sm"
+			borderRadius="lg"
+			border="1px solid"
+			borderColor="gray.200">
+			<CardBody p={6}>
+				<VStack
+					spacing={4}
+					align="stretch">
+					<Heading
+						size="md"
+						color="gray.800">
+						Weekly Overview
+					</Heading>
+
+					{/* Stats Grid */}
+					<SimpleGrid
+						columns={{ base: 2, md: 4 }}
+						spacing={4}>
+						{/* Total Calories */}
+						<VStack spacing={1}>
+							<Text
+								fontSize="2xl"
+								fontWeight="bold"
+								color="gray.800">
+								{totalCalories}
+							</Text>
+							<Text
+								fontSize="xs"
+								color="gray.500">
+								Total Calories
+							</Text>
+						</VStack>
+
+						{/* Protein */}
+						<VStack spacing={1}>
+							<Text
+								fontSize="2xl"
+								fontWeight="bold"
+								color="gray.800">
+								{totalProtein}g
+							</Text>
+							<Text
+								fontSize="xs"
+								color="gray.500">
+								Protein
+							</Text>
+						</VStack>
+
+						{/* Carbs */}
+						<VStack spacing={1}>
+							<Text
+								fontSize="2xl"
+								fontWeight="bold"
+								color="gray.800">
+								{totalCarbs}g
+							</Text>
+							<Text
+								fontSize="xs"
+								color="gray.500">
+								Carbs
+							</Text>
+						</VStack>
+
+						{/* Fat */}
+						<VStack spacing={1}>
+							<Text
+								fontSize="2xl"
+								fontWeight="bold"
+								color="gray.800">
+								{totalFat}g
+							</Text>
+							<Text
+								fontSize="xs"
+								color="gray.500">
+								Fat
+							</Text>
+						</VStack>
+					</SimpleGrid>
+				</VStack>
+			</CardBody>
+		</Card>
+	);
 };
 
 export default WeeklySummaryCard;
