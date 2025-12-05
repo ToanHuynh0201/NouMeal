@@ -23,7 +23,7 @@ class FoodService {
 	 * @returns {Promise} Standardized response with success flag and data
 	 */
 	getWeeklyMenu = withErrorHandling(async () => {
-		return await api.get("/foods/weekly");
+		return await api.get("/foods/weekly-recommended");
 	});
 }
 

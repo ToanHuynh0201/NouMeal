@@ -205,11 +205,14 @@ const createDefaultRecipe = (
  * @returns {DailyMenu[]} Array of daily menus
  */
 export const convertWeeklyMenuToDailyMenus = (weeklyData: any): DailyMenu[] => {
-	if (!weeklyData || !weeklyData.week || !Array.isArray(weeklyData.week)) {
+	// Handle both array format and object with week property
+	const weekArray = Array.isArray(weeklyData) ? weeklyData : weeklyData?.week;
+
+	if (!weekArray || !Array.isArray(weekArray)) {
 		return [];
 	}
 
-	return weeklyData.week.map((day: any) => {
+	return weekArray.map((day: any) => {
 		const breakfastRecipe = day.meals?.breakfast?.[0]
 			? convertFoodToRecipe(day.meals.breakfast[0])
 			: createDefaultRecipe("breakfast");
@@ -222,7 +225,7 @@ export const convertWeeklyMenuToDailyMenus = (weeklyData: any): DailyMenu[] => {
 			? convertFoodToRecipe(day.meals.dinner[0])
 			: createDefaultRecipe("dinner");
 
-		const snackRecipes = (day.meals?.snacks || [])
+		const snackRecipes = (day.meals?.snack || [])
 			.slice(0, 2)
 			.map(convertFoodToRecipe);
 

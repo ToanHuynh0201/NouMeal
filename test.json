@@ -1,0 +1,204 @@
+{
+	"success": true,
+	"data": {
+		"week": [
+			{
+				"date": "2025-11-25",
+				"dayOfWeek": "Monday",
+				"meals": {
+					"breakfast": [
+						{
+							"_id": "64f1f77bcf86cd7994390123",
+							"name": "Grilled Chicken Salad",
+							"description": "Lean grilled chicken with mixed greens and vinaigrette.",
+							"instructions": [
+								{
+									"step": 1,
+									"description": "Season chicken with salt and pepper."
+								},
+								{
+									"step": 2,
+									"description": "Grill for 6–8 minutes per side until cooked."
+								},
+								{
+									"step": 3,
+									"description": "Toss with greens and vinaigrette."
+								}
+							],
+							"imageUrl": "https://cdn.example.com/images/grilled-chicken-salad.jpg",
+							"category": "protein",
+							"meal": "lunch",
+							"ingredients": [
+								{
+									"name": "Chicken Breast",
+									"amount": "200g"
+								}
+							],
+							"nutritionalInfo": {
+								"calories": 350,
+								"protein": 35,
+								"carbohydrates": 12,
+								"fat": 15,
+								"fiber": 5,
+								"sugar": 4,
+								"sodium": 420,
+								"cholesterol": 75
+							},
+							"allergens": ["milk"],
+							"isActive": true,
+							"tags": ["high_protein", "low_carb"],
+							"postedBy": "507f1f77bcf86cd799439011",
+							"createdAt": "2024-10-07T10:30:00.000Z",
+							"updatedAt": "2024-10-07T10:30:00.000Z"
+						}
+					],
+					"lunch": [
+						{
+							"_id": "64f1f77bcf86cd7994390123",
+							"name": "Grilled Chicken Salad",
+							"description": "Lean grilled chicken with mixed greens and vinaigrette.",
+							"instructions": [
+								{
+									"step": 1,
+									"description": "Season chicken with salt and pepper."
+								},
+								{
+									"step": 2,
+									"description": "Grill for 6–8 minutes per side until cooked."
+								},
+								{
+									"step": 3,
+									"description": "Toss with greens and vinaigrette."
+								}
+							],
+							"imageUrl": "https://cdn.example.com/images/grilled-chicken-salad.jpg",
+							"category": "protein",
+							"meal": "lunch",
+							"ingredients": [
+								{
+									"name": "Chicken Breast",
+									"amount": "200g"
+								}
+							],
+							"nutritionalInfo": {
+								"calories": 350,
+								"protein": 35,
+								"carbohydrates": 12,
+								"fat": 15,
+								"fiber": 5,
+								"sugar": 4,
+								"sodium": 420,
+								"cholesterol": 75
+							},
+							"allergens": ["milk"],
+							"isActive": true,
+							"tags": ["high_protein", "low_carb"],
+							"postedBy": "507f1f77bcf86cd799439011",
+							"createdAt": "2024-10-07T10:30:00.000Z",
+							"updatedAt": "2024-10-07T10:30:00.000Z"
+						}
+					],
+					"dinner": [
+						{
+							"_id": "64f1f77bcf86cd7994390123",
+							"name": "Grilled Chicken Salad",
+							"description": "Lean grilled chicken with mixed greens and vinaigrette.",
+							"instructions": [
+								{
+									"step": 1,
+									"description": "Season chicken with salt and pepper."
+								},
+								{
+									"step": 2,
+									"description": "Grill for 6–8 minutes per side until cooked."
+								},
+								{
+									"step": 3,
+									"description": "Toss with greens and vinaigrette."
+								}
+							],
+							"imageUrl": "https://cdn.example.com/images/grilled-chicken-salad.jpg",
+							"category": "protein",
+							"meal": "lunch",
+							"ingredients": [
+								{
+									"name": "Chicken Breast",
+									"amount": "200g"
+								}
+							],
+							"nutritionalInfo": {
+								"calories": 350,
+								"protein": 35,
+								"carbohydrates": 12,
+								"fat": 15,
+								"fiber": 5,
+								"sugar": 4,
+								"sodium": 420,
+								"cholesterol": 75
+							},
+							"allergens": ["milk"],
+							"isActive": true,
+							"tags": ["high_protein", "low_carb"],
+							"postedBy": "507f1f77bcf86cd799439011",
+							"createdAt": "2024-10-07T10:30:00.000Z",
+							"updatedAt": "2024-10-07T10:30:00.000Z"
+						}
+					],
+					"snacks": [
+						{
+							"_id": "64f1f77bcf86cd7994390123",
+							"name": "Grilled Chicken Salad",
+							"description": "Lean grilled chicken with mixed greens and vinaigrette.",
+							"instructions": [
+								{
+									"step": 1,
+									"description": "Season chicken with salt and pepper."
+								},
+								{
+									"step": 2,
+									"description": "Grill for 6–8 minutes per side until cooked."
+								},
+								{
+									"step": 3,
+									"description": "Toss with greens and vinaigrette."
+								}
+							],
+							"imageUrl": "https://cdn.example.com/images/grilled-chicken-salad.jpg",
+							"category": "protein",
+							"meal": "lunch",
+							"ingredients": [
+								{
+									"name": "Chicken Breast",
+									"amount": "200g"
+								}
+							],
+							"nutritionalInfo": {
+								"calories": 350,
+								"protein": 35,
+								"carbohydrates": 12,
+								"fat": 15,
+								"fiber": 5,
+								"sugar": 4,
+								"sodium": 420,
+								"cholesterol": 75
+							},
+							"allergens": ["milk"],
+							"isActive": true,
+							"tags": ["high_protein", "low_carb"],
+							"postedBy": "507f1f77bcf86cd799439011",
+							"createdAt": "2024-10-07T10:30:00.000Z",
+							"updatedAt": "2024-10-07T10:30:00.000Z"
+						}
+					]
+				}
+			}
+		],
+		"nutritionTarget": {
+			"dailyCalories": 2000,
+			"protein": 150,
+			"carbs": 200,
+			"fat": 67
+		},
+		"cached": false
+	}
+}

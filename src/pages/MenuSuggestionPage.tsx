@@ -13,7 +13,6 @@ import {
 	TabPanel,
 	Button,
 	SimpleGrid,
-	useToast,
 	Alert,
 	AlertIcon,
 	AlertTitle,
@@ -51,7 +50,6 @@ const MenuSuggestionPage = () => {
 		null,
 	);
 	const headerSection = useScrollAnimation({ threshold: 0.1 });
-	const toast = useToast();
 	const user = authService.getCurrentUser();
 
 	// Fetch daily calorie needs
@@ -96,6 +94,7 @@ const MenuSuggestionPage = () => {
 
 		if (result.success) {
 			setWeeklyMenuData(result.data);
+			console.log(result.data);
 		} else {
 			setWeeklyError(result.error || "Failed to fetch weekly menu");
 		}
@@ -331,31 +330,6 @@ const MenuSuggestionPage = () => {
 											fat={todayMenu.totalFat}
 										/>
 
-										{/* Refresh Button */}
-										<HStack justify="flex-end">
-											<Button
-												size="sm"
-												variant="outline"
-												colorScheme="purple"
-												leftIcon={
-													<Icon as={FiRefreshCw} />
-												}
-												onClick={async () => {
-													await fetchRecommendations();
-													toast({
-														title: "Menu refreshed",
-														description:
-															"Your daily menu has been updated.",
-														status: "success",
-														duration: 2000,
-														isClosable: true,
-														position: "top",
-													});
-												}}>
-												Refresh Menu
-											</Button>
-										</HStack>
-
 										{/* Today's Detailed Menu */}
 										<DayMenuView
 											dailyMenu={todayMenu}
@@ -487,60 +461,138 @@ const MenuSuggestionPage = () => {
 													totalFat={weeklyTotals.fat}
 												/>
 
-												{/* Refresh Button */}
-												<HStack justify="flex-end">
-													<Button
-														size="sm"
-														variant="outline"
-														colorScheme="purple"
-														leftIcon={
-															<Icon
-																as={FiRefreshCw}
-															/>
-														}
-														onClick={async () => {
-															await fetchWeeklyMenu();
-															toast({
-																title: "Weekly menu refreshed",
-																description:
-																	"Your weekly menu has been updated.",
-																status: "success",
-																duration: 2000,
-																isClosable:
-																	true,
-																position: "top",
-															});
-														}}>
-														Refresh Weekly Menu
-													</Button>
-												</HStack>
+												{/* Weekly Menu Grid - Better layout for 7 days */}
+												<VStack
+													spacing={6}
+													align="stretch">
+													{/* First Row - 4 days */}
+													<SimpleGrid
+														columns={{
+															base: 1,
+															sm: 2,
+															lg: 4,
+														}}
+														spacing={6}>
+														{weeklyMenu
+															.slice(0, 4)
+															.map(
+																(
+																	day,
+																	index,
+																) => (
+																	<Box
+																		key={
+																			index
+																		}
+																		opacity={
+																			0
+																		}
+																		animation={`fadeInUp 0.5s ease-out ${
+																			index *
+																			0.1
+																		}s forwards`}
+																		sx={{
+																			"@keyframes fadeInUp":
+																				{
+																					from: {
+																						opacity: 0,
+																						transform:
+																							"translateY(20px)",
+																					},
+																					to: {
+																						opacity: 1,
+																						transform:
+																							"translateY(0)",
+																					},
+																				},
+																		}}>
+																		<WeeklyMenuCard
+																			day={
+																				day
+																			}
+																			formatDate={
+																				formatDate
+																			}
+																			onRecipeClick={
+																				handleRecipeClick
+																			}
+																			onViewDetails={
+																				setSelectedDayMenu
+																			}
+																		/>
+																	</Box>
+																),
+															)}
+													</SimpleGrid>
 
-												{/* Weekly Menu Cards */}
-												<SimpleGrid
-													columns={{
-														base: 1,
-														md: 2,
-														lg: 3,
-													}}
-													spacing={6}>
-													{weeklyMenu.map(
-														(day, index) => (
-															<WeeklyMenuCard
-																key={index}
-																day={day}
-																formatDate={
-																	formatDate
-																}
-																onRecipeClick={
-																	handleRecipeClick
-																}
-																onViewDetails={
-																	setSelectedDayMenu
-																}
-															/>
-														),
-													)}
-												</SimpleGrid>
+													{/* Second Row - 3 days centered */}
+													<SimpleGrid
+														columns={{
+															base: 1,
+															sm: 2,
+															md: 3,
+														}}
+														spacing={6}
+														maxW={{
+															base: "full",
+															md: "75%",
+														}}
+														mx="auto"
+														w="full">
+														{weeklyMenu
+															.slice(4, 7)
+															.map(
+																(
+																	day,
+																	index,
+																) => (
+																	<Box
+																		key={
+																			index +
+																			4
+																		}
+																		opacity={
+																			0
+																		}
+																		animation={`fadeInUp 0.5s ease-out ${
+																			(index +
+																				4) *
+																			0.1
+																		}s forwards`}
+																		sx={{
+																			"@keyframes fadeInUp":
+																				{
+																					from: {
+																						opacity: 0,
+																						transform:
+																							"translateY(20px)",
+																					},
+																					to: {
+																						opacity: 1,
+																						transform:
+																							"translateY(0)",
+																					},
+																				},
+																		}}>
+																		<WeeklyMenuCard
+																			day={
+																				day
+																			}
+																			formatDate={
+																				formatDate
+																			}
+																			onRecipeClick={
+																				handleRecipeClick
+																			}
+																			onViewDetails={
+																				setSelectedDayMenu
+																			}
+																		/>
+																	</Box>
+																),
+															)}
+													</SimpleGrid>
+												</VStack>
 											</>
 										)}
 									</VStack>
