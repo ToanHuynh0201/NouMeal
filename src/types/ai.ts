@@ -33,6 +33,23 @@ export interface RecognizedFood {
     confidence: number; // 0-100
     category: string;
     estimatedWeight?: string;
+    weight?: string; // From API response
+}
+
+export interface NutritionValue {
+    value: number;
+    unit: string;
+}
+
+export interface NutritionAnalysis {
+    calories: NutritionValue;
+    protein: NutritionValue;
+    carbs: NutritionValue;
+    fat: NutritionValue;
+    fiber: NutritionValue;
+    sugar: NutritionValue;
+    sodium: NutritionValue;
+    cholesterol: NutritionValue;
 }
 
 export interface ImageRecognitionResult {
@@ -48,4 +65,28 @@ export interface ImageRecognitionResult {
 export interface ImageUploadRequest {
     image: File | string;
     analysisType?: "nutrition" | "ingredients" | "full";
+}
+
+// API Request/Response Types
+export interface AnalyzeFoodRequest {
+    dietary_goals: string;
+    health_condition: string;
+    image: string; // base64 image string
+}
+
+export interface AnalyzeFoodData {
+    session_id: string;
+    status: string;
+    dietary_goals: string;
+    health_condition: string;
+    recognized_foods: RecognizedFood[];
+    nutrition_analysis: NutritionAnalysis;
+    recommendations: string[];
+    processing_time: string;
+}
+
+export interface AnalyzeFoodResponse {
+    success: boolean;
+    message: string;
+    data: AnalyzeFoodData;
 }
