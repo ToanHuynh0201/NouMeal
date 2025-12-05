@@ -9,13 +9,10 @@ import {
     SimpleGrid,
     Card,
     CardBody,
-    Image,
     Badge,
-    HStack,
     Icon,
     useDisclosure,
     Flex,
-    Progress,
     Tag,
     TagLabel,
     TagLeftIcon,
@@ -23,10 +20,8 @@ import {
 import {useState} from "react";
 import {
     FiSearch,
-    FiStar,
     FiClock,
     FiUsers,
-    FiTrendingUp,
     FiZap,
 } from "react-icons/fi";
 import MainLayout from "@/components/layout/MainLayout";
@@ -212,7 +207,7 @@ const AIMealSuggestionPage = () => {
                                 </Text>
                             </Flex>
 
-                            <SimpleGrid columns={{base: 1, md: 2, lg: 3}} spacing={6}>
+                            <SimpleGrid columns={{base: 1, md: 2}} spacing={6}>
                                 {suggestions.map((suggestion) => (
                                     <Card
                                         key={suggestion.id}
@@ -222,118 +217,98 @@ const AIMealSuggestionPage = () => {
                                         }
                                         transition="all 0.3s"
                                         _hover={{
-                                            transform: "translateY(-8px)",
-                                            boxShadow: "2xl",
+                                            transform: "translateY(-4px)",
+                                            boxShadow: "xl",
+                                            borderColor: "purple.300",
                                         }}
                                         overflow="hidden"
                                         position="relative"
+                                        border="2px"
+                                        borderColor="gray.100"
+                                        bg="white"
                                     >
-                                        {/* Match Score Badge */}
-                                        <Badge
-                                            position="absolute"
-                                            top={3}
-                                            right={3}
-                                            colorScheme="green"
-                                            fontSize="sm"
-                                            px={3}
-                                            py={1}
-                                            borderRadius="full"
-                                            zIndex={1}
-                                        >
-                                            <HStack spacing={1}>
-                                                <Icon as={FiStar} />
-                                                <Text>{suggestion.matchScore}% Match</Text>
-                                            </HStack>
-                                        </Badge>
+                                        <CardBody p={6}>
+                                            <VStack align="stretch" spacing={4}>
+                                                {/* Header with Title and Match Score */}
+                                                <Flex justify="space-between" align="start">
+                                                    <Heading size="md" flex="1" noOfLines={2}>
+                                                        {suggestion.recipe.title}
+                                                    </Heading>
+                                                    <Badge
+                                                        colorScheme="green"
+                                                        fontSize="md"
+                                                        px={3}
+                                                        py={1}
+                                                        borderRadius="full"
+                                                        ml={3}
+                                                    >
+                                                        {suggestion.matchScore}%
+                                                    </Badge>
+                                                </Flex>
 
-                                        <Image
-                                            src={suggestion.recipe.image}
-                                            alt={suggestion.recipe.title}
-                                            h="200px"
-                                            w="100%"
-                                            objectFit="cover"
-                                        />
-
-                                        <CardBody>
-                                            <VStack align="stretch" spacing={3}>
-                                                <Heading size="md" noOfLines={2}>
-                                                    {suggestion.recipe.title}
-                                                </Heading>
-
-                                                <Progress
-                                                    value={suggestion.matchScore}
-                                                    size="sm"
-                                                    colorScheme="green"
-                                                    borderRadius="full"
-                                                />
-
+                                                {/* Description */}
                                                 <Text
                                                     fontSize="sm"
                                                     color="gray.600"
-                                                    noOfLines={3}
+                                                    noOfLines={2}
                                                 >
                                                     {suggestion.matchReason}
                                                 </Text>
 
-                                                <HStack spacing={2} flexWrap="wrap">
-                                                    <Tag size="sm" colorScheme="purple">
+                                                {/* Meal Info Tags */}
+                                                <Flex gap={2} flexWrap="wrap">
+                                                    <Tag size="md" colorScheme="purple" variant="subtle">
                                                         <TagLeftIcon as={FiClock} />
                                                         <TagLabel>
                                                             {suggestion.recipe.cookingTime}
                                                         </TagLabel>
                                                     </Tag>
-                                                    <Tag size="sm" colorScheme="blue">
+                                                    <Tag size="md" colorScheme="blue" variant="subtle">
                                                         <TagLeftIcon as={FiUsers} />
                                                         <TagLabel>
                                                             {suggestion.recipe.servingSize}
                                                         </TagLabel>
                                                     </Tag>
-                                                    <Tag size="sm" colorScheme="orange">
+                                                    <Tag size="md" colorScheme="orange" variant="subtle">
                                                         <TagLeftIcon as={FiZap} />
                                                         <TagLabel>
-                                                            {suggestion.recipe.nutrition.calories}{" "}
-                                                            cal
+                                                            {suggestion.recipe.nutrition.calories} cal
                                                         </TagLabel>
                                                     </Tag>
-                                                </HStack>
+                                                </Flex>
 
-                                                <HStack spacing={2} flexWrap="wrap">
-                                                    {suggestion.recipe.tags
-                                                        .slice(0, 3)
-                                                        .map((tag, idx) => (
-                                                            <Badge
-                                                                key={idx}
-                                                                colorScheme="purple"
-                                                                fontSize="xs"
-                                                            >
-                                                                {tag}
-                                                            </Badge>
-                                                        ))}
-                                                </HStack>
-
+                                                {/* Nutrition Facts */}
                                                 <Box
-                                                    bg="gray.50"
-                                                    p={3}
-                                                    borderRadius="lg"
+                                                    bg="gradient"
+                                                    bgGradient="linear(to-r, purple.50, pink.50)"
+                                                    p={4}
+                                                    borderRadius="xl"
+                                                    border="1px"
+                                                    borderColor="purple.100"
                                                 >
-                                                    <HStack
-                                                        spacing={4}
-                                                        justify="space-around"
-                                                        fontSize="sm"
+                                                    <Text
+                                                        fontSize="xs"
+                                                        fontWeight="bold"
+                                                        color="gray.600"
+                                                        mb={2}
+                                                        textTransform="uppercase"
+                                                        letterSpacing="wide"
                                                     >
+                                                        Nutrition Facts
+                                                    </Text>
+                                                    <SimpleGrid columns={3} spacing={3}>
                                                         <VStack spacing={0}>
                                                             <Text
                                                                 fontWeight="bold"
                                                                 color="purple.600"
+                                                                fontSize="lg"
                                                             >
-                                                                {
-                                                                    suggestion.recipe.nutrition
-                                                                        .protein
-                                                                }
+                                                                {suggestion.recipe.nutrition.protein}
                                                             </Text>
                                                             <Text
                                                                 fontSize="xs"
                                                                 color="gray.600"
+                                                                fontWeight="medium"
                                                             >
                                                                 Protein
                                                             </Text>
@@ -342,15 +317,14 @@ const AIMealSuggestionPage = () => {
                                                             <Text
                                                                 fontWeight="bold"
                                                                 color="orange.600"
+                                                                fontSize="lg"
                                                             >
-                                                                {
-                                                                    suggestion.recipe.nutrition
-                                                                        .carbs
-                                                                }
+                                                                {suggestion.recipe.nutrition.carbs}
                                                             </Text>
                                                             <Text
                                                                 fontSize="xs"
                                                                 color="gray.600"
+                                                                fontWeight="medium"
                                                             >
                                                                 Carbs
                                                             </Text>
@@ -359,47 +333,40 @@ const AIMealSuggestionPage = () => {
                                                             <Text
                                                                 fontWeight="bold"
                                                                 color="yellow.600"
+                                                                fontSize="lg"
                                                             >
-                                                                {
-                                                                    suggestion.recipe.nutrition
-                                                                        .fat
-                                                                }
+                                                                {suggestion.recipe.nutrition.fat}
                                                             </Text>
                                                             <Text
                                                                 fontSize="xs"
                                                                 color="gray.600"
+                                                                fontWeight="medium"
                                                             >
                                                                 Fat
                                                             </Text>
                                                         </VStack>
-                                                    </HStack>
+                                                    </SimpleGrid>
                                                 </Box>
 
-                                                {suggestion.alternativeOptions &&
-                                                    suggestion.alternativeOptions.length >
-                                                        0 && (
-                                                        <HStack
-                                                            spacing={1}
-                                                            fontSize="xs"
-                                                            color="blue.600"
-                                                        >
-                                                            <Icon as={FiTrendingUp} />
-                                                            <Text>
-                                                                +
-                                                                {
-                                                                    suggestion
-                                                                        .alternativeOptions
-                                                                        .length
-                                                                }{" "}
-                                                                alternative
-                                                                {suggestion.alternativeOptions
-                                                                    .length > 1
-                                                                    ? "s"
-                                                                    : ""}{" "}
-                                                                available
-                                                            </Text>
-                                                        </HStack>
-                                                    )}
+                                                {/* Tags */}
+                                                {suggestion.recipe.tags.length > 0 && (
+                                                    <Flex gap={2} flexWrap="wrap">
+                                                        {suggestion.recipe.tags
+                                                            .slice(0, 4)
+                                                            .map((tag, idx) => (
+                                                                <Badge
+                                                                    key={idx}
+                                                                    colorScheme="purple"
+                                                                    fontSize="xs"
+                                                                    px={2}
+                                                                    py={1}
+                                                                    borderRadius="md"
+                                                                >
+                                                                    {tag}
+                                                                </Badge>
+                                                            ))}
+                                                    </Flex>
+                                                )}
                                             </VStack>
                                         </CardBody>
                                     </Card>

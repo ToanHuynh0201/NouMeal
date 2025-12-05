@@ -1,10 +1,6 @@
 import { ApiService } from "../lib/api";
 import { withErrorHandling } from "../utils";
-import type {
-	AnalyzeFoodRequest,
-	ApiMealSuggestionRequest,
-	ApiMealSuggestionResponse,
-} from "../types/ai";
+import type { AnalyzeFoodRequest, ApiMealSuggestionRequest } from "../types/ai";
 import { API_CONFIG } from "@/constants";
 
 class AiService {
