@@ -90,3 +90,49 @@ export interface AnalyzeFoodResponse {
     message: string;
     data: AnalyzeFoodData;
 }
+
+// Meal Suggestion API Types (Backend)
+export interface ApiMealSuggestionRequest {
+    query: string;
+}
+
+export interface ApiNutritionValue {
+    value: number;
+    unit: string;
+}
+
+export interface ApiNutritionFacts {
+    calories: ApiNutritionValue;
+    protein: ApiNutritionValue;
+    carbs: ApiNutritionValue;
+    fat: ApiNutritionValue;
+    fiber: ApiNutritionValue;
+    sugar: ApiNutritionValue;
+    sodium: ApiNutritionValue;
+    cholesterol: ApiNutritionValue;
+}
+
+export interface ApiMeal {
+    name: string;
+    description: string;
+    difficulty: "EASY" | "MEDIUM" | "HARD";
+    ingredients: string[];
+    instructions: string[];
+    match_percentage: number;
+    nutrition_facts: ApiNutritionFacts;
+    prep_time: string;
+    servings: number;
+    tags: string[];
+}
+
+export interface ApiMealSuggestionData {
+    meals: ApiMeal[];
+    query: string;
+    total_suggestions: number;
+}
+
+export interface ApiMealSuggestionResponse {
+    success: boolean;
+    message: string;
+    data: ApiMealSuggestionData;
+}

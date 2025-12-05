@@ -32,9 +32,38 @@ import {
 import MainLayout from "@/components/layout/MainLayout";
 import RecipeDetailModal from "@/components/menu/RecipeDetailModal";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
-import {mockMealSuggestions} from "@/data/mockData";
+import {aiService} from "@/services";
 import type {Recipe} from "@/types/recipe";
 import type {MealSuggestion} from "@/types/ai";
+import type {ApiMeal} from "@/types/ai";
+
+// Helper function to convert API meal to Recipe format
+const convertApiMealToRecipe = (meal: ApiMeal, index: number): Recipe => {
+    return {
+        id: `meal-${index}-${Date.now()}`,
+        title: meal.name,
+        description: meal.description,
+        cookingTime: meal.prep_time,
+        servingSize: `${meal.servings} servings`,
+        image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800", // Default image
+        category: "lunch", // Default category
+        difficulty: meal.difficulty.toLowerCase() as "easy" | "medium" | "hard",
+        nutrition: {
+            calories: meal.nutrition_facts.calories.value,
+            protein: `${meal.nutrition_facts.protein.value}${meal.nutrition_facts.protein.unit}`,
+            fat: `${meal.nutrition_facts.fat.value}${meal.nutrition_facts.fat.unit}`,
+            satFat: "0g", // Not provided by API
+            carbs: `${meal.nutrition_facts.carbs.value}${meal.nutrition_facts.carbs.unit}`,
+            cholesterol: `${meal.nutrition_facts.cholesterol.value}${meal.nutrition_facts.cholesterol.unit}`,
+            fiber: `${meal.nutrition_facts.fiber.value}${meal.nutrition_facts.fiber.unit}`,
+            sugar: `${meal.nutrition_facts.sugar.value}${meal.nutrition_facts.sugar.unit}`,
+            sodium: `${meal.nutrition_facts.sodium.value}${meal.nutrition_facts.sodium.unit}`,
+        },
+        ingredients: meal.ingredients,
+        instructions: meal.instructions,
+        tags: meal.tags,
+    };
+};
 
 const AIMealSuggestionPage = () => {
     const [prompt, setPrompt] = useState("");
@@ -55,43 +84,32 @@ const AIMealSuggestionPage = () => {
         setIsLoading(true);
         setHasSearched(true);
 
-        // Simulate API call with delay
-        await new Promise((resolve) => setTimeout(resolve, 1500));
+        try {
+            const response = await aiService.getMealSuggestions({
+                query: prompt,
+            });
 
-        // Simple keyword matching for demo
-        const lowerPrompt = prompt.toLowerCase();
-        let results: MealSuggestion[] = [];
+            if (response.success && response.data.meals) {
+                const mealSuggestions: MealSuggestion[] = response.data.meals.map(
+                    (meal: ApiMeal, index: number) => ({
+                        id: `suggestion-${index}-${Date.now()}`,
+                        recipe: convertApiMealToRecipe(meal, index),
+                        matchScore: meal.match_percentage,
+                        matchReason: meal.description,
+                        alternativeOptions: [],
+                    })
+                );
 
-        if (lowerPrompt.includes("breakfast")) {
-            results = mockMealSuggestions["healthy breakfast"];
-        } else if (
-            lowerPrompt.includes("protein") ||
-            lowerPrompt.includes("lunch")
-        ) {
-            results = mockMealSuggestions["high protein lunch"];
-        } else if (
-            lowerPrompt.includes("low carb") ||
-            lowerPrompt.includes("keto") ||
-            lowerPrompt.includes("dinner")
-        ) {
-            results = mockMealSuggestions["low carb dinner"];
-        } else if (
-            lowerPrompt.includes("vegan") ||
-            lowerPrompt.includes("plant")
-        ) {
-            results = mockMealSuggestions["vegan meal"];
-        } else if (
-            lowerPrompt.includes("quick") ||
-            lowerPrompt.includes("easy") ||
-            lowerPrompt.includes("fast")
-        ) {
-            results = mockMealSuggestions["quick and easy"];
-        } else {
-            results = mockMealSuggestions.default;
+                setSuggestions(mealSuggestions);
+            } else {
+                setSuggestions([]);
+            }
+        } catch (error) {
+            console.error("Error fetching meal suggestions:", error);
+            setSuggestions([]);
+        } finally {
+            setIsLoading(false);
         }
-
-        setSuggestions(results);
-        setIsLoading(false);
     };
 
     const handleKeyPress = (e: React.KeyboardEvent) => {

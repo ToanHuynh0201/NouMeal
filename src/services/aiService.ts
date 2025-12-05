@@ -1,6 +1,10 @@
 import { ApiService } from "../lib/api";
 import { withErrorHandling } from "../utils";
-import type { AnalyzeFoodRequest } from "../types/ai";
+import type {
+	AnalyzeFoodRequest,
+	ApiMealSuggestionRequest,
+	ApiMealSuggestionResponse,
+} from "../types/ai";
 import { API_CONFIG } from "@/constants";
 
 class AiService {
@@ -15,10 +19,20 @@ class AiService {
 	 */
 	analyzeFood = withErrorHandling(async (request: AnalyzeFoodRequest) => {
 		const data = await this.customApi.post("/analyze-food", request);
-		console.log(data);
 
 		return data;
 	});
+
+	/**
+	 * Get AI meal suggestions based on user query
+	 * @param {ApiMealSuggestionRequest} request - Request containing user query
+	 * @returns {Promise<ApiMealSuggestionResponse>} Response with meal suggestions
+	 */
+	getMealSuggestions = withErrorHandling(
+		async (request: ApiMealSuggestionRequest) => {
+			return await this.customApi.post("/meal-suggestion", request);
+		},
+	);
 }
 
 export const aiService = new AiService();
