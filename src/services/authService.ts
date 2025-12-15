@@ -429,7 +429,7 @@ class AuthService {
 	 */
 	isAdmin() {
 		const user = this.getCurrentUser();
-		return user?.role === "ADMIN";
+		return user?.role?.toUpperCase() === "ADMIN";
 	}
 
 	/**
@@ -439,7 +439,7 @@ class AuthService {
 	 */
 	hasRole(role: string) {
 		const user = this.getCurrentUser();
-		return user?.role === role;
+		return user?.role?.toUpperCase() === role.toUpperCase();
 	}
 
 	/**

@@ -10,7 +10,8 @@ import LoginPage from "./pages/LoginPage";
 import LandingPage from "./pages/LandingPage";
 import DashboardPage from "./pages/DashboardPage";
 import ProfilePage from "./pages/ProfilePage";
-import ProtectedRoute from "./components/auth/ProtectedRoute";
+import AdminRoute from "./components/auth/AdminRoute";
+import UserRoute from "./components/auth/UserRoute";
 import { AuthProvider } from "./contexts/AuthContext";
 import MenuSuggestionPage from "./pages/MenuSuggestionPage";
 import AIMealSuggestionPage from "./pages/AIMealSuggestionPage";
@@ -36,87 +37,87 @@ const App = () => {
 						element={<LoginPage />}
 					/>
 
-					{/* Protected Routes - Regular Users */}
+					{/* Protected Routes - Regular Users Only */}
 					<Route
 						path={ROUTES.DASHBOARD}
 						element={
-							<ProtectedRoute>
+							<UserRoute>
 								<DashboardPage />
-							</ProtectedRoute>
+							</UserRoute>
 						}
 					/>
 					<Route
 						path={ROUTES.MENU_SUGGESTION}
 						element={
-							<ProtectedRoute>
+							<UserRoute>
 								<MenuSuggestionPage />
-							</ProtectedRoute>
+							</UserRoute>
 						}
 					/>
 					<Route
 						path={ROUTES.AI_MEAL_SUGGESTION}
 						element={
-							<ProtectedRoute>
+							<UserRoute>
 								<AIMealSuggestionPage />
-							</ProtectedRoute>
+							</UserRoute>
 						}
 					/>
 					<Route
 						path={ROUTES.IMAGE_RECOGNITION}
 						element={
-							<ProtectedRoute>
+							<UserRoute>
 								<ImageRecognitionPage />
-							</ProtectedRoute>
+							</UserRoute>
 						}
 					/>
 					<Route
 						path={ROUTES.MY_RECIPES}
 						element={
-							<ProtectedRoute>
+							<UserRoute>
 								<MyRecipesPage />
-							</ProtectedRoute>
+							</UserRoute>
 						}
 					/>
 					<Route
 						path={ROUTES.PROFILE}
 						element={
-							<ProtectedRoute>
+							<UserRoute>
 								<ProfilePage />
-							</ProtectedRoute>
+							</UserRoute>
 						}
 					/>
 
-					{/* Protected Routes - Admin */}
+					{/* Protected Routes - Admin Only */}
 					<Route
 						path={ROUTES.ADMIN_OVERALL}
 						element={
-							<ProtectedRoute>
+							<AdminRoute>
 								<OverallPage />
-							</ProtectedRoute>
+							</AdminRoute>
 						}
 					/>
 					<Route
 						path={ROUTES.ADMIN_USERS}
 						element={
-							<ProtectedRoute>
+							<AdminRoute>
 								<UsersPage />
-							</ProtectedRoute>
+							</AdminRoute>
 						}
 					/>
 					<Route
 						path={ROUTES.ADMIN_FOOD}
 						element={
-							<ProtectedRoute>
+							<AdminRoute>
 								<FoodPage />
-							</ProtectedRoute>
+							</AdminRoute>
 						}
 					/>
 					<Route
 						path={ROUTES.ADMIN_COMMUNITY}
 						element={
-							<ProtectedRoute>
+							<AdminRoute>
 								<CommunityPage />
-							</ProtectedRoute>
+							</AdminRoute>
 						}
 					/>
 

@@ -24,12 +24,13 @@ import {
 import ChangePasswordModal from "../auth/ChangePasswordModal";
 import { ROUTES } from "@/constants";
 import { useNavigate } from "react-router-dom";
+import { useRole } from "@/hooks/useRole";
 
 const AppHeader = ({ onLogout, showAuthButtons = false }: AppHeaderProps) => {
 	const { user, isAuthenticated } = useAuth();
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const navigate = useNavigate();
-
+	const { isAdmin } = useRole();
 	const borderColor = useColorModeValue("gray.200", "gray.600");
 
 	// Get current date info
@@ -187,19 +188,21 @@ const AppHeader = ({ onLogout, showAuthButtons = false }: AppHeaderProps) => {
 										backdropFilter: "blur(10px)",
 										WebkitBackdropFilter: "blur(10px)",
 									}}>
-									<MenuItem
-										icon={<CgProfile />}
-										borderRadius="lg"
-										fontWeight="500"
-										_hover={{
-											bg: "purple.50",
-											color: "purple.600",
-										}}
-										onClick={() =>
-											navigate(ROUTES.PROFILE)
-										}>
-										My Profile
-									</MenuItem>
+									{!isAdmin && (
+										<MenuItem
+											icon={<CgProfile />}
+											borderRadius="lg"
+											fontWeight="500"
+											_hover={{
+												bg: "purple.50",
+												color: "purple.600",
+											}}
+											onClick={() =>
+												navigate(ROUTES.PROFILE)
+											}>
+											My Profile
+										</MenuItem>
+									)}
 									<MenuItem
 										icon={<LockIcon />}
 										borderRadius="lg"

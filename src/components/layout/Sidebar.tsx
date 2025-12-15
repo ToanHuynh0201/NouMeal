@@ -12,6 +12,7 @@ import { ChevronLeftIcon, ChevronRightIcon } from "@chakra-ui/icons";
 import type { navItem } from "@/types/layout";
 import { ROUTES } from "@/constants";
 import { useAuth } from "@/hooks/useAuth";
+import { useRole } from "@/hooks/useRole";
 import { SidebarLogo } from "./SidebarLogo";
 import { SidebarItem } from "./SidebarItem";
 import { SidebarUserProfile } from "./SidebarUserProfile";
@@ -24,6 +25,7 @@ import { RiCommunityLine } from "react-icons/ri";
 function Sidebar() {
 	const location = useLocation();
 	const { user, logout } = useAuth();
+	const { isAdmin } = useRole();
 	const [isCollapsed, setIsCollapsed] = useState(false);
 
 	const toggleSidebar = () => setIsCollapsed(!isCollapsed);
@@ -37,9 +39,6 @@ function Sidebar() {
 		"rgba(159, 122, 234, 0.1)",
 		"gray.700",
 	);
-
-	// Check if user is admin
-	const isAdmin = user?.role === "ADMIN";
 
 	// Navigation items for regular users
 	const userNavItems: navItem[] = [
@@ -195,7 +194,7 @@ function Sidebar() {
 			</VStack>
 
 			{/* User Profile Section */}
-			{user && (
+			{user && !isAdmin && (
 				<SidebarUserProfile
 					user={user}
 					isCollapsed={isCollapsed}
