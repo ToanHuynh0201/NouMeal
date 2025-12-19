@@ -67,14 +67,6 @@ class UserService {
 	// });
 
 	/**
-	 * Get daily calorie needs and macro distribution
-	 * @returns {Promise<Object>} Standardized response with daily calorie needs data
-	 */
-	getDailyCalorieNeeds = withErrorHandling(async () => {
-		return api.get("/users/daily-calorie-needs");
-	});
-
-	/**
 	 * Update user profile
 	 * @param {Object} profileData - Profile data to update
 	 * @returns {Promise<Object>} Standardized response with updated user data

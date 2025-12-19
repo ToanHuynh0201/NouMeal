@@ -17,6 +17,7 @@ import {
 	AlertIcon,
 	AlertTitle,
 	AlertDescription,
+	Badge,
 } from "@chakra-ui/react";
 import { useState, useMemo, useEffect } from "react";
 import { FiCalendar, FiArrowLeft, FiRefreshCw } from "react-icons/fi";
@@ -24,13 +25,12 @@ import MainLayout from "@/components/layout/MainLayout";
 import RecipeDetailModal from "@/components/menu/RecipeDetailModal";
 import DayMenuView from "@/components/menu/DayMenuView";
 import UserProfileHeader from "@/components/menu/UserProfileHeader";
-import NutritionSummaryCard from "@/components/menu/NutritionSummaryCard";
 import WeeklyMenuCard from "@/components/menu/WeeklyMenuCard";
-import WeeklySummaryCard from "@/components/menu/WeeklySummaryCard";
 import WeeklyDayDetailView from "@/components/menu/WeeklyDayDetailView";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import useScrollAnimation from "@/hooks/useScrollAnimation";
 import useDailyCalorieNeeds from "@/hooks/useDailyCalorieNeeds";
+import { useTodayProgress } from "@/hooks/useTodayProgress";
 import { authService, foodService } from "@/services";
 import type {
 	Recipe,
@@ -55,6 +55,9 @@ const MenuSuggestionPage = () => {
 	// Fetch daily calorie needs
 	const { data: dailyCalorieNeeds, isLoading: isLoadingCalories } =
 		useDailyCalorieNeeds();
+
+	// Fetch today's progress
+	const { data: progressData, isLoading: isLoadingProgress } = useTodayProgress();
 
 	// State for food recommendations
 	const [recommendations, setRecommendations] =
@@ -144,23 +147,6 @@ const MenuSuggestionPage = () => {
 			});
 		}
 	};
-
-	// Calculate weekly totals
-	const weeklyTotals = useMemo(() => {
-		if (!weeklyMenu || weeklyMenu.length === 0) {
-			return { calories: 0, protein: 0, carbs: 0, fat: 0 };
-		}
-
-		return weeklyMenu.reduce(
-			(acc, day) => ({
-				calories: acc.calories + day.totalCalories,
-				protein: acc.protein + parseInt(day.totalProtein),
-				carbs: acc.carbs + parseInt(day.totalCarbs),
-				fat: acc.fat + parseInt(day.totalFat),
-			}),
-			{ calories: 0, protein: 0, carbs: 0, fat: 0 },
-		);
-	}, [weeklyMenu]);
 
 	return (
 		<MainLayout
@@ -322,13 +308,167 @@ const MenuSuggestionPage = () => {
 									<VStack
 										spacing={6}
 										align="stretch">
-										{/* Today's Nutrition Summary */}
-										<NutritionSummaryCard
-											calories={todayMenu.totalCalories}
-											protein={todayMenu.totalProtein}
-											carbs={todayMenu.totalCarbs}
-											fat={todayMenu.totalFat}
-										/>
+										{/* Today's Progress Card */}
+										{!isLoadingProgress && progressData && (
+											<Box
+												bg="white"
+												borderRadius="2xl"
+												shadow="lg"
+												border="1px solid"
+												borderColor="purple.100"
+												overflow="hidden">
+												<Box
+													bgGradient="linear(to-r, purple.500, pink.500)"
+													p={4}>
+													<HStack justify="space-between">
+														<Text
+															color="white"
+															fontSize="lg"
+															fontWeight="bold">
+															Today's Progress
+														</Text>
+														<Badge
+															colorScheme="whiteAlpha"
+															fontSize="sm"
+															px={3}
+															py={1}
+															bg="whiteAlpha.300">
+															{progressData.consumed.calories} / {progressData.totalCalories} cal
+														</Badge>
+													</HStack>
+												</Box>
+
+												<Box p={6}>
+													<VStack spacing={4} align="stretch">
+														{/* Progress bars */}
+														<SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
+															{/* Protein */}
+															<Box>
+																<HStack justify="space-between" mb={2}>
+																	<Text fontSize="sm" fontWeight="medium" color="gray.600">
+																		Protein
+																	</Text>
+																	<Text fontSize="sm" fontWeight="bold" color="green.600">
+																		{progressData.consumed.protein}g / {progressData.macroProfile.protein}g
+																	</Text>
+																</HStack>
+																<Box
+																	h="8px"
+																	bg="gray.200"
+																	borderRadius="full"
+																	overflow="hidden">
+																	<Box
+																		h="100%"
+																		bg="green.500"
+																		borderRadius="full"
+																		width={`${Math.min((progressData.consumed.protein / progressData.macroProfile.protein) * 100, 100)}%`}
+																		transition="width 0.5s ease"
+																	/>
+																</Box>
+															</Box>
+
+															{/* Carbs */}
+															<Box>
+																<HStack justify="space-between" mb={2}>
+																	<Text fontSize="sm" fontWeight="medium" color="gray.600">
+																		Carbs
+																	</Text>
+																	<Text fontSize="sm" fontWeight="bold" color="blue.600">
+																		{progressData.consumed.carbs}g / {progressData.macroProfile.carb}g
+																	</Text>
+																</HStack>
+																<Box
+																	h="8px"
+																	bg="gray.200"
+																	borderRadius="full"
+																	overflow="hidden">
+																	<Box
+																		h="100%"
+																		bg="blue.500"
+																		borderRadius="full"
+																		width={`${Math.min((progressData.consumed.carbs / progressData.macroProfile.carb) * 100, 100)}%`}
+																		transition="width 0.5s ease"
+																	/>
+																</Box>
+															</Box>
+
+															{/* Fat */}
+															<Box>
+																<HStack justify="space-between" mb={2}>
+																	<Text fontSize="sm" fontWeight="medium" color="gray.600">
+																		Fat
+																	</Text>
+																	<Text fontSize="sm" fontWeight="bold" color="purple.600">
+																		{progressData.consumed.fat}g / {progressData.macroProfile.fat}g
+																	</Text>
+																</HStack>
+																<Box
+																	h="8px"
+																	bg="gray.200"
+																	borderRadius="full"
+																	overflow="hidden">
+																	<Box
+																		h="100%"
+																		bg="purple.500"
+																		borderRadius="full"
+																		width={`${Math.min((progressData.consumed.fat / progressData.macroProfile.fat) * 100, 100)}%`}
+																		transition="width 0.5s ease"
+																	/>
+																</Box>
+															</Box>
+
+															{/* Calories */}
+															<Box>
+																<HStack justify="space-between" mb={2}>
+																	<Text fontSize="sm" fontWeight="medium" color="gray.600">
+																		Calories
+																	</Text>
+																	<Text fontSize="sm" fontWeight="bold" color="orange.600">
+																		{progressData.consumed.calories} / {progressData.totalCalories}
+																	</Text>
+																</HStack>
+																<Box
+																	h="8px"
+																	bg="gray.200"
+																	borderRadius="full"
+																	overflow="hidden">
+																	<Box
+																		h="100%"
+																		bg="orange.500"
+																		borderRadius="full"
+																		width={`${Math.min((progressData.consumed.calories / progressData.totalCalories) * 100, 100)}%`}
+																		transition="width 0.5s ease"
+																	/>
+																</Box>
+															</Box>
+														</SimpleGrid>
+
+														{/* Remaining meals */}
+														{progressData.remainingMeals.length > 0 && (
+															<Box pt={4} borderTop="1px" borderColor="gray.200">
+																<Text fontSize="sm" color="gray.600" mb={2} fontWeight="medium">
+																	Remaining Meals:
+																</Text>
+																<HStack spacing={2} flexWrap="wrap">
+																	{progressData.remainingMeals.map((meal, index) => (
+																		<Badge
+																			key={index}
+																			colorScheme="orange"
+																			fontSize="sm"
+																			px={3}
+																			py={1}
+																			borderRadius="full"
+																			textTransform="capitalize">
+																			{meal}
+																		</Badge>
+																	))}
+																</HStack>
+															</Box>
+														)}
+													</VStack>
+												</Box>
+											</Box>
+										)}
 
 										{/* Today's Detailed Menu */}
 										<DayMenuView
@@ -447,20 +587,6 @@ const MenuSuggestionPage = () => {
 										) : (
 											// Weekly overview
 											<>
-												{/* Weekly Summary */}
-												<WeeklySummaryCard
-													totalCalories={
-														weeklyTotals.calories
-													}
-													totalProtein={
-														weeklyTotals.protein
-													}
-													totalCarbs={
-														weeklyTotals.carbs
-													}
-													totalFat={weeklyTotals.fat}
-												/>
-
 												{/* Weekly Menu Grid - Better layout for 7 days */}
 												<VStack
 													spacing={6}

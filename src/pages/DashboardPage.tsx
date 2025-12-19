@@ -1,5 +1,7 @@
 import MainLayout from "@/components/layout/MainLayout";
+import LoadingSpinner from "@/components/common/LoadingSpinner";
 import {useAuth} from "@/hooks/useAuth";
+import {useTodayProgress} from "@/hooks/useTodayProgress";
 import {
     Box,
     Container,
@@ -17,6 +19,10 @@ import {
     StatNumber,
     StatHelpText,
     Progress,
+    Alert,
+    AlertIcon,
+    AlertTitle,
+    AlertDescription,
 } from "@chakra-ui/react";
 import {
     FaAppleAlt,
@@ -29,57 +35,97 @@ import {
 
 function DashboardPage() {
     const {user} = useAuth();
+    const {data: progressData, isLoading, error} = useTodayProgress();
 
-    // Mock data - replace with real data from API
-    const stats = [
-        {
-            label: "Calories Today",
-            value: "1,450",
-            goal: "2,200",
-            icon: FaFire,
-            color: "orange.500",
-            progress: 66,
-        },
-        {
-            label: "Protein",
-            value: "85g",
-            goal: "150g",
-            icon: FaAppleAlt,
-            color: "green.500",
-            progress: 57,
-        },
-        {
-            label: "Water",
-            value: "6",
-            goal: "8 glasses",
-            icon: FaHeart,
-            color: "blue.500",
-            progress: 75,
-        },
-        {
-            label: "Meals Logged",
-            value: "2",
-            goal: "3 today",
-            icon: FaUtensils,
-            color: "purple.500",
-            progress: 67,
-        },
-    ];
+    // Calculate stats from API data
+    const stats = progressData
+        ? [
+              {
+                  label: "Calories Today",
+                  value: progressData.consumed.calories.toLocaleString(),
+                  goal: progressData.totalCalories.toLocaleString(),
+                  icon: FaFire,
+                  color: "orange.500",
+                  progress: Math.round(
+                      (progressData.consumed.calories / progressData.totalCalories) * 100
+                  ),
+              },
+              {
+                  label: "Protein",
+                  value: `${progressData.consumed.protein}g`,
+                  goal: `${progressData.macroProfile.protein}g`,
+                  icon: FaAppleAlt,
+                  color: "green.500",
+                  progress: Math.round(
+                      (progressData.consumed.protein / progressData.macroProfile.protein) * 100
+                  ),
+              },
+              {
+                  label: "Carbs",
+                  value: `${progressData.consumed.carbs}g`,
+                  goal: `${progressData.macroProfile.carb}g`,
+                  icon: FaHeart,
+                  color: "blue.500",
+                  progress: Math.round(
+                      (progressData.consumed.carbs / progressData.macroProfile.carb) * 100
+                  ),
+              },
+              {
+                  label: "Fat",
+                  value: `${progressData.consumed.fat}g`,
+                  goal: `${progressData.macroProfile.fat}g`,
+                  icon: FaUtensils,
+                  color: "purple.500",
+                  progress: Math.round(
+                      (progressData.consumed.fat / progressData.macroProfile.fat) * 100
+                  ),
+              },
+          ]
+        : [];
 
-    const todaysMeals = [
-        {
-            name: "Breakfast",
-            meal: "Oatmeal with Berries",
-            calories: 350,
-            time: "8:30 AM",
-        },
-        {
-            name: "Lunch",
-            meal: "Grilled Chicken Salad",
-            calories: 450,
-            time: "12:30 PM",
-        },
-    ];
+    // Get remaining meals count
+    const remainingMealsCount = progressData?.remainingMeals.length || 0;
+    const totalMeals = 4; // breakfast, lunch, dinner, snack
+    const mealsLogged = totalMeals - remainingMealsCount;
+
+    // Show loading state
+    if (isLoading) {
+        return (
+            <MainLayout showHeader={true} showSidebar={true}>
+                <Container maxW="7xl" py={8}>
+                    <LoadingSpinner />
+                </Container>
+            </MainLayout>
+        );
+    }
+
+    // Show error state
+    if (error) {
+        return (
+            <MainLayout showHeader={true} showSidebar={true}>
+                <Container maxW="7xl" py={8}>
+                    <Alert
+                        status="error"
+                        variant="subtle"
+                        flexDirection="column"
+                        alignItems="center"
+                        justifyContent="center"
+                        textAlign="center"
+                        height="200px"
+                        borderRadius="xl"
+                    >
+                        <AlertIcon boxSize="40px" mr={0} />
+                        <AlertTitle mt={4} mb={1} fontSize="lg">
+                            Failed to load progress data
+                        </AlertTitle>
+                        <AlertDescription maxWidth="sm">
+                            {error}
+                        </AlertDescription>
+                    </Alert>
+                </Container>
+            </MainLayout>
+        );
+    }
 
     return (
         <MainLayout showHeader={true} showSidebar={true}>
@@ -161,7 +207,7 @@ function DashboardPage() {
                         ))}
                     </SimpleGrid>
 
-                    {/* Today's Meals */}
+                    {/* Today's Progress Summary */}
                     <Card
                         shadow="md"
                         borderRadius="xl"
@@ -171,71 +217,110 @@ function DashboardPage() {
                         <CardBody>
                             <VStack align="stretch" spacing={6}>
                                 <HStack justify="space-between">
-                                    <Heading size="md">Today's Meals</Heading>
+                                    <Heading size="md">Today's Progress</Heading>
                                     <Badge colorScheme="purple" fontSize="sm" px={3} py={1}>
-                                        {todaysMeals.length} meals logged
+                                        {mealsLogged} / {totalMeals} meals logged
                                     </Badge>
                                 </HStack>
 
                                 <VStack align="stretch" spacing={4}>
-                                    {todaysMeals.map((meal, index) => (
-                                        <Card
-                                            key={index}
-                                            bg="gray.50"
-                                            borderRadius="lg"
-                                        >
-                                            <CardBody>
-                                                <HStack justify="space-between">
-                                                    <VStack align="start" spacing={1}>
-                                                        <Text
-                                                            fontSize="sm"
-                                                            color="gray.600"
-                                                            fontWeight="medium"
-                                                        >
-                                                            {meal.name}
-                                                        </Text>
-                                                        <Text
-                                                            fontSize="lg"
-                                                            fontWeight="semibold"
-                                                        >
-                                                            {meal.meal}
-                                                        </Text>
-                                                        <Text
-                                                            fontSize="sm"
-                                                            color="gray.500"
-                                                        >
-                                                            {meal.time}
-                                                        </Text>
-                                                    </VStack>
-                                                    <VStack>
-                                                        <Badge
-                                                            colorScheme="orange"
-                                                            fontSize="md"
-                                                            px={4}
-                                                            py={2}
-                                                            borderRadius="full"
-                                                        >
-                                                            {meal.calories} cal
-                                                        </Badge>
-                                                    </VStack>
-                                                </HStack>
-                                            </CardBody>
-                                        </Card>
-                                    ))}
-
-                                    {todaysMeals.length === 0 && (
+                                    {/* Remaining Meals Section */}
+                                    {progressData && progressData.remainingMeals.length > 0 ? (
+                                        <Box>
+                                            <Text fontSize="sm" color="gray.600" mb={3} fontWeight="medium">
+                                                Remaining Meals:
+                                            </Text>
+                                            <HStack spacing={2} flexWrap="wrap">
+                                                {progressData.remainingMeals.map((meal, index) => (
+                                                    <Badge
+                                                        key={index}
+                                                        colorScheme="orange"
+                                                        fontSize="sm"
+                                                        px={3}
+                                                        py={1}
+                                                        borderRadius="full"
+                                                        textTransform="capitalize"
+                                                    >
+                                                        {meal}
+                                                    </Badge>
+                                                ))}
+                                            </HStack>
+                                        </Box>
+                                    ) : (
                                         <Box
-                                            py={12}
+                                            py={8}
                                             textAlign="center"
-                                            color="gray.500"
+                                            color="green.600"
+                                            bg="green.50"
+                                            borderRadius="lg"
                                         >
                                             <Icon
                                                 as={FaUtensils}
-                                                boxSize={12}
-                                                mb={4}
-                                                opacity={0.3}
+                                                boxSize={10}
+                                                mb={3}
                                             />
-                                            <Text>No meals logged yet today</Text>
+                                            <Text fontWeight="semibold" fontSize="lg">
+                                                All meals logged for today! 🎉
+                                            </Text>
+                                        </Box>
+                                    )}
+
+                                    {/* Nutrition Summary */}
+                                    {progressData && (
+                                        <Box pt={4} borderTop="1px" borderColor="gray.200">
+                                            <Text fontSize="sm" color="gray.600" mb={3} fontWeight="medium">
+                                                Remaining Nutrition:
+                                            </Text>
+                                            <SimpleGrid columns={{base: 2, md: 4}} spacing={4}>
+                                                <Card bg="orange.50" borderRadius="lg">
+                                                    <CardBody p={3}>
+                                                        <VStack spacing={1}>
+                                                            <Text fontSize="xs" color="gray.600">
+                                                                Calories
+                                                            </Text>
+                                                            <Text fontSize="lg" fontWeight="bold" color="orange.600">
+                                                                {progressData.remaining.calories}
+                                                            </Text>
+                                                        </VStack>
+                                                    </CardBody>
+                                                </Card>
+                                                <Card bg="green.50" borderRadius="lg">
+                                                    <CardBody p={3}>
+                                                        <VStack spacing={1}>
+                                                            <Text fontSize="xs" color="gray.600">
+                                                                Protein
+                                                            </Text>
+                                                            <Text fontSize="lg" fontWeight="bold" color="green.600">
+                                                                {progressData.remaining.protein}g
+                                                            </Text>
+                                                        </VStack>
+                                                    </CardBody>
+                                                </Card>
+                                                <Card bg="blue.50" borderRadius="lg">
+                                                    <CardBody p={3}>
+                                                        <VStack spacing={1}>
+                                                            <Text fontSize="xs" color="gray.600">
+                                                                Carbs
+                                                            </Text>
+                                                            <Text fontSize="lg" fontWeight="bold" color="blue.600">
+                                                                {progressData.remaining.carbs}g
+                                                            </Text>
+                                                        </VStack>
+                                                    </CardBody>
+                                                </Card>
+                                                <Card bg="purple.50" borderRadius="lg">
+                                                    <CardBody p={3}>
+                                                        <VStack spacing={1}>
+                                                            <Text fontSize="xs" color="gray.600">
+                                                                Fat
+                                                            </Text>
+                                                            <Text fontSize="lg" fontWeight="bold" color="purple.600">
+                                                                {progressData.remaining.fat}g
+                                                            </Text>
+                                                        </VStack>
+                                                    </CardBody>
+                                                </Card>
+                                            </SimpleGrid>
                                         </Box>
                                     )}
                                 </VStack>

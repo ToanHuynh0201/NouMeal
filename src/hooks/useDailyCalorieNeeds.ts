@@ -1,16 +1,17 @@
 import { useState, useEffect } from "react";
-import { userService } from "@/services";
+import { authService } from "@/services";
+import { calculateDailyCalorieNeeds } from "@/utils";
 import type { DailyCalorieNeeds } from "@/types/profile";
 
 interface UseDailyCalorieNeedsReturn {
 	data: DailyCalorieNeeds | null;
 	isLoading: boolean;
 	error: string | null;
-	refetch: () => Promise<void>;
+	refetch: () => void;
 }
 
 /**
- * Custom hook to fetch and manage daily calorie needs data
+ * Custom hook to calculate and manage daily calorie needs data from user profile
  * @returns {UseDailyCalorieNeedsReturn} Hook state and methods
  */
 export const useDailyCalorieNeeds = (): UseDailyCalorieNeedsReturn => {
@@ -18,30 +19,42 @@ export const useDailyCalorieNeeds = (): UseDailyCalorieNeedsReturn => {
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const [error, setError] = useState<string | null>(null);
 
-	const fetchDailyCalorieNeeds = async () => {
+	const calculateCalorieNeeds = () => {
 		setIsLoading(true);
 		setError(null);
 
-		const result = await userService.getDailyCalorieNeeds();
+		try {
+			const user = authService.getCurrentUser();
 
-		if (result.success) {
-			setData(result.data);
-		} else {
-			setError(result.error || "Failed to fetch daily calorie needs");
+			if (!user) {
+				setError("User not found. Please login.");
+				setIsLoading(false);
+				return;
+			}
+
+			// Calculate calorie needs from user profile
+			const calorieNeeds = calculateDailyCalorieNeeds(user);
+			setData(calorieNeeds);
+		} catch (err) {
+			setError(
+				err instanceof Error
+					? err.message
+					: "Failed to calculate daily calorie needs",
+			);
 		}
 
 		setIsLoading(false);
 	};
 
 	useEffect(() => {
-		fetchDailyCalorieNeeds();
+		calculateCalorieNeeds();
 	}, []);
 
 	return {
 		data,
 		isLoading,
 		error,
-		refetch: fetchDailyCalorieNeeds,
+		refetch: calculateCalorieNeeds,
 	};
 };
 

@@ -11,19 +11,19 @@ class FoodService {
 	});
 
 	/**
-	 * Get daily calorie needs for the current user
-	 * @returns {Promise} Standardized response with success flag and data
-	 */
-	getDailyCalorieNeeds = withErrorHandling(async () => {
-		return await api.get("/foods/daily-calorie-needs");
-	});
-
-	/**
 	 * Get weekly menu for the current user
 	 * @returns {Promise} Standardized response with success flag and data
 	 */
 	getWeeklyMenu = withErrorHandling(async () => {
 		return await api.get("/foods/weekly-recommended");
+	});
+
+	/**
+	 * Get today's progress for the current user
+	 * @returns {Promise} Standardized response with success flag and data
+	 */
+	getTodayProgress = withErrorHandling(async () => {
+		return await api.get("/foods/progress/today");
 	});
 }
 
