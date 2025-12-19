@@ -25,6 +25,15 @@ class FoodService {
 	getTodayProgress = withErrorHandling(async () => {
 		return await api.get("/foods/progress/today");
 	});
+
+	/**
+	 * Log a food item for the current user
+	 * @param {string} foodId - The ID of the food to log
+	 * @returns {Promise} Standardized response with success flag and data
+	 */
+	logFood = withErrorHandling(async (foodId: string) => {
+		return await api.post("/foods/log", { foodId });
+	});
 }
 
 export const foodService = new FoodService();

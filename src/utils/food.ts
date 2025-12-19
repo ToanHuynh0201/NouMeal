@@ -112,21 +112,27 @@ export const convertRecommendationsToDailyMenu = (recommendations: {
 	dinner: Food[];
 	snack: Food[];
 }): DailyMenu => {
-	const breakfastRecipe = recommendations.breakfast[0]
+	console.log("Converting recommendations to DailyMenu:", recommendations);
+	console.log("Breakfast array:", recommendations.breakfast);
+	console.log("Breakfast length:", recommendations.breakfast?.length);
+
+	const breakfastRecipe = recommendations.breakfast?.[0]
 		? convertFoodToRecipe(recommendations.breakfast[0])
 		: createDefaultRecipe("breakfast");
 
-	const lunchRecipe = recommendations.lunch[0]
+	const lunchRecipe = recommendations.lunch?.[0]
 		? convertFoodToRecipe(recommendations.lunch[0])
 		: createDefaultRecipe("lunch");
 
-	const dinnerRecipe = recommendations.dinner[0]
+	const dinnerRecipe = recommendations.dinner?.[0]
 		? convertFoodToRecipe(recommendations.dinner[0])
 		: createDefaultRecipe("dinner");
 
-	const snackRecipes = recommendations.snack
+	const snackRecipes = (recommendations.snack || [])
 		.slice(0, 2)
 		.map(convertFoodToRecipe);
+
+	console.log("Breakfast recipe created:", breakfastRecipe);
 
 	// Calculate totals
 	const allRecipes = [

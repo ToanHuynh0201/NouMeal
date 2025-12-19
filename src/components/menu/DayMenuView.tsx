@@ -11,18 +11,78 @@ import {
 	Image,
 	Icon,
 	Divider,
+	Button,
+	useToast,
+	Modal,
+	ModalOverlay,
+	ModalContent,
+	ModalHeader,
+	ModalBody,
+	ModalFooter,
+	ModalCloseButton,
+	useDisclosure,
 } from "@chakra-ui/react";
-import { FiClock, FiUsers } from "react-icons/fi";
+import { FiClock, FiUsers, FiCheck, FiAlertCircle } from "react-icons/fi";
+import { useState } from "react";
 import useScrollAnimation from "@/hooks/useScrollAnimation";
 import type { Recipe, DailyMenu } from "@/types/recipe";
 
 interface DayMenuViewProps {
 	dailyMenu: DailyMenu;
 	onRecipeClick: (recipe: Recipe) => void;
+	onLogFood?: (foodId: string) => Promise<void>;
+	remainingMeals?: string[];
 }
 
-const DayMenuView = ({ dailyMenu, onRecipeClick }: DayMenuViewProps) => {
+const DayMenuView = ({ dailyMenu, onRecipeClick, onLogFood, remainingMeals = [] }: DayMenuViewProps) => {
 	const contentSection = useScrollAnimation({ threshold: 0.1 });
+	const toast = useToast();
+	const [loggingFoods, setLoggingFoods] = useState<Set<string>>(new Set());
+	const { isOpen, onOpen, onClose } = useDisclosure();
+	const [selectedMeal, setSelectedMeal] = useState<{ foodId: string; name: string; mealType: string } | null>(null);
+
+	const openConfirmModal = (foodId: string, name: string, mealType: string) => {
+		setSelectedMeal({ foodId, name, mealType });
+		onOpen();
+	};
+
+	const handleConfirmLog = async () => {
+		if (!selectedMeal || !onLogFood) return;
+
+		const { foodId } = selectedMeal;
+		onClose();
+		setLoggingFoods(prev => new Set(prev).add(foodId));
+
+		try {
+			await onLogFood(foodId);
+			toast({
+				title: "Food logged successfully",
+				description: "This meal has been added to your diary.",
+				status: "success",
+				duration: 3000,
+				isClosable: true,
+			});
+		} catch (error) {
+			toast({
+				title: "Failed to log food",
+				description: "Please try again later.",
+				status: "error",
+				duration: 3000,
+				isClosable: true,
+			});
+		} finally {
+			setLoggingFoods(prev => {
+				const next = new Set(prev);
+				next.delete(foodId);
+				return next;
+			});
+			setSelectedMeal(null);
+		}
+	};
+
+	const isMealRemaining = (mealType: string) => {
+		return remainingMeals.includes(mealType);
+	};
 
 	const MealSection = ({
 		recipe,
@@ -31,6 +91,7 @@ const DayMenuView = ({ dailyMenu, onRecipeClick }: DayMenuViewProps) => {
 		subtitle,
 		bgColor,
 		delay = 0,
+		mealType,
 	}: {
 		recipe: Recipe;
 		emoji: string;
@@ -38,6 +99,7 @@ const DayMenuView = ({ dailyMenu, onRecipeClick }: DayMenuViewProps) => {
 		subtitle: string;
 		bgColor: string;
 		delay?: number;
+		mealType: "breakfast" | "lunch" | "dinner" | "snack";
 	}) => {
 		const categoryColor = {
 			breakfast: "orange",
@@ -203,6 +265,29 @@ const DayMenuView = ({ dailyMenu, onRecipeClick }: DayMenuViewProps) => {
 									</VStack>
 								</HStack>
 							</HStack>
+							{onLogFood && (
+								<>
+									<Divider />
+									<Button
+										size="sm"
+										colorScheme={categoryColor[recipe.category]}
+										leftIcon={<Icon as={FiCheck} />}
+										w="full"
+										isLoading={loggingFoods.has(recipe.id)}
+										isDisabled={!isMealRemaining(mealType)}
+										onClick={(e) => {
+											e.stopPropagation();
+											openConfirmModal(recipe.id, recipe.title, mealType);
+										}}
+										_hover={{
+											transform: "translateY(-2px)",
+											shadow: "md",
+										}}
+										transition="all 0.2s">
+										Log This Meal
+									</Button>
+								</>
+							)}
 						</VStack>
 					</CardBody>
 				</Card>
@@ -232,6 +317,7 @@ const DayMenuView = ({ dailyMenu, onRecipeClick }: DayMenuViewProps) => {
 						subtitle="Start your day"
 						bgColor="orange.50"
 						delay={0}
+						mealType="breakfast"
 					/>
 					<MealSection
 						recipe={dailyMenu.lunch}
@@ -240,6 +326,7 @@ const DayMenuView = ({ dailyMenu, onRecipeClick }: DayMenuViewProps) => {
 						subtitle="Midday fuel"
 						bgColor="green.50"
 						delay={0.1}
+						mealType="lunch"
 					/>
 					<MealSection
 						recipe={dailyMenu.dinner}
@@ -248,6 +335,7 @@ const DayMenuView = ({ dailyMenu, onRecipeClick }: DayMenuViewProps) => {
 						subtitle="Evening nourishment"
 						bgColor="purple.50"
 						delay={0.2}
+						mealType="dinner"
 					/>
 				</SimpleGrid>
 
@@ -438,6 +526,29 @@ const DayMenuView = ({ dailyMenu, onRecipeClick }: DayMenuViewProps) => {
 													</VStack>
 												</HStack>
 											</HStack>
+											{onLogFood && (
+												<>
+													<Divider />
+													<Button
+														size="sm"
+														colorScheme="blue"
+														leftIcon={<Icon as={FiCheck} />}
+														w="full"
+														isLoading={loggingFoods.has(snack.id)}
+														isDisabled={!isMealRemaining("snack")}
+														onClick={(e) => {
+															e.stopPropagation();
+															openConfirmModal(snack.id, snack.title, "snack");
+														}}
+														_hover={{
+															transform: "translateY(-2px)",
+															shadow: "md",
+														}}
+														transition="all 0.2s">
+														Log This Snack
+													</Button>
+												</>
+											)}
 										</VStack>
 									</CardBody>
 								</Card>
@@ -446,6 +557,76 @@ const DayMenuView = ({ dailyMenu, onRecipeClick }: DayMenuViewProps) => {
 					</Box>
 				)}
 			</VStack>
+
+			{/* Confirmation Modal */}
+			<Modal isOpen={isOpen} onClose={onClose} isCentered>
+				<ModalOverlay bg="blackAlpha.600" backdropFilter="blur(4px)" />
+				<ModalContent borderRadius="2xl" mx={4}>
+					<ModalHeader borderBottom="1px solid" borderColor="gray.100" pb={4}>
+						<HStack spacing={2}>
+							<Icon as={FiAlertCircle} color="purple.500" boxSize={6} />
+							<Text>Confirm Meal Log</Text>
+						</HStack>
+					</ModalHeader>
+					<ModalCloseButton />
+					<ModalBody py={6}>
+						<VStack spacing={4} align="start">
+							<Text fontSize="md" color="gray.700">
+								Are you sure you want to log this meal to your diary?
+							</Text>
+							{selectedMeal && (
+								<Box
+									w="full"
+									p={4}
+									bg="purple.50"
+									borderRadius="xl"
+									border="1px solid"
+									borderColor="purple.200">
+									<VStack align="start" spacing={2}>
+										<HStack spacing={2}>
+											<Text fontSize="sm" fontWeight="semibold" color="purple.700" textTransform="uppercase">
+												Meal Type:
+											</Text>
+											<Badge colorScheme="purple" fontSize="sm" px={2} py={1}>
+												{selectedMeal.mealType}
+											</Badge>
+										</HStack>
+										<Text fontSize="md" fontWeight="bold" color="gray.800">
+											{selectedMeal.name}
+										</Text>
+									</VStack>
+								</Box>
+							)}
+							<Text fontSize="sm" color="gray.600">
+								This action will update your daily nutrition progress.
+							</Text>
+						</VStack>
+					</ModalBody>
+					<ModalFooter borderTop="1px solid" borderColor="gray.100" pt={4}>
+						<HStack spacing={3} w="full" justify="flex-end">
+							<Button
+								variant="ghost"
+								onClick={onClose}
+								_hover={{ bg: "gray.100" }}>
+								Cancel
+							</Button>
+							<Button
+								bgGradient="linear(135deg, purple.500, pink.500)"
+								color="white"
+								onClick={handleConfirmLog}
+								leftIcon={<Icon as={FiCheck} />}
+								_hover={{
+									bgGradient: "linear(135deg, purple.600, pink.600)",
+									transform: "translateY(-2px)",
+									shadow: "md",
+								}}
+								transition="all 0.2s">
+								Confirm & Log
+							</Button>
+						</HStack>
+					</ModalFooter>
+				</ModalContent>
+			</Modal>
 		</Box>
 	);
 };

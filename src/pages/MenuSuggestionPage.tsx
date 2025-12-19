@@ -57,7 +57,8 @@ const MenuSuggestionPage = () => {
 		useDailyCalorieNeeds();
 
 	// Fetch today's progress
-	const { data: progressData, isLoading: isLoadingProgress } = useTodayProgress();
+	const { data: progressData, isLoading: isLoadingProgress } =
+		useTodayProgress();
 
 	// State for food recommendations
 	const [recommendations, setRecommendations] =
@@ -80,6 +81,8 @@ const MenuSuggestionPage = () => {
 		const result = await foodService.getRecommendedFoods();
 
 		if (result.success) {
+			console.log("API Response - Recommended Foods:", result.data);
+			console.log("Breakfast data:", result.data.breakfast);
 			setRecommendations(result.data);
 		} else {
 			setError(result.error || "Failed to fetch recommendations");
@@ -97,7 +100,6 @@ const MenuSuggestionPage = () => {
 
 		if (result.success) {
 			setWeeklyMenuData(result.data);
-			console.log(result.data);
 		} else {
 			setWeeklyError(result.error || "Failed to fetch weekly menu");
 		}
@@ -126,6 +128,17 @@ const MenuSuggestionPage = () => {
 	const handleRecipeClick = (recipe: Recipe) => {
 		setSelectedRecipe(recipe);
 		onOpen();
+	};
+
+	const handleLogFood = async (foodId: string) => {
+		const result = await foodService.logFood(foodId);
+
+		if (result.success) {
+			// Refresh today's progress after logging food
+			window.location.reload();
+		} else {
+			throw new Error(result.error || "Failed to log food");
+		}
 	};
 
 	// Helper function to format date
@@ -333,23 +346,58 @@ const MenuSuggestionPage = () => {
 															px={3}
 															py={1}
 															bg="whiteAlpha.300">
-															{progressData.consumed.calories} / {progressData.totalCalories} cal
+															{
+																progressData
+																	.consumed
+																	.calories
+															}{" "}
+															/{" "}
+															{
+																progressData.totalCalories
+															}{" "}
+															cal
 														</Badge>
 													</HStack>
 												</Box>
 
 												<Box p={6}>
-													<VStack spacing={4} align="stretch">
+													<VStack
+														spacing={4}
+														align="stretch">
 														{/* Progress bars */}
-														<SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
+														<SimpleGrid
+															columns={{
+																base: 1,
+																md: 2,
+															}}
+															spacing={4}>
 															{/* Protein */}
 															<Box>
-																<HStack justify="space-between" mb={2}>
-																	<Text fontSize="sm" fontWeight="medium" color="gray.600">
+																<HStack
+																	justify="space-between"
+																	mb={2}>
+																	<Text
+																		fontSize="sm"
+																		fontWeight="medium"
+																		color="gray.600">
 																		Protein
 																	</Text>
-																	<Text fontSize="sm" fontWeight="bold" color="green.600">
-																		{progressData.consumed.protein}g / {progressData.macroProfile.protein}g
+																	<Text
+																		fontSize="sm"
+																		fontWeight="bold"
+																		color="green.600">
+																		{
+																			progressData
+																				.consumed
+																				.protein
+																		}
+																		g /{" "}
+																		{
+																			progressData
+																				.macroProfile
+																				.protein
+																		}
+																		g
 																	</Text>
 																</HStack>
 																<Box
@@ -361,7 +409,16 @@ const MenuSuggestionPage = () => {
 																		h="100%"
 																		bg="green.500"
 																		borderRadius="full"
-																		width={`${Math.min((progressData.consumed.protein / progressData.macroProfile.protein) * 100, 100)}%`}
+																		width={`${Math.min(
+																			(progressData
+																				.consumed
+																				.protein /
+																				progressData
+																					.macroProfile
+																					.protein) *
+																				100,
+																			100,
+																		)}%`}
 																		transition="width 0.5s ease"
 																	/>
 																</Box>
@@ -369,12 +426,31 @@ const MenuSuggestionPage = () => {
 
 															{/* Carbs */}
 															<Box>
-																<HStack justify="space-between" mb={2}>
-																	<Text fontSize="sm" fontWeight="medium" color="gray.600">
+																<HStack
+																	justify="space-between"
+																	mb={2}>
+																	<Text
+																		fontSize="sm"
+																		fontWeight="medium"
+																		color="gray.600">
 																		Carbs
 																	</Text>
-																	<Text fontSize="sm" fontWeight="bold" color="blue.600">
-																		{progressData.consumed.carbs}g / {progressData.macroProfile.carb}g
+																	<Text
+																		fontSize="sm"
+																		fontWeight="bold"
+																		color="blue.600">
+																		{
+																			progressData
+																				.consumed
+																				.carbs
+																		}
+																		g /{" "}
+																		{
+																			progressData
+																				.macroProfile
+																				.carb
+																		}
+																		g
 																	</Text>
 																</HStack>
 																<Box
@@ -386,7 +462,16 @@ const MenuSuggestionPage = () => {
 																		h="100%"
 																		bg="blue.500"
 																		borderRadius="full"
-																		width={`${Math.min((progressData.consumed.carbs / progressData.macroProfile.carb) * 100, 100)}%`}
+																		width={`${Math.min(
+																			(progressData
+																				.consumed
+																				.carbs /
+																				progressData
+																					.macroProfile
+																					.carb) *
+																				100,
+																			100,
+																		)}%`}
 																		transition="width 0.5s ease"
 																	/>
 																</Box>
@@ -394,12 +479,31 @@ const MenuSuggestionPage = () => {
 
 															{/* Fat */}
 															<Box>
-																<HStack justify="space-between" mb={2}>
-																	<Text fontSize="sm" fontWeight="medium" color="gray.600">
+																<HStack
+																	justify="space-between"
+																	mb={2}>
+																	<Text
+																		fontSize="sm"
+																		fontWeight="medium"
+																		color="gray.600">
 																		Fat
 																	</Text>
-																	<Text fontSize="sm" fontWeight="bold" color="purple.600">
-																		{progressData.consumed.fat}g / {progressData.macroProfile.fat}g
+																	<Text
+																		fontSize="sm"
+																		fontWeight="bold"
+																		color="purple.600">
+																		{
+																			progressData
+																				.consumed
+																				.fat
+																		}
+																		g /{" "}
+																		{
+																			progressData
+																				.macroProfile
+																				.fat
+																		}
+																		g
 																	</Text>
 																</HStack>
 																<Box
@@ -411,7 +515,16 @@ const MenuSuggestionPage = () => {
 																		h="100%"
 																		bg="purple.500"
 																		borderRadius="full"
-																		width={`${Math.min((progressData.consumed.fat / progressData.macroProfile.fat) * 100, 100)}%`}
+																		width={`${Math.min(
+																			(progressData
+																				.consumed
+																				.fat /
+																				progressData
+																					.macroProfile
+																					.fat) *
+																				100,
+																			100,
+																		)}%`}
 																		transition="width 0.5s ease"
 																	/>
 																</Box>
@@ -419,12 +532,28 @@ const MenuSuggestionPage = () => {
 
 															{/* Calories */}
 															<Box>
-																<HStack justify="space-between" mb={2}>
-																	<Text fontSize="sm" fontWeight="medium" color="gray.600">
+																<HStack
+																	justify="space-between"
+																	mb={2}>
+																	<Text
+																		fontSize="sm"
+																		fontWeight="medium"
+																		color="gray.600">
 																		Calories
 																	</Text>
-																	<Text fontSize="sm" fontWeight="bold" color="orange.600">
-																		{progressData.consumed.calories} / {progressData.totalCalories}
+																	<Text
+																		fontSize="sm"
+																		fontWeight="bold"
+																		color="orange.600">
+																		{
+																			progressData
+																				.consumed
+																				.calories
+																		}{" "}
+																		/{" "}
+																		{
+																			progressData.totalCalories
+																		}
 																	</Text>
 																</HStack>
 																<Box
@@ -436,7 +565,14 @@ const MenuSuggestionPage = () => {
 																		h="100%"
 																		bg="orange.500"
 																		borderRadius="full"
-																		width={`${Math.min((progressData.consumed.calories / progressData.totalCalories) * 100, 100)}%`}
+																		width={`${Math.min(
+																			(progressData
+																				.consumed
+																				.calories /
+																				progressData.totalCalories) *
+																				100,
+																			100,
+																		)}%`}
 																		transition="width 0.5s ease"
 																	/>
 																</Box>
@@ -444,24 +580,49 @@ const MenuSuggestionPage = () => {
 														</SimpleGrid>
 
 														{/* Remaining meals */}
-														{progressData.remainingMeals.length > 0 && (
-															<Box pt={4} borderTop="1px" borderColor="gray.200">
-																<Text fontSize="sm" color="gray.600" mb={2} fontWeight="medium">
-																	Remaining Meals:
+														{progressData
+															.remainingMeals
+															.length > 0 && (
+															<Box
+																pt={4}
+																borderTop="1px"
+																borderColor="gray.200">
+																<Text
+																	fontSize="sm"
+																	color="gray.600"
+																	mb={2}
+																	fontWeight="medium">
+																	Remaining
+																	Meals:
 																</Text>
-																<HStack spacing={2} flexWrap="wrap">
-																	{progressData.remainingMeals.map((meal, index) => (
-																		<Badge
-																			key={index}
-																			colorScheme="orange"
-																			fontSize="sm"
-																			px={3}
-																			py={1}
-																			borderRadius="full"
-																			textTransform="capitalize">
-																			{meal}
-																		</Badge>
-																	))}
+																<HStack
+																	spacing={2}
+																	flexWrap="wrap">
+																	{progressData.remainingMeals.map(
+																		(
+																			meal,
+																			index,
+																		) => (
+																			<Badge
+																				key={
+																					index
+																				}
+																				colorScheme="orange"
+																				fontSize="sm"
+																				px={
+																					3
+																				}
+																				py={
+																					1
+																				}
+																				borderRadius="full"
+																				textTransform="capitalize">
+																				{
+																					meal
+																				}
+																			</Badge>
+																		),
+																	)}
 																</HStack>
 															</Box>
 														)}
@@ -474,6 +635,11 @@ const MenuSuggestionPage = () => {
 										<DayMenuView
 											dailyMenu={todayMenu}
 											onRecipeClick={handleRecipeClick}
+											onLogFood={handleLogFood}
+											remainingMeals={
+												progressData?.remainingMeals ||
+												[]
+											}
 										/>
 									</VStack>
 								) : (
@@ -591,39 +757,44 @@ const MenuSuggestionPage = () => {
 												<SimpleGrid
 													columns={{ base: 1, md: 2 }}
 													spacing={4}>
-													{weeklyMenu.map((day, index) => (
-														<Box
-															key={index}
-															opacity={0}
-															animation={`fadeInUp 0.5s ease-out ${
-																index * 0.1
-															}s forwards`}
-															sx={{
-																"@keyframes fadeInUp": {
-																	from: {
-																		opacity: 0,
-																		transform:
-																			"translateY(20px)",
-																	},
-																	to: {
-																		opacity: 1,
-																		transform:
-																			"translateY(0)",
-																	},
-																},
-															}}>
-															<WeeklyMenuCard
-																day={day}
-																formatDate={formatDate}
-																onRecipeClick={
-																	handleRecipeClick
-																}
-																onViewDetails={
-																	setSelectedDayMenu
-																}
-															/>
-														</Box>
-													))}
+													{weeklyMenu.map(
+														(day, index) => (
+															<Box
+																key={index}
+																opacity={0}
+																animation={`fadeInUp 0.5s ease-out ${
+																	index * 0.1
+																}s forwards`}
+																sx={{
+																	"@keyframes fadeInUp":
+																		{
+																			from: {
+																				opacity: 0,
+																				transform:
+																					"translateY(20px)",
+																			},
+																			to: {
+																				opacity: 1,
+																				transform:
+																					"translateY(0)",
+																			},
+																		},
+																}}>
+																<WeeklyMenuCard
+																	day={day}
+																	formatDate={
+																		formatDate
+																	}
+																	onRecipeClick={
+																		handleRecipeClick
+																	}
+																	onViewDetails={
+																		setSelectedDayMenu
+																	}
+																/>
+															</Box>
+														),
+													)}
 												</SimpleGrid>
 											</>
 										)}

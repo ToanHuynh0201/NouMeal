@@ -211,3 +211,38 @@ export interface WeeklyMenuResponse {
 	success: boolean;
 	data: WeeklyMenuData;
 }
+
+// Food Log Types
+export interface NutritionSnapshot {
+	calories: number;
+	protein: number;
+	carbs: number;
+	fat: number;
+}
+
+export interface FoodLog {
+	_id: string;
+	user: string;
+	food: string;
+	meal: MealType;
+	date: string;
+	servings: number;
+	source: "recommended" | "non_recommended";
+	nutritionSnapshot: NutritionSnapshot;
+	loggedAt: string;
+	createdAt: string;
+	updatedAt: string;
+}
+
+export interface LogFoodRequest {
+	foodId: string;
+	meal?: MealType;
+	servings?: number;
+	date?: string;
+}
+
+export interface LogFoodResponse {
+	success: boolean;
+	message: number | string;
+	data: FoodLog;
+}
