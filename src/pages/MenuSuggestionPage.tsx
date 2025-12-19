@@ -587,138 +587,44 @@ const MenuSuggestionPage = () => {
 										) : (
 											// Weekly overview
 											<>
-												{/* Weekly Menu Grid - Better layout for 7 days */}
-												<VStack
-													spacing={6}
-													align="stretch">
-													{/* First Row - 4 days */}
-													<SimpleGrid
-														columns={{
-															base: 1,
-															sm: 2,
-															lg: 4,
-														}}
-														spacing={6}>
-														{weeklyMenu
-															.slice(0, 4)
-															.map(
-																(
-																	day,
-																	index,
-																) => (
-																	<Box
-																		key={
-																			index
-																		}
-																		opacity={
-																			0
-																		}
-																		animation={`fadeInUp 0.5s ease-out ${
-																			index *
-																			0.1
-																		}s forwards`}
-																		sx={{
-																			"@keyframes fadeInUp":
-																				{
-																					from: {
-																						opacity: 0,
-																						transform:
-																							"translateY(20px)",
-																					},
-																					to: {
-																						opacity: 1,
-																						transform:
-																							"translateY(0)",
-																					},
-																				},
-																		}}>
-																		<WeeklyMenuCard
-																			day={
-																				day
-																			}
-																			formatDate={
-																				formatDate
-																			}
-																			onRecipeClick={
-																				handleRecipeClick
-																			}
-																			onViewDetails={
-																				setSelectedDayMenu
-																			}
-																		/>
-																	</Box>
-																),
-															)}
-													</SimpleGrid>
-
-													{/* Second Row - 3 days centered */}
-													<SimpleGrid
-														columns={{
-															base: 1,
-															sm: 2,
-															md: 3,
-														}}
-														spacing={6}
-														maxW={{
-															base: "full",
-															md: "75%",
-														}}
-														mx="auto"
-														w="full">
-														{weeklyMenu
-															.slice(4, 7)
-															.map(
-																(
-																	day,
-																	index,
-																) => (
-																	<Box
-																		key={
-																			index +
-																			4
-																		}
-																		opacity={
-																			0
-																		}
-																		animation={`fadeInUp 0.5s ease-out ${
-																			(index +
-																				4) *
-																			0.1
-																		}s forwards`}
-																		sx={{
-																			"@keyframes fadeInUp":
-																				{
-																					from: {
-																						opacity: 0,
-																						transform:
-																							"translateY(20px)",
-																					},
-																					to: {
-																						opacity: 1,
-																						transform:
-																							"translateY(0)",
-																					},
-																				},
-																		}}>
-																		<WeeklyMenuCard
-																			day={
-																				day
-																			}
-																			formatDate={
-																				formatDate
-																			}
-																			onRecipeClick={
-																				handleRecipeClick
-																			}
-																			onViewDetails={
-																				setSelectedDayMenu
-																			}
-																		/>
-																	</Box>
-																),
-															)}
-													</SimpleGrid>
-												</VStack>
+												{/* Weekly Menu Grid - 2 Columns */}
+												<SimpleGrid
+													columns={{ base: 1, md: 2 }}
+													spacing={4}>
+													{weeklyMenu.map((day, index) => (
+														<Box
+															key={index}
+															opacity={0}
+															animation={`fadeInUp 0.5s ease-out ${
+																index * 0.1
+															}s forwards`}
+															sx={{
+																"@keyframes fadeInUp": {
+																	from: {
+																		opacity: 0,
+																		transform:
+																			"translateY(20px)",
+																	},
+																	to: {
+																		opacity: 1,
+																		transform:
+																			"translateY(0)",
+																	},
+																},
+															}}>
+															<WeeklyMenuCard
+																day={day}
+																formatDate={formatDate}
+																onRecipeClick={
+																	handleRecipeClick
+																}
+																onViewDetails={
+																	setSelectedDayMenu
+																}
+															/>
+														</Box>
+													))}
+												</SimpleGrid>
 											</>
 										)}
 									</VStack>
