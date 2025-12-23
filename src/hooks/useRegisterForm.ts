@@ -20,6 +20,8 @@ export const useRegisterForm = (
     getError,
     reset,
     setValue,
+    trigger,
+    getValues,
     } = useFormValidation(
         registerSchema,
         {
@@ -103,6 +105,8 @@ export const useRegisterForm = (
         errors,
         register,
         setValue,
+        trigger,
+        getValues,
         handleSubmit: handleSubmit(onSubmit),
         hasError,
         getError,

@@ -13,7 +13,7 @@ import {
 } from "@chakra-ui/react";
 import {animationPresets} from "@/styles/animation";
 import {useThemeValues} from "@/styles/themeUtils";
-import RegisterForm from "./RegisterForm";
+import MultiStepRegisterForm from "./MultiStepRegisterForm";
 import EmailVerificationModal from "./EmailVerificationModal";
 import {useState} from "react";
 
@@ -129,7 +129,7 @@ const RegisterModal = ({isOpen, onClose}: RegisterModalProps) => {
                     <Divider />
 
                     <ModalBody py={6} px={8}>
-                        <RegisterForm
+                        <MultiStepRegisterForm
                             onSuccess={handleSuccess}
                             onSwitchToLogin={handleClose}
                         />

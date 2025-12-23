@@ -8,6 +8,7 @@ import {
 	Box,
 	Button,
 	useBreakpointValue,
+	Badge,
 } from "@chakra-ui/react";
 import type { User } from "@/types";
 import { FiEye } from "react-icons/fi";
@@ -38,8 +39,7 @@ export const UserTable = ({
 					<Tr>
 						<Th>Name</Th>
 						<Th>Email</Th>
-						<Th>Gender</Th>
-						<Th>Age</Th>
+						<Th>Role</Th>
 						<Th>Status</Th>
 						<Th textAlign="center">Action</Th>
 					</Tr>
@@ -50,17 +50,26 @@ export const UserTable = ({
 							<Td fontWeight="medium">{user.name}</Td>
 							<Td>{user.email}</Td>
 							<Td>
-								{user.gender === "male"
-									? "Male"
-									: user.gender === "female"
-									? "Female"
-									: "Order"}
+								<Badge
+									colorScheme={user.role === "admin" ? "purple" : "blue"}
+									fontSize="sm"
+									px={3}
+									py={1}
+									borderRadius="md"
+									fontWeight="bold">
+									{user.role?.toUpperCase() || "USER"}
+								</Badge>
 							</Td>
-							<Td>{user.age}</Td>
-							<Td
-								color={user.isActive ? "green.500" : "red.500"}
-								fontWeight="bold">
-								{user.isActive ? "Active" : "Inactive"}
+							<Td>
+								<Badge
+									colorScheme={user.isActive ? "green" : "red"}
+									fontSize="sm"
+									px={3}
+									py={1}
+									borderRadius="md"
+									fontWeight="bold">
+									{user.isActive ? "Active" : "Inactive"}
+								</Badge>
 							</Td>
 							<Td textAlign="center">
 								<Button

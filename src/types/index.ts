@@ -257,3 +257,20 @@ export interface FoodLogsByDateResponse {
 	message: number | string;
 	data: PopulatedFoodLog[];
 }
+
+// Pagination Types
+export interface PaginationInfo {
+	currentPage: number;
+	totalPages: number;
+	totalUsers: number;
+	limit: number;
+}
+
+export interface UsersListResponse {
+	success: boolean;
+	message: string;
+	data: {
+		users: User[];
+		pagination: PaginationInfo;
+	};
+}
