@@ -9,7 +9,6 @@ import {
     Heading,
     HStack,
     Progress,
-    SimpleGrid,
     Stat,
     StatGroup,
     StatLabel,
@@ -52,8 +51,6 @@ import {
     mockWeeklyStats,
 } from "@/mocks/profileData";
 import {animationPresets} from "@/styles/animation";
-
-const COLORS = ["#3182CE", "#38A169", "#D69E2E", "#E53E3E"];
 
 const TrackingSection = () => {
     const profile = mockUserProfile;

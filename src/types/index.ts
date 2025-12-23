@@ -246,3 +246,14 @@ export interface LogFoodResponse {
 	message: number | string;
 	data: FoodLog;
 }
+
+// Food Log with populated food field
+export interface PopulatedFoodLog extends Omit<FoodLog, 'food'> {
+	food: Food;
+}
+
+export interface FoodLogsByDateResponse {
+	success: boolean;
+	message: number | string;
+	data: PopulatedFoodLog[];
+}

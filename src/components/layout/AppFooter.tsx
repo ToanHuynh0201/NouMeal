@@ -3,7 +3,6 @@ import {
 	Box,
 	Container,
 	Text,
-	Divider,
 	HStack,
 	Link,
 	useColorModeValue,

@@ -34,6 +34,15 @@ class FoodService {
 	logFood = withErrorHandling(async (foodId: string) => {
 		return await api.post("/foods/log", { foodId });
 	});
+
+	/**
+	 * Get food logs for a specific date
+	 * @param {string} date - The date in YYYY-MM-DD format
+	 * @returns {Promise} Standardized response with success flag and data
+	 */
+	getFoodLogsByDate = withErrorHandling(async (date: string) => {
+		return await api.get(`/foods/logs/${date}`);
+	});
 }
 
 export const foodService = new FoodService();

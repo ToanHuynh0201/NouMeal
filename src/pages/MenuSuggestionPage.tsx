@@ -81,8 +81,6 @@ const MenuSuggestionPage = () => {
 		const result = await foodService.getRecommendedFoods();
 
 		if (result.success) {
-			console.log("API Response - Recommended Foods:", result.data);
-			console.log("Breakfast data:", result.data.breakfast);
 			setRecommendations(result.data);
 		} else {
 			setError(result.error || "Failed to fetch recommendations");

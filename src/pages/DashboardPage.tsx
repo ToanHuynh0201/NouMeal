@@ -1,7 +1,11 @@
 import MainLayout from "@/components/layout/MainLayout";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
+import LoggedFoodCard from "@/components/dashboard/LoggedFoodCard";
 import {useAuth} from "@/hooks/useAuth";
 import {useTodayProgress} from "@/hooks/useTodayProgress";
+import {foodService} from "@/services/foodService";
+import type {PopulatedFoodLog} from "@/types";
+import {useState, useEffect} from "react";
 import {
     Box,
     Container,
@@ -36,6 +40,28 @@ import {
 function DashboardPage() {
     const {user} = useAuth();
     const {data: progressData, isLoading, error} = useTodayProgress();
+    const [todayFoodLogs, setTodayFoodLogs] = useState<PopulatedFoodLog[]>([]);
+    const [foodLogsLoading, setFoodLogsLoading] = useState(true);
+
+    // Fetch today's food logs
+    useEffect(() => {
+        const fetchTodayFoodLogs = async () => {
+            try {
+                setFoodLogsLoading(true);
+                const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+                const response = await foodService.getFoodLogsByDate(today);
+                if (response.success && response.data) {
+                    setTodayFoodLogs(response.data);
+                }
+            } catch (err) {
+                console.error("Failed to fetch today's food logs:", err);
+            } finally {
+                setFoodLogsLoading(false);
+            }
+        };
+
+        fetchTodayFoodLogs();
+    }, []);
 
     // Calculate stats from API data
     const stats = progressData
@@ -324,6 +350,53 @@ function DashboardPage() {
                                         </Box>
                                     )}
                                 </VStack>
+                            </VStack>
+                        </CardBody>
+                    </Card>
+
+                    {/* Today's Meals */}
+                    <Card
+                        shadow="md"
+                        borderRadius="xl"
+                        border="1px"
+                        borderColor="gray.100"
+                    >
+                        <CardBody>
+                            <VStack align="stretch" spacing={4}>
+                                <HStack justify="space-between">
+                                    <Heading size="md">Today's Meals</Heading>
+                                    <Badge colorScheme="blue" fontSize="sm" px={3} py={1}>
+                                        {todayFoodLogs.length} items logged
+                                    </Badge>
+                                </HStack>
+
+                                {foodLogsLoading ? (
+                                    <Box py={8} textAlign="center">
+                                        <LoadingSpinner />
+                                    </Box>
+                                ) : todayFoodLogs.length > 0 ? (
+                                    <VStack align="stretch" spacing={3}>
+                                        {todayFoodLogs.map((foodLog) => (
+                                            <LoggedFoodCard key={foodLog._id} foodLog={foodLog} />
+                                        ))}
+                                    </VStack>
+                                ) : (
+                                    <Box
+                                        py={8}
+                                        textAlign="center"
+                                        color="gray.500"
+                                        bg="gray.50"
+                                        borderRadius="lg"
+                                    >
+                                        <Icon as={FaUtensils} boxSize={10} mb={3} />
+                                        <Text fontWeight="semibold" fontSize="lg">
+                                            No meals logged yet today
+                                        </Text>
+                                        <Text fontSize="sm" color="gray.400" mt={1}>
+                                            Start tracking your nutrition by logging your first meal!
+                                        </Text>
+                                    </Box>
+                                )}
                             </VStack>
                         </CardBody>
                     </Card>

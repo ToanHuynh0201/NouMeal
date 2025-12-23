@@ -44,9 +44,9 @@ export type AppHeaderProps = {
 
 export type LoadingSpinnerProps = {
     size?: string;
-    message: string;
-    minHeight: string;
-    variant: string;
+    message?: string;
+    minHeight?: string;
+    variant?: string;
 };
 
 export interface FormFieldProps<TFieldValues extends FieldValues = FieldValues>

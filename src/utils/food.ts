@@ -1,4 +1,19 @@
-import type { Food, Recipe, DailyMenu } from "@/types";
+import type { Food, Recipe, DailyMenu, MealType } from "@/types";
+
+/**
+ * Format meal type for display
+ * @param {MealType} mealType - The meal type
+ * @returns {string} Formatted meal type
+ */
+export const formatMealType = (mealType: MealType): string => {
+	const mealTypeMap: Record<MealType, string> = {
+		breakfast: "Breakfast",
+		lunch: "Lunch",
+		dinner: "Dinner",
+		snack: "Snack",
+	};
+	return mealTypeMap[mealType] || mealType;
+};
 
 /**
  * Convert a Food object from the API to a Recipe object for UI

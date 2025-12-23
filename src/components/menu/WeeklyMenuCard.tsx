@@ -6,7 +6,6 @@ import {
 	Button,
 	Icon,
 	Image,
-	Flex,
 	Badge,
 } from "@chakra-ui/react";
 import { FiArrowRight, FiCalendar } from "react-icons/fi";
