@@ -40,7 +40,7 @@ export const CustomBarChart = ({
 			boxShadow="md">
 			<Heading
 				size="md"
-				mb={6}
+				mb={4}
 				color="gray.700">
 				{title}
 			</Heading>

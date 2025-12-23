@@ -59,11 +59,10 @@ export const CustomPieChart = ({
 			bg={bgColor}
 			p={6}
 			borderRadius="xl"
-			h="500"
 			boxShadow="md">
 			<Heading
 				size="md"
-				mb={6}
+				mb={4}
 				color="gray.700">
 				{title}
 			</Heading>
