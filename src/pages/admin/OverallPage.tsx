@@ -32,9 +32,9 @@ const OverallPage = () => {
 
 	// Prepare data for charts
 	const genderData: PieChartData[] = [
-		{ name: "Nam", value: demographics.genderDistribution.male },
-		{ name: "Nữ", value: demographics.genderDistribution.female },
-		{ name: "Khác", value: demographics.genderDistribution.other },
+		{ name: "Male", value: demographics.genderDistribution.male },
+		{ name: "Female", value: demographics.genderDistribution.female },
+		{ name: "Other", value: demographics.genderDistribution.other },
 	];
 
 	const ageData: BarChartData[] = demographics.ageDistribution.map(
@@ -73,13 +73,13 @@ const OverallPage = () => {
 						<Heading
 							size="xl"
 							mb={2}>
-							Tổng Quan Hệ Thống
+							System Overview
 						</Heading>
 						<Heading
 							size="sm"
 							fontWeight="normal"
 							color="gray.500">
-							Thống kê tổng quan về người dùng và nhân khẩu học
+							General statistics about users and demographics
 						</Heading>
 					</Box>
 
@@ -89,7 +89,7 @@ const OverallPage = () => {
 							size="md"
 							mb={4}
 							color="gray.700">
-							📊 Tổng Quan Người Dùng
+							📊 User Overview
 						</Heading>
 						<Grid
 							templateColumns={{
@@ -100,7 +100,7 @@ const OverallPage = () => {
 							gap={6}>
 							<GridItem>
 								<StatsCard
-									title="Tổng số người dùng"
+									title="Total Users"
 									value={userOverview.totalUsers}
 									icon={FiUsers}
 									colorScheme="blue"
@@ -108,20 +108,20 @@ const OverallPage = () => {
 							</GridItem>
 							<GridItem>
 								<StatsCard
-									title="Người dùng hoạt động"
+									title="Active Users"
 									value={userOverview.activeUsers}
 									helpText={`${(
 										(userOverview.activeUsers /
 											userOverview.totalUsers) *
 										100
-									).toFixed(1)}% tổng số`}
+									).toFixed(1)}% of total`}
 									icon={FiUserCheck}
 									colorScheme="green"
 								/>
 							</GridItem>
 							<GridItem>
 								<StatsCard
-									title="Đăng nhập 24h"
+									title="Logged in Last 24h"
 									value={userOverview.loggedInLast24Hours}
 									icon={FiClock}
 									colorScheme="purple"
@@ -129,7 +129,7 @@ const OverallPage = () => {
 							</GridItem>
 							<GridItem>
 								<StatsCard
-									title="Đăng nhập 7 ngày"
+									title="Logged in Last 7 Days"
 									value={userOverview.loggedInLast7Days}
 									icon={FiCalendar}
 									colorScheme="orange"
@@ -144,7 +144,7 @@ const OverallPage = () => {
 							size="md"
 							mb={4}
 							color="gray.700">
-							📈 Người Dùng Mới
+							📈 New Users
 						</Heading>
 						<Grid
 							templateColumns={{
@@ -155,7 +155,7 @@ const OverallPage = () => {
 							gap={6}>
 							<GridItem>
 								<StatsCard
-									title="Hôm nay"
+									title="Today"
 									value={userOverview.newUsersToday}
 									icon={FiUserPlus}
 									colorScheme="teal"
@@ -163,7 +163,7 @@ const OverallPage = () => {
 							</GridItem>
 							<GridItem>
 								<StatsCard
-									title="Tuần này"
+									title="This Week"
 									value={userOverview.newUsersThisWeek}
 									icon={FiTrendingUp}
 									colorScheme="cyan"
@@ -171,7 +171,7 @@ const OverallPage = () => {
 							</GridItem>
 							<GridItem>
 								<StatsCard
-									title="Tháng này"
+									title="This Month"
 									value={userOverview.newUsersThisMonth}
 									icon={FiActivity}
 									colorScheme="blue"
@@ -179,13 +179,13 @@ const OverallPage = () => {
 							</GridItem>
 							<GridItem>
 								<StatsCard
-									title="Chưa xác minh email"
+									title="Unverified Emails"
 									value={userOverview.unverifiedEmails}
 									helpText={`${(
 										(userOverview.unverifiedEmails /
 											userOverview.totalUsers) *
 										100
-									).toFixed(1)}% tổng số`}
+									).toFixed(1)}% of total`}
 									icon={FiMail}
 									colorScheme="red"
 								/>
@@ -199,7 +199,7 @@ const OverallPage = () => {
 							size="md"
 							mb={4}
 							color="gray.700">
-							👥 Thống Kê Nhân Khẩu Học
+							👥 Demographics Statistics
 						</Heading>
 
 						{/* Gender and Age Distribution */}
@@ -212,18 +212,18 @@ const OverallPage = () => {
 							mb={6}>
 							<GridItem>
 								<CustomPieChart
-									title="Phân Bố Giới Tính"
+									title="Gender Distribution"
 									data={genderData}
 									colors={["#0073e6", "#ff69b4", "#9370db"]}
 								/>
 							</GridItem>
 							<GridItem>
 								<CustomBarChart
-									title="Phân Bố Độ Tuổi"
+									title="Age Distribution"
 									data={ageData}
 									dataKey="value"
 									xAxisKey="name"
-									barName="Số người dùng"
+									barName="Number of users"
 									color="#0073e6"
 								/>
 							</GridItem>
@@ -232,17 +232,17 @@ const OverallPage = () => {
 						{/* Height & Weight by Gender */}
 						<Box mb={6}>
 							<GroupedBarChart
-								title="Chiều Cao & Cân Nặng Trung Bình Theo Giới"
+								title="Average Height & Weight by Gender"
 								data={demographics.heightWeightByGender}
 								bars={[
 									{
 										dataKey: "avgHeight",
-										name: "Chiều cao (cm)",
+										name: "Height (cm)",
 										color: "#0073e6",
 									},
 									{
 										dataKey: "avgWeight",
-										name: "Cân nặng (kg)",
+										name: "Weight (kg)",
 										color: "#00a8e6",
 									},
 								]}
@@ -260,7 +260,7 @@ const OverallPage = () => {
 							gap={6}>
 							<GridItem>
 								<CustomPieChart
-									title="Phân Bố Mục Tiêu"
+									title="Goal Distribution"
 									data={goalData}
 									colors={[
 										"#ff6b6b",
@@ -274,7 +274,7 @@ const OverallPage = () => {
 							</GridItem>
 							<GridItem>
 								<CustomPieChart
-									title="Phân Bố Mức Độ Hoạt Động"
+									title="Activity Level Distribution"
 									data={activityData}
 									colors={[
 										"#ff6b6b",
