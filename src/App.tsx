@@ -20,6 +20,7 @@ import MyRecipesPage from "./pages/MyRecipesPage";
 import OverallPage from "./pages/admin/OverallPage";
 import UsersPage from "./pages/admin/UsersPage";
 import FoodPage from "./pages/admin/FoodPage";
+import FoodsManagementPage from "./pages/admin/FoodsManagementPage";
 import CommunityPage from "./pages/admin/CommunityPage";
 
 const App = () => {
@@ -109,6 +110,14 @@ const App = () => {
 						element={
 							<AdminRoute>
 								<FoodPage />
+							</AdminRoute>
+						}
+					/>
+					<Route
+						path={ROUTES.ADMIN_FOODS_MANAGEMENT}
+						element={
+							<AdminRoute>
+								<FoodsManagementPage />
 							</AdminRoute>
 						}
 					/>

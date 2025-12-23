@@ -92,6 +92,11 @@ function Sidebar() {
 			icon: MdFastfood,
 		},
 		{
+			label: "Foods Management",
+			path: ROUTES.ADMIN_FOODS_MANAGEMENT,
+			icon: FiBook,
+		},
+		{
 			label: "Community",
 			path: ROUTES.ADMIN_COMMUNITY,
 			icon: RiCommunityLine,

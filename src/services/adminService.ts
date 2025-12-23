@@ -102,6 +102,65 @@ class AdminService {
 			return api.post("/admin/promote", { userId, email });
 		},
 	);
+
+	/**
+	 * Get all foods with pagination and filters
+	 * @param {number} page - Page number (default: 1)
+	 * @param {number} limit - Items per page (default: 10)
+	 * @param {Object} filters - Optional filters (category, meal, isActive, search)
+	 * @returns {Promise<Object>} Standardized response with foods list and pagination info
+	 */
+	getAllFoods = withErrorHandling(
+		async (
+			page: number = 1,
+			limit: number = 10,
+			filters?: {
+				category?: string;
+				meal?: string;
+				isActive?: string;
+				search?: string;
+			},
+		) => {
+			const params: any = { page, limit };
+
+			// Add filters if provided
+			if (filters?.category) {
+				params.category = filters.category;
+			}
+			if (filters?.meal) {
+				params.meal = filters.meal;
+			}
+			if (filters?.isActive) {
+				params.isActive = filters.isActive;
+			}
+			if (filters?.search) {
+				params.search = filters.search;
+			}
+
+			return api.get("/foods", { params });
+		},
+	);
+
+	/**
+	 * Update food status (activate/deactivate)
+	 * @param {string} foodId - Food ID
+	 * @param {boolean} isActive - New active status
+	 * @returns {Promise<Object>} Standardized response with updated food info
+	 */
+	updateFoodStatus = withErrorHandling(
+		async (foodId: string, isActive: boolean) => {
+			return api.patch(`/foods/${foodId}/status`, { isActive });
+		},
+	);
+
+	/**
+	 * Delete a food item
+	 * @param {string} foodId - Food ID
+	 * @returns {Promise<Object>} Standardized response with deletion result
+	 */
+	deleteFood = withErrorHandling(async (foodId: string) => {
+		return api.delete(`/foods/${foodId}`);
+	});
 }
 
 export const adminService = new AdminService();
