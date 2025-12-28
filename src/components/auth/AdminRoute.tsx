@@ -5,6 +5,8 @@ import LoadingSpinner from "../common/LoadingSpinner";
 import {authService} from "@/services";
 import {Box, Heading, Text, Button, VStack} from "@chakra-ui/react";
 import {WarningIcon} from "@chakra-ui/icons";
+import {getSubdomainInfo, redirectToSubdomain} from "@/utils/subdomain";
+import {useEffect} from "react";
 
 interface AdminRouteProps {
 	children: React.ReactNode;
@@ -13,6 +15,19 @@ interface AdminRouteProps {
 const AdminRoute = ({children}: AdminRouteProps) => {
 	const {isAuthenticated, isLoading} = useAuth();
 	const location = useLocation();
+
+	// Check subdomain on mount and when auth changes
+	useEffect(() => {
+		if (!isLoading && isAuthenticated) {
+			const isAdmin = authService.isAdmin();
+			const subdomainInfo = getSubdomainInfo();
+
+			// Redirect admin to admin subdomain if not already there
+			if (isAdmin && !subdomainInfo.isAdmin) {
+				redirectToSubdomain(true);
+			}
+		}
+	}, [isLoading, isAuthenticated]);
 
 	if (isLoading) {
 		return (
@@ -29,8 +44,22 @@ const AdminRoute = ({children}: AdminRouteProps) => {
 	}
 
 	const isAdmin = authService.isAdmin();
+	const subdomainInfo = getSubdomainInfo();
 
+	// Check if user is not admin
 	if (!isAdmin) {
+		// If on admin subdomain, redirect to user domain
+		if (subdomainInfo.isAdmin) {
+			redirectToSubdomain(false);
+			return (
+				<LoadingSpinner
+					message="Redirecting..."
+					minHeight="100vh"
+					variant="primary"
+				/>
+			);
+		}
+
 		return (
 			<Box
 				minH="100vh"
@@ -55,6 +84,17 @@ const AdminRoute = ({children}: AdminRouteProps) => {
 					</Button>
 				</VStack>
 			</Box>
+		);
+	}
+
+	// Check if admin is not on admin subdomain
+	if (!subdomainInfo.isAdmin) {
+		return (
+			<LoadingSpinner
+				message="Redirecting to admin portal..."
+				minHeight="100vh"
+				variant="primary"
+			/>
 		);
 	}
 

@@ -151,6 +151,35 @@ const UsersPage = () => {
 		}
 	};
 
+	const handleDemoteToUser = async (user: User) => {
+		try {
+			setLoading(true);
+			const response = await adminService.demoteToUser(
+				user._id,
+				user.email,
+			);
+
+			if (response && response.success) {
+				// Update the user in the list with new role
+				setUsers((prev) =>
+					prev.map((u) =>
+						u._id === user._id ? { ...u, role: "user" } : u
+					),
+				);
+
+				// Update selected user and close modal
+				if (selectedUser?._id === user._id) {
+					setSelectedUser({ ...user, role: "user" });
+				}
+				setModalOpen(false);
+			}
+		} catch (error) {
+			console.error("Error demoting admin to user:", error);
+		} finally {
+			setLoading(false);
+		}
+	};
+
 	const handlePageChange = (newPage: number) => {
 		if (newPage >= 1 && newPage <= pagination.totalPages) {
 			fetchUsers(newPage);
@@ -335,6 +364,7 @@ const UsersPage = () => {
 					onClose={() => setModalOpen(false)}
 					onToggleStatus={handleToggleStatus}
 					onPromoteToAdmin={handlePromoteToAdmin}
+					onDemoteToUser={handleDemoteToUser}
 				/>
 			</Box>
 		</MainLayout>

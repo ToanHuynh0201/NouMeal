@@ -57,6 +57,7 @@ interface UserDetailModalProps {
 	onClose: () => void;
 	onToggleStatus: (user: User) => void;
 	onPromoteToAdmin?: (user: User) => void;
+	onDemoteToUser?: (user: User) => void;
 }
 
 const InfoField = ({ label, value }: { label: string; value: React.ReactNode }) => (
@@ -76,6 +77,7 @@ export const UserDetailModal = ({
 	onClose,
 	onToggleStatus,
 	onPromoteToAdmin,
+	onDemoteToUser,
 }: UserDetailModalProps) => {
 	const isMobile = useBreakpointValue({ base: true, md: false });
 	if (!user) return null;
@@ -264,6 +266,20 @@ export const UserDetailModal = ({
 							py={2}
 							borderRadius="lg">
 							Promote to Admin
+						</Button>
+					)}
+					{isAdmin && onDemoteToUser && (
+						<Button
+							colorScheme="orange"
+							variant="solid"
+							mr="auto"
+							onClick={() => onDemoteToUser(user)}
+							fontWeight="bold"
+							fontSize="md"
+							px={6}
+							py={2}
+							borderRadius="lg">
+							Demote to User
 						</Button>
 					)}
 					<Button

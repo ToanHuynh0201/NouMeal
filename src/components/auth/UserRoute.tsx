@@ -5,6 +5,8 @@ import LoadingSpinner from "../common/LoadingSpinner";
 import {authService} from "@/services";
 import {Box, Heading, Text, Button, VStack} from "@chakra-ui/react";
 import {WarningIcon} from "@chakra-ui/icons";
+import {getSubdomainInfo, redirectToSubdomain} from "@/utils/subdomain";
+import {useEffect} from "react";
 
 interface UserRouteProps {
 	children: React.ReactNode;
@@ -13,6 +15,23 @@ interface UserRouteProps {
 const UserRoute = ({children}: UserRouteProps) => {
 	const {isAuthenticated, isLoading} = useAuth();
 	const location = useLocation();
+
+	// Check subdomain on mount and when auth changes
+	useEffect(() => {
+		if (!isLoading && isAuthenticated) {
+			const isAdmin = authService.isAdmin();
+			const subdomainInfo = getSubdomainInfo();
+
+			// Redirect user away from admin subdomain if they're there
+			if (!isAdmin && subdomainInfo.isAdmin) {
+				redirectToSubdomain(false);
+			}
+			// Redirect admin to admin subdomain if they're not there
+			else if (isAdmin && !subdomainInfo.isAdmin) {
+				redirectToSubdomain(true);
+			}
+		}
+	}, [isLoading, isAuthenticated]);
 
 	if (isLoading) {
 		return (
@@ -29,9 +48,22 @@ const UserRoute = ({children}: UserRouteProps) => {
 	}
 
 	const isAdmin = authService.isAdmin();
+	const subdomainInfo = getSubdomainInfo();
 
-	// If user is admin, redirect to admin dashboard
+	// If user is admin
 	if (isAdmin) {
+		// Redirect to admin subdomain if not already there
+		if (!subdomainInfo.isAdmin) {
+			redirectToSubdomain(true);
+			return (
+				<LoadingSpinner
+					message="Redirecting to admin portal..."
+					minHeight="100vh"
+					variant="primary"
+				/>
+			);
+		}
+
 		return (
 			<Box
 				minH="100vh"
@@ -56,6 +88,18 @@ const UserRoute = ({children}: UserRouteProps) => {
 					</Button>
 				</VStack>
 			</Box>
+		);
+	}
+
+	// If regular user is on admin subdomain, redirect them
+	if (subdomainInfo.isAdmin) {
+		redirectToSubdomain(false);
+		return (
+			<LoadingSpinner
+				message="Redirecting..."
+				minHeight="100vh"
+				variant="primary"
+			/>
 		);
 	}
 

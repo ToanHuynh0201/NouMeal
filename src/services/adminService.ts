@@ -104,6 +104,18 @@ class AdminService {
 	);
 
 	/**
+	 * Demote admin to user role
+	 * @param {string} userId - User ID
+	 * @param {string} email - User email
+	 * @returns {Promise<Object>} Standardized response with demotion result
+	 */
+	demoteToUser = withErrorHandling(
+		async (userId: string, email: string) => {
+			return api.post("/admin/demote", { userId, email });
+		},
+	);
+
+	/**
 	 * Get all foods with pagination and filters
 	 * @param {number} page - Page number (default: 1)
 	 * @param {number} limit - Items per page (default: 10)
