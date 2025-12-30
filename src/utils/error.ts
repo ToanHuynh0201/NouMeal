@@ -80,7 +80,8 @@ export const withErrorHandling = <TArgs extends any[], TReturn>(
 				return {
 					success: true,
 					data: (response as any).data.data || (response as any).data,
-					pagination: (response as any).data.pagination,
+					// pagination: (response as any).data.pagination,
+					meta: (response as any).data.meta,
 					message: (response as any).data.message,
 				};
 			}

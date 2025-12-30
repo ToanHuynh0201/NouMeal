@@ -50,6 +50,7 @@ const MyRecipesPage = () => {
         recipes,
         filters,
         statistics,
+        isLoading,
         addRecipe,
         updateRecipe,
         deleteRecipe,
@@ -387,7 +388,13 @@ const MyRecipesPage = () => {
                     </Box>
 
                     {/* Recipes Grid or Empty State */}
-                    {recipes.length > 0 ? (
+                    {isLoading ? (
+                        <Box p={16} textAlign="center">
+                            <Text fontSize="xl" color="gray.600">
+                                Loading recipes...
+                            </Text>
+                        </Box>
+                    ) : recipes.length > 0 ? (
                         <SimpleGrid columns={{base: 1, md: 2, lg: 3}} spacing={6}>
                             {recipes.map((recipe) => (
                                 <RecipeCard
@@ -399,9 +406,7 @@ const MyRecipesPage = () => {
                                 />
                             ))}
                         </SimpleGrid>
-                    ) : statistics.total === 0 ? (
-                        <EmptyState onAddRecipe={handleAddRecipe} />
-                    ) : (
+                    ) : (filters.category !== "all" || filters.difficulty !== "all" || filters.searchQuery) ? (
                         <Box
                             p={16}
                             textAlign="center"
@@ -433,6 +438,8 @@ const MyRecipesPage = () => {
                                 </Button>
                             </VStack>
                         </Box>
+                    ) : (
+                        <EmptyState onAddRecipe={handleAddRecipe} />
                     )}
                 </VStack>
             </Container>

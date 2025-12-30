@@ -14,6 +14,80 @@ export interface NutritionInfo {
     sodium: string;
 }
 
+/**
+ * Food API related types
+ */
+
+export interface FoodInstruction {
+    step: number;
+    description: string;
+}
+
+export interface FoodIngredient {
+    name: string;
+    amount: string;
+}
+
+export interface FoodNutritionalInfo {
+    calories: number;
+    protein: number;
+    carbohydrates: number;
+    fat: number;
+    fiber: number;
+    sugar: number;
+    sodium: number;
+    cholesterol: number;
+}
+
+export interface Food {
+    _id: string;
+    name: string;
+    description: string;
+    instructions: FoodInstruction[];
+    imageUrl: string;
+    category: "fruits" | "vegetables" | "grains" | "protein" | "dairy" | "fats" | "beverages" | "snacks" | "desserts" | "spices";
+    meal: "breakfast" | "lunch" | "dinner" | "snack";
+    ingredients: FoodIngredient[];
+    nutritionalInfo: FoodNutritionalInfo;
+    allergens: string[];
+    isActive: boolean;
+    tags: string[];
+    postedBy: string;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export interface CreateFoodRequest {
+    name: string;
+    description: string;
+    instructions: FoodInstruction[];
+    imageUrl: string;
+    category: "fruits" | "vegetables" | "grains" | "protein" | "dairy" | "fats" | "beverages" | "snacks" | "desserts" | "spices";
+    meal: "breakfast" | "lunch" | "dinner" | "snack";
+    ingredients: FoodIngredient[];
+    nutritionalInfo: FoodNutritionalInfo;
+    allergens: string[];
+    tags: string[];
+}
+
+export interface GetUserFoodsResponse {
+    success: boolean;
+    message: string;
+    data: Food[];
+    meta: {
+        currentPage: number;
+        totalPages: number;
+        totalItems: number;
+        itemsPerPage: number;
+    };
+}
+
+export interface CreateUserFoodResponse {
+    success: boolean;
+    message: string;
+    data: Food;
+}
+
 export interface Recipe {
     id: string;
     title: string;

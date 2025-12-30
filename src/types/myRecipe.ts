@@ -9,11 +9,13 @@ export interface RecipeFormData {
 	cookingTime: string;
 	servingSize: string;
 	image: string;
+	foodCategory: "fruits" | "vegetables" | "grains" | "protein" | "dairy" | "fats" | "beverages" | "snacks" | "desserts" | "spices";
 	category: "breakfast" | "lunch" | "dinner" | "snack";
 	difficulty: "easy" | "medium" | "hard";
-	ingredients: string[];
+	ingredients: Array<{ name: string; amount: string }>;
 	instructions: string[];
 	tags: string[];
+	allergens: string[];
 	nutrition: {
 		calories: number;
 		protein: string;

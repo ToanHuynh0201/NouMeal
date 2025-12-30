@@ -21,39 +21,7 @@ import {
 	ListItem,
 	UnorderedList,
 } from "@chakra-ui/react";
-
-interface Food {
-	_id: string;
-	name: string;
-	description: string;
-	instructions: Array<{
-		step: number;
-		description: string;
-	}>;
-	imageUrl: string;
-	category: string;
-	meal: string;
-	ingredients: Array<{
-		name: string;
-		amount: string;
-	}>;
-	nutritionalInfo: {
-		calories: number;
-		protein: number;
-		carbohydrates: number;
-		fat: number;
-		fiber: number;
-		sugar: number;
-		sodium: number;
-		cholesterol: number;
-	};
-	allergens: string[];
-	isActive: boolean;
-	tags?: string[];
-	postedBy: string;
-	createdAt: string;
-	updatedAt: string;
-}
+import type { Food } from "@/types/recipe";
 
 interface FoodDetailModalProps {
 	food: Food | null;

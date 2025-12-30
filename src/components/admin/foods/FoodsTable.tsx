@@ -13,29 +13,13 @@ import {
 	Text,
 	VStack,
 } from "@chakra-ui/react";
-import { FiEye, FiTrash2 } from "react-icons/fi";
-
-interface Food {
-	_id: string;
-	name: string;
-	description: string;
-	category: string;
-	meal: string;
-	imageUrl: string;
-	nutritionalInfo: {
-		calories: number;
-		protein: number;
-		carbohydrates: number;
-		fat: number;
-	};
-	isActive: boolean;
-	tags?: string[];
-}
+import { FiEye, FiTrash2, FiEdit2 } from "react-icons/fi";
+import type { Food } from "@/types/recipe";
 
 interface FoodsTableProps {
 	foods: Food[];
 	onView: (food: Food) => void;
-	onToggleStatus: (food: Food) => void;
+	onEdit: (food: Food) => void;
 	onDelete: (food: Food) => void;
 }
 
@@ -58,7 +42,7 @@ const mealColors: { [key: string]: string } = {
 export const FoodsTable = ({
 	foods,
 	onView,
-	onToggleStatus,
+	onEdit,
 	onDelete,
 }: FoodsTableProps) => {
 	const isMobile = useBreakpointValue({ base: true, md: false });
@@ -152,15 +136,12 @@ export const FoodsTable = ({
 								</Button>
 								<Button
 									size="sm"
-									variant={
-										food.isActive ? "outline" : "solid"
-									}
-									colorScheme={
-										food.isActive ? "red" : "green"
-									}
+									leftIcon={<FiEdit2 />}
+									variant="outline"
+									colorScheme="orange"
 									mr={2}
-									onClick={() => onToggleStatus(food)}>
-									{food.isActive ? "Deactivate" : "Activate"}
+									onClick={() => onEdit(food)}>
+									Edit
 								</Button>
 								<Button
 									size="sm"

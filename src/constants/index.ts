@@ -4,8 +4,7 @@
  */
 // API Configuration
 export const API_CONFIG = {
-	BASE_URL:
-		import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api/v1",
+	BASE_URL: "http://localhost:3000/api/v1",
 	TIMEOUT: 10000, // 10 seconds
 	RETRY_ATTEMPTS: 3,
 	RETRY_DELAY: 1000,
@@ -92,6 +91,43 @@ export const SUCCESS_MESSAGES = {
 	ACTION_COMPLETED: "Action completed successfully!",
 };
 
+// Food Categories
+export const FOOD_CATEGORIES = [
+	'fruits',
+	'vegetables',
+	'grains',
+	'protein',
+	'dairy',
+	'fats',
+	'beverages',
+	'snacks',
+	'desserts',
+	'spices',
+] as const;
+
+// Allergen Values
+export const ALLERGEN_VALUES = [
+	'peanuts',
+	'tree_nuts',
+	'milk',
+	'eggs',
+	'wheat_gluten',
+	'fish',
+	'shellfish',
+	'soy',
+	'corn',
+	'sesame',
+	'pineapple',
+	'strawberry',
+	'banana',
+	'tomato',
+	'apple',
+	'chocolate',
+	'honey',
+	'mustard',
+	'other',
+] as const;
+
 // Export profile constants
 export * from "./profile";
 
@@ -104,4 +140,6 @@ export default {
 	ERROR_MESSAGES,
 	SUCCESS_MESSAGES,
 	ROLES,
+	FOOD_CATEGORIES,
+	ALLERGEN_VALUES,
 };

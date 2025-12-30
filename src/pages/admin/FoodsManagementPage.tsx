@@ -25,40 +25,10 @@ import { useRef } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import { FoodsTable } from "@/components/admin/foods/FoodsTable";
 import { FoodDetailModal } from "@/components/admin/foods/FoodDetailModal";
-import { adminService } from "@/services/adminService";
-
-interface Food {
-	_id: string;
-	name: string;
-	description: string;
-	instructions: Array<{
-		step: number;
-		description: string;
-	}>;
-	imageUrl: string;
-	category: string;
-	meal: string;
-	ingredients: Array<{
-		name: string;
-		amount: string;
-	}>;
-	nutritionalInfo: {
-		calories: number;
-		protein: number;
-		carbohydrates: number;
-		fat: number;
-		fiber: number;
-		sugar: number;
-		sodium: number;
-		cholesterol: number;
-	};
-	allergens: string[];
-	isActive: boolean;
-	tags?: string[];
-	postedBy: string;
-	createdAt: string;
-	updatedAt: string;
-}
+import { FoodEditModal } from "@/components/admin/foods/FoodEditModal";
+import { foodService } from "@/services/foodService";
+import type { Food } from "@/types/recipe";
+import type { RecipeFormData } from "@/types/myRecipe";
 
 interface PaginationInfo {
 	currentPage: number;
@@ -72,6 +42,8 @@ const FoodsManagementPage = () => {
 	const [loading, setLoading] = useState(true);
 	const [selectedFood, setSelectedFood] = useState<Food | null>(null);
 	const [modalOpen, setModalOpen] = useState(false);
+	const [editingFood, setEditingFood] = useState<Food | null>(null);
+	const [editModalOpen, setEditModalOpen] = useState(false);
 	const [search, setSearch] = useState("");
 	const [searchDebounced, setSearchDebounced] = useState("");
 	const [filterCategory, setFilterCategory] = useState<string>("all");
@@ -85,7 +57,11 @@ const FoodsManagementPage = () => {
 		limit: 10,
 	});
 	const [foodToDelete, setFoodToDelete] = useState<Food | null>(null);
-	const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
+	const {
+		isOpen: isDeleteOpen,
+		onOpen: onDeleteOpen,
+		onClose: onDeleteClose,
+	} = useDisclosure();
 	const cancelRef = useRef<HTMLButtonElement>(null);
 	const toast = useToast();
 
@@ -126,29 +102,36 @@ const FoodsManagementPage = () => {
 				filters.search = searchDebounced.trim();
 			}
 
-			const response = await adminService.getAllFoods(page, 10, filters);
-			if (response && response.success) {
-				// Assuming response structure similar to users
-				const foodsData = response.data;
+			const response = await foodService.getAdminFoods(page, 10, filters);
+			console.log(response);
 
-				// Handle different response structures
+			if (response && response.success) {
+				const foodsData = response.data;
+				const meta = response.meta;
+
+				// Set foods array
 				if (Array.isArray(foodsData)) {
 					setFoods(foodsData);
+				}
+
+				// Set pagination from meta if available
+				if (meta) {
+					setPagination({
+						currentPage: meta.currentPage,
+						totalPages: meta.totalPages,
+						totalFoods: meta.totalItems,
+						limit: meta.itemsPerPage,
+					});
+				} else {
+					// Fallback if no meta
 					setPagination({
 						currentPage: page,
-						totalPages: Math.ceil(foodsData.length / 10),
+						totalPages: 1,
 						totalFoods: foodsData.length,
 						limit: 10,
 					});
-				} else if (foodsData.foods) {
-					setFoods(foodsData.foods || []);
-					setPagination(foodsData.pagination || {
-						currentPage: page,
-						totalPages: 1,
-						totalFoods: foodsData.foods.length,
-						limit: 10,
-					});
 				}
+
 				setCurrentPage(page);
 			}
 		} catch (error) {
@@ -174,10 +157,86 @@ const FoodsManagementPage = () => {
 		setModalOpen(true);
 	};
 
+	const handleEdit = (food: Food) => {
+		setEditingFood(food);
+		setEditModalOpen(true);
+	};
+
+	const handleSaveEdit = async (foodId: string, recipeData: RecipeFormData) => {
+		try {
+			setLoading(true);
+
+			// Convert RecipeFormData back to CreateFoodRequest format
+			const foodData = {
+				name: recipeData.title,
+				description: recipeData.description,
+				imageUrl: recipeData.image,
+				category: recipeData.foodCategory,
+				meal: recipeData.category,
+				ingredients: recipeData.ingredients,
+				instructions: recipeData.instructions.map((desc, index) => ({
+					step: index + 1,
+					description: desc,
+				})),
+				nutritionalInfo: {
+					calories: recipeData.nutrition.calories,
+					protein: parseFloat(recipeData.nutrition.protein) || 0,
+					carbohydrates: parseFloat(recipeData.nutrition.carbs) || 0,
+					fat: parseFloat(recipeData.nutrition.fat) || 0,
+					fiber: parseFloat(recipeData.nutrition.fiber) || 0,
+					sugar: parseFloat(recipeData.nutrition.sugar) || 0,
+					sodium: parseFloat(recipeData.nutrition.sodium) || 0,
+					cholesterol: parseFloat(recipeData.nutrition.cholesterol) || 0,
+				},
+				allergens: recipeData.allergens || [],
+				tags: recipeData.tags || [],
+			};
+
+			const response = await foodService.updateAdminFood(foodId, foodData);
+
+			if (response && response.success) {
+				// Update the food in the list
+				setFoods((prev) =>
+					prev.map((f) =>
+						f._id === foodId ? response.data : f,
+					),
+				);
+
+				// Update selected food if it's the same one
+				if (selectedFood?._id === foodId) {
+					setSelectedFood(response.data);
+				}
+
+				// Close edit modal
+				setEditModalOpen(false);
+				setEditingFood(null);
+
+				toast({
+					title: "Success",
+					description: "Food updated successfully",
+					status: "success",
+					duration: 3000,
+					isClosable: true,
+				});
+			}
+		} catch (error) {
+			console.error("Error updating food:", error);
+			toast({
+				title: "Error",
+				description: "Failed to update food",
+				status: "error",
+				duration: 3000,
+				isClosable: true,
+			});
+		} finally {
+			setLoading(false);
+		}
+	};
+
 	const handleToggleStatus = async (food: Food) => {
 		try {
 			setLoading(true);
-			const response = await adminService.updateFoodStatus(
+			const response = await foodService.updateFoodStatus(
 				food._id,
 				!food.isActive,
 			);
@@ -188,7 +247,7 @@ const FoodsManagementPage = () => {
 					prev.map((f) =>
 						f._id === food._id
 							? { ...f, isActive: !food.isActive }
-							: f
+							: f,
 					),
 				);
 
@@ -199,7 +258,9 @@ const FoodsManagementPage = () => {
 
 				toast({
 					title: "Success",
-					description: `Food ${!food.isActive ? "activated" : "deactivated"} successfully`,
+					description: `Food ${
+						!food.isActive ? "activated" : "deactivated"
+					} successfully`,
 					status: "success",
 					duration: 3000,
 					isClosable: true,
@@ -229,11 +290,15 @@ const FoodsManagementPage = () => {
 
 		try {
 			setLoading(true);
-			const response = await adminService.deleteFood(foodToDelete._id);
+			const response = await foodService.deleteAdminFood(
+				foodToDelete._id,
+			);
 
 			if (response && response.success) {
 				// Remove the food from the list
-				setFoods((prev) => prev.filter((f) => f._id !== foodToDelete._id));
+				setFoods((prev) =>
+					prev.filter((f) => f._id !== foodToDelete._id),
+				);
 
 				// Close modal if it's the same food
 				if (selectedFood?._id === foodToDelete._id) {
@@ -351,7 +416,7 @@ const FoodsManagementPage = () => {
 						<FoodsTable
 							foods={foods}
 							onView={handleView}
-							onToggleStatus={handleToggleStatus}
+							onEdit={handleEdit}
 							onDelete={handleDeleteClick}
 						/>
 
@@ -477,26 +542,45 @@ const FoodsManagementPage = () => {
 					onClose={onDeleteClose}>
 					<AlertDialogOverlay>
 						<AlertDialogContent>
-							<AlertDialogHeader fontSize="lg" fontWeight="bold">
+							<AlertDialogHeader
+								fontSize="lg"
+								fontWeight="bold">
 								Delete Food
 							</AlertDialogHeader>
 
 							<AlertDialogBody>
-								Are you sure you want to delete <strong>{foodToDelete?.name}</strong>?
-								This action cannot be undone.
+								Are you sure you want to delete{" "}
+								<strong>{foodToDelete?.name}</strong>? This
+								action cannot be undone.
 							</AlertDialogBody>
 
 							<AlertDialogFooter>
-								<Button ref={cancelRef} onClick={onDeleteClose}>
+								<Button
+									ref={cancelRef}
+									onClick={onDeleteClose}>
 									Cancel
 								</Button>
-								<Button colorScheme="red" onClick={handleDeleteConfirm} ml={3}>
+								<Button
+									colorScheme="red"
+									onClick={handleDeleteConfirm}
+									ml={3}>
 									Delete
 								</Button>
 							</AlertDialogFooter>
 						</AlertDialogContent>
 					</AlertDialogOverlay>
 				</AlertDialog>
+
+				{/* Food Edit Modal */}
+				<FoodEditModal
+					food={editingFood}
+					isOpen={editModalOpen}
+					onClose={() => {
+						setEditModalOpen(false);
+						setEditingFood(null);
+					}}
+					onSave={handleSaveEdit}
+				/>
 			</Box>
 		</MainLayout>
 	);
