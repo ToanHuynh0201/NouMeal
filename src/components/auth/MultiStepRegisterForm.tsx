@@ -12,7 +12,6 @@ import {
 	WrapItem,
 	Tag,
 	TagLabel,
-	TagCloseButton,
 	Box,
 	Button,
 	useToast,
