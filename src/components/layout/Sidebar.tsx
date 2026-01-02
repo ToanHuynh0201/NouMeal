@@ -72,6 +72,11 @@ function Sidebar() {
 			path: ROUTES.IMAGE_RECOGNITION,
 			icon: FiCamera,
 		},
+		{
+			label: "Community",
+			path: ROUTES.COMMUNITY,
+			icon: FiCamera,
+		},
 	];
 
 	// Navigation items for admin

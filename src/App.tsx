@@ -21,7 +21,7 @@ import OverallPage from "./pages/admin/OverallPage";
 import UsersPage from "./pages/admin/UsersPage";
 import FoodPage from "./pages/admin/FoodPage";
 import FoodsManagementPage from "./pages/admin/FoodsManagementPage";
-import CommunityPage from "./pages/admin/CommunityPage";
+import CommunityPage from "./pages/CommunityPage";
 
 const App = () => {
 	return (
@@ -84,6 +84,14 @@ const App = () => {
 						element={
 							<UserRoute>
 								<ProfilePage />
+							</UserRoute>
+						}
+					/>
+					<Route
+						path={ROUTES.COMMUNITY}
+						element={
+							<UserRoute>
+								<CommunityPage />
 							</UserRoute>
 						}
 					/>
