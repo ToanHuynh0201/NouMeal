@@ -131,6 +131,7 @@ export const FoodsTable = ({
 									variant="outline"
 									colorScheme="blue"
 									mr={2}
+									minW="100px"
 									onClick={() => onView(food)}>
 									View
 								</Button>
@@ -140,6 +141,7 @@ export const FoodsTable = ({
 									variant="outline"
 									colorScheme="orange"
 									mr={2}
+									minW="100px"
 									onClick={() => onEdit(food)}>
 									Edit
 								</Button>
@@ -147,7 +149,7 @@ export const FoodsTable = ({
 									size="sm"
 									leftIcon={<FiTrash2 />}
 									variant="outline"
-									colorScheme="red"
+									colorScheme="red"								mr={2}									minW="100px"
 									onClick={() => onDelete(food)}>
 									Delete
 								</Button>

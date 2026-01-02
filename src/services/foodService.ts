@@ -139,7 +139,7 @@ class FoodService {
 	});
 
 	/**
-	 * Update a food by ID (Admin only) - Uses shared PATCH endpoint
+	 * Update a food by ID (Admin only)
 	 * @param {string} foodId - The ID of the food to update
 	 * @param {CreateFoodRequest} foodData - Updated food data
 	 * @returns {Promise} Standardized response with success flag and data
