@@ -104,7 +104,7 @@ class ApiService {
      * @returns {boolean} Whether URL is login endpoint
      */
     _isLoginEndpoint(url: string) {
-        return url?.includes("/auth/login");
+        return url?.includes("/users/login");
     }
 
     /**
@@ -137,9 +137,10 @@ class ApiService {
         try {
             const refreshResponse = await this._performTokenRefresh(refreshToken);
 
-            if (refreshResponse.data.status === "success") {
-                const {accessToken, refreshToken: newRefreshToken} =
-                    refreshResponse.data.data;
+            if (refreshResponse.data.success === true) {
+                // Tokens are inside the `data` object
+                const accessToken = refreshResponse.data.data.accessToken;
+                const newRefreshToken = refreshResponse.data.data.refreshToken;
                 setStorageItem(AUTH_CONFIG.TOKEN_STORAGE_KEY, accessToken);
 
                 if (newRefreshToken) {
@@ -165,7 +166,7 @@ class ApiService {
      * @returns {Promise<Object>} Refresh response
      */
     async _performTokenRefresh(refreshToken: any) {
-        return axios.post(`${API_CONFIG.BASE_URL}/auth/token/refresh`, {
+        return axios.post(`${API_CONFIG.BASE_URL}/auth/refresh-token`, {
             refreshToken,
         });
     }

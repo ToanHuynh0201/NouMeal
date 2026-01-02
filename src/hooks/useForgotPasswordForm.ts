@@ -2,8 +2,9 @@ import {forgotPasswordSchema} from "@/lib/validationSchemas";
 import useFormValidation from "./useFormValidation";
 import {VALIDATION_MODES} from "@/constants/forms";
 import {useCallback, useState} from "react";
+import {authService} from "@/services/authService";
 
-export const useForgotPasswordForm = (onSuccess: () => void, options: any = {}) => {
+export const useForgotPasswordForm = (onSuccess: (email: string) => void, options: any = {}) => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -31,13 +32,9 @@ export const useForgotPasswordForm = (onSuccess: () => void, options: any = {}) 
                 setIsLoading(true);
                 setError(null);
 
-                // Simulate API call
-                await new Promise((resolve) => setTimeout(resolve, 1500));
+                await authService.forgotPassword(data.email);
 
-                console.log("Password reset email sent to:", data.email);
-
-                reset();
-                onSuccess();
+                onSuccess(data.email);
             } catch (err: any) {
                 setError(
                     err.message || "Failed to send reset email. Please try again."
@@ -47,7 +44,7 @@ export const useForgotPasswordForm = (onSuccess: () => void, options: any = {}) 
                 setIsLoading(false);
             }
         },
-        [reset, onSuccess]
+        [onSuccess]
     );
 
     const clearError = () => setError(null);

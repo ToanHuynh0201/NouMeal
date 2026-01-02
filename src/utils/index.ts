@@ -2,3 +2,6 @@ export * from "./date";
 export * from "./error";
 export * from "./storage";
 export * from "./string";
+export * from "./food";
+export * from "./nutrition";
+export * from "./subdomain";

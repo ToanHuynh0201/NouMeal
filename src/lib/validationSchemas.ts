@@ -103,6 +103,14 @@ export const registerSchema = yup.object({
         .min(20, "Weight must be between 20 and 500 kg")
         .max(500, "Weight must be between 20 and 500 kg"),
 
+    activity: yup
+        .string()
+        .required("Activity level is required")
+        .oneOf(
+            ["sedentary", "lightly_active", "moderately_active", "very_active", "extra_active"],
+            "Activity level must be one of: sedentary, lightly_active, moderately_active, very_active, extra_active"
+        ),
+
     goal: yup
         .string()
         .required("Goal is required")
@@ -119,13 +127,58 @@ export const registerSchema = yup.object({
 });
 
 export const changePasswordSchema = yup.object({
-    currentPassword: validationRules.password,
-    newPassword: validationRules.password,
-    confirmNewPassword: validationRules.confirmPassword,
+    currentPassword: yup
+        .string()
+        .required("Current password is required"),
+    newPassword: yup
+        .string()
+        .required("New password is required")
+        .min(6, "New password must be at least 6 characters long")
+        .max(VALIDATION.PASSWORD_MAX_LENGTH, "Password is too long")
+        .matches(
+            /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+            "Password must contain at least one lowercase letter, one uppercase letter, and one number"
+        )
+        .notOneOf([yup.ref("currentPassword")], "New password must be different from current password"),
+    confirmNewPassword: yup
+        .string()
+        .required("Please confirm your new password")
+        .oneOf([yup.ref("newPassword")], "Passwords must match"),
 });
 
 export const forgotPasswordSchema = yup.object({
     email: validationRules.email,
+});
+
+export const verifyEmailSchema = yup.object({
+    email: validationRules.email,
+    otp: yup
+        .string()
+        .required("OTP is required")
+        .length(6, "OTP must be exactly 6 digits")
+        .matches(/^\d{6}$/, "OTP must be a 6-digit number"),
+});
+
+export const resetPasswordSchema = yup.object({
+    email: validationRules.email,
+    otp: yup
+        .string()
+        .required("OTP is required")
+        .length(6, "OTP must be exactly 6 digits")
+        .matches(/^\d{6}$/, "OTP must be a 6-digit number"),
+    newPassword: yup
+        .string()
+        .required("New password is required")
+        .min(6, "New password must be at least 6 characters long")
+        .max(VALIDATION.PASSWORD_MAX_LENGTH, "Password is too long")
+        .matches(
+            /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+            "Password must contain at least one lowercase letter, one uppercase letter, and one number"
+        ),
+    confirmNewPassword: yup
+        .string()
+        .required("Please confirm your new password")
+        .oneOf([yup.ref("newPassword")], "Passwords must match"),
 });
 
 // Custom validation helpers
@@ -162,6 +215,8 @@ export default {
     registerSchema,
     changePasswordSchema,
     forgotPasswordSchema,
+    verifyEmailSchema,
+    resetPasswordSchema,
     createConditionalSchema,
     createArraySchema,
 };

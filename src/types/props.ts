@@ -1,11 +1,11 @@
 import type {InputProps} from "@chakra-ui/react";
-import type {ReactNode} from "react";
 import type {FieldValues, UseFormRegister} from "react-hook-form";
 
 export type MainLayoutProps = {
-    children: ReactNode;
-    showHeader: boolean;
-    showFooter: boolean;
+    children: any;
+    showHeader?: boolean;
+    showFooter?: boolean;
+    showSidebar?: boolean;
 };
 
 export type LoginPageProps = {
@@ -37,11 +37,16 @@ export type AuthHeaderProps = {
     subtitle?: string;
 };
 
+export type AppHeaderProps = {
+    onLogout?: () => void;
+    showAuthButtons?: boolean;
+};
+
 export type LoadingSpinnerProps = {
     size?: string;
-    message: string;
-    minHeight: string;
-    variant: string;
+    message?: string;
+    minHeight?: string;
+    variant?: string;
 };
 
 export interface FormFieldProps<TFieldValues extends FieldValues = FieldValues>

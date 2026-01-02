@@ -1,58 +1,80 @@
-import {useState} from "react";
-import {useLocation, useNavigate} from "react-router-dom";
+import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { ROUTES } from "@/constants";
 import LoginForm from "@/components/auth/LoginForm";
 import RegisterModal from "@/components/auth/RegisterModal";
 import ForgotPasswordModal from "@/components/auth/ForgotPasswordModal";
 
 export default function LoginPage() {
-    const navigate = useNavigate();
-    const location = useLocation();
-    const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
-    const [isForgotPasswordModalOpen, setIsForgotPasswordModalOpen] =
-        useState(false);
+	const navigate = useNavigate();
+	const location = useLocation();
+	const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+	const [isForgotPasswordModalOpen, setIsForgotPasswordModalOpen] =
+		useState(false);
 
-    const handleLoginSuccess = () => {
-        const from = location.state?.from?.pathname || "/home";
-        navigate(from, {replace: true});
-    };
+	const handleLoginSuccess = (user?: any) => {
+		// Check user role and redirect accordingly
+		const isAdmin = user?.role === "ADMIN";
+		const defaultRoute = isAdmin ? ROUTES.ADMIN_OVERALL : ROUTES.DASHBOARD;
 
-    const handleOpenRegister = () => {
-        setIsForgotPasswordModalOpen(false);
-        setIsRegisterModalOpen(true);
-    };
+		// Only use 'from' if it's appropriate for the user's role
+		const from = location.state?.from?.pathname;
+		let targetRoute = defaultRoute;
 
-    const handleCloseRegister = () => {
-        setIsRegisterModalOpen(false);
-    };
+		if (from) {
+			// If user is admin and 'from' is an admin route, use it
+			// If user is regular and 'from' is not an admin route, use it
+			const isAdminRoute = from.startsWith("/admin");
+			if (isAdmin && isAdminRoute) {
+				targetRoute = from;
+			} else if (!isAdmin && !isAdminRoute) {
+				targetRoute = from;
+			}
+			// Otherwise, use defaultRoute
+		}
 
-    const handleOpenForgotPassword = () => {
-        setIsRegisterModalOpen(false);
-        setIsForgotPasswordModalOpen(true);
-    };
+		navigate(targetRoute, { replace: true });
+	};
 
-    const handleCloseForgotPassword = () => {
-        setIsForgotPasswordModalOpen(false);
-    };
+	const handleOpenRegister = () => {
+		setIsForgotPasswordModalOpen(false);
+		setIsRegisterModalOpen(true);
+	};
 
-    return (
-        <>
-            <LoginForm
-                onLoginSuccess={handleLoginSuccess}
-                onOpenRegister={handleOpenRegister}
-                onOpenForgotPassword={handleOpenForgotPassword}
-            />
+	const handleCloseRegister = () => {
+		setIsRegisterModalOpen(false);
+	};
 
-            <RegisterModal
-                key={isRegisterModalOpen ? "register-open" : "register-closed"}
-                isOpen={isRegisterModalOpen}
-                onClose={handleCloseRegister}
-            />
+	const handleOpenForgotPassword = () => {
+		setIsRegisterModalOpen(false);
+		setIsForgotPasswordModalOpen(true);
+	};
 
-            <ForgotPasswordModal
-                key={isForgotPasswordModalOpen ? "forgot-open" : "forgot-closed"}
-                isOpen={isForgotPasswordModalOpen}
-                onClose={handleCloseForgotPassword}
-            />
-        </>
-    );
+	const handleCloseForgotPassword = () => {
+		setIsForgotPasswordModalOpen(false);
+	};
+
+	return (
+		<>
+			<LoginForm
+				onLoginSuccess={handleLoginSuccess}
+				onOpenRegister={handleOpenRegister}
+				onOpenForgotPassword={handleOpenForgotPassword}
+			/>
+
+			<RegisterModal
+				key={isRegisterModalOpen ? "register-open" : "register-closed"}
+				isOpen={isRegisterModalOpen}
+				onClose={handleCloseRegister}
+			/>
+
+			<ForgotPasswordModal
+				key={
+					isForgotPasswordModalOpen ? "forgot-open" : "forgot-closed"
+				}
+				isOpen={isForgotPasswordModalOpen}
+				onClose={handleCloseForgotPassword}
+			/>
+		</>
+	);
 }

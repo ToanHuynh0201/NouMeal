@@ -6,11 +6,14 @@ import {FIELD_PRESETS} from "@/constants/forms";
 import {useForgotPasswordForm} from "@/hooks/useForgotPasswordForm";
 
 interface ForgotPasswordFormProps {
-    onSuccess: () => void;
+    onSuccess: (email: string) => void;
     onSwitchToLogin?: () => void;
 }
 
-function ForgotPasswordForm({onSuccess, onSwitchToLogin}: ForgotPasswordFormProps) {
+const ForgotPasswordForm = ({
+    onSuccess,
+    onSwitchToLogin,
+}: ForgotPasswordFormProps) => {
     const {
         isLoading,
         isValid,
@@ -35,7 +38,7 @@ function ForgotPasswordForm({onSuccess, onSwitchToLogin}: ForgotPasswordFormProp
 
                 <Box w="full">
                     <Text fontSize="sm" color="gray.600" mb={4} textAlign="center">
-                        Enter your email address and we'll send you a link to reset
+                        Enter your email address and we'll send you a verification code to reset
                         your password.
                     </Text>
                 </Box>
@@ -59,10 +62,10 @@ function ForgotPasswordForm({onSuccess, onSwitchToLogin}: ForgotPasswordFormProp
 
                 <SubmitButton
                     isLoading={isLoading}
-                    loadingText="Sending Reset Link..."
+                    loadingText="Sending Code..."
                     isDisabled={!isValid}
                 >
-                    Send Reset Link
+                    Send Verification Code
                 </SubmitButton>
 
                 {onSwitchToLogin && (
@@ -85,6 +88,6 @@ function ForgotPasswordForm({onSuccess, onSwitchToLogin}: ForgotPasswordFormProp
             </VStack>
         </form>
     );
-}
+};
 
 export default ForgotPasswordForm;

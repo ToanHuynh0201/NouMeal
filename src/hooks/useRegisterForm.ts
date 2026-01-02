@@ -5,7 +5,10 @@ import {useCallback, useState} from "react";
 import {authService} from "@/services/authService";
 import type {UserRegistrationRequest} from "@/types";
 
-export const useRegisterForm = (onSuccess: () => void, options: any = {}) => {
+export const useRegisterForm = (
+    onSuccess: (email: string, name: string) => void,
+    options: any = {}
+) => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -17,6 +20,8 @@ export const useRegisterForm = (onSuccess: () => void, options: any = {}) => {
     getError,
     reset,
     setValue,
+    trigger,
+    getValues,
     } = useFormValidation(
         registerSchema,
         {
@@ -28,6 +33,7 @@ export const useRegisterForm = (onSuccess: () => void, options: any = {}) => {
             gender: "",
             height: undefined,
             weight: undefined,
+            activity: "",
             goal: "",
             preferences: [],
             allergies: [],
@@ -54,6 +60,7 @@ export const useRegisterForm = (onSuccess: () => void, options: any = {}) => {
                     gender: data.gender,
                     height: Number(data.height),
                     weight: Number(data.weight),
+                    activity: data.activity,
                     goal: data.goal,
                     preferences: data.preferences || [],
                     allergies: data.allergies || [],
@@ -62,6 +69,7 @@ export const useRegisterForm = (onSuccess: () => void, options: any = {}) => {
                 console.log("Sending registration data:", registrationData);
 
                 // Call register API
+                // Note: Backend will send OTP email automatically
                 const response = await authService.register(registrationData);
 
                 console.log("Registration successful:", response);
@@ -69,8 +77,8 @@ export const useRegisterForm = (onSuccess: () => void, options: any = {}) => {
                 // Reset form after successful registration
                 reset();
                 
-                // Call success callback
-                onSuccess();
+                // Call success callback with email and name for verification step
+                onSuccess(data.email, data.name);
             } catch (err: any) {
                 const errorMessage =
                     err.message ||
@@ -97,6 +105,8 @@ export const useRegisterForm = (onSuccess: () => void, options: any = {}) => {
         errors,
         register,
         setValue,
+        trigger,
+        getValues,
         handleSubmit: handleSubmit(onSubmit),
         hasError,
         getError,

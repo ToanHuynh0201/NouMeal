@@ -5,25 +5,30 @@ import {
     Link,
     Select,
     HStack,
-    Input,
     FormControl,
     FormLabel,
     Wrap,
     WrapItem,
+    Tag,
+    TagLabel,
+    TagCloseButton,
+    Box,
 } from "@chakra-ui/react";
 import FormField from "../common/FormField";
 import SubmitButton from "../common/SubmitButton";
 import AlertMessage from "../common/AlertMessage";
 import PasswordToggle from "../common/PasswordToggle";
 import {FIELD_PRESETS} from "@/constants/forms";
+import {ACTIVITY_LEVELS, HEALTH_GOALS, GENDERS, ALLERGIES} from "@/constants/profile";
 import {useRegisterForm} from "@/hooks/useRegisterForm";
+import {useState} from "react";
 
 interface RegisterFormProps {
-    onSuccess: () => void;
+    onSuccess: (email: string, name: string) => void;
     onSwitchToLogin?: () => void;
 }
 
-function RegisterForm({onSuccess, onSwitchToLogin}: RegisterFormProps) {
+const RegisterForm = ({onSuccess, onSwitchToLogin}: RegisterFormProps) => {
     const {
         isLoading,
         isValid,
@@ -37,6 +42,7 @@ function RegisterForm({onSuccess, onSwitchToLogin}: RegisterFormProps) {
     } = useRegisterForm(onSuccess);
 
     const {showPassword, button: passwordToggleButton} = PasswordToggle();
+    const [selectedAllergies, setSelectedAllergies] = useState<string[]>([]);
 
     return (
         <form onSubmit={handleSubmit}>
@@ -132,9 +138,9 @@ function RegisterForm({onSuccess, onSwitchToLogin}: RegisterFormProps) {
                         </FormLabel>
                         <Select id="gender" {...(register as any)("gender")} bg="gray.50">
                             <option value="">Select</option>
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
-                            <option value="other">Other</option>
+                            {GENDERS.map((g) => (
+                                <option key={g.value} value={g.value}>{g.label}</option>
+                            ))}
                         </Select>
                         {hasError("gender") && (
                             <Text fontSize="sm" color="red.500">{getError("gender")}</Text>
@@ -148,14 +154,27 @@ function RegisterForm({onSuccess, onSwitchToLogin}: RegisterFormProps) {
                     </FormLabel>
                     <Select id="goal" {...(register as any)("goal")} bg="gray.50">
                         <option value="">Select goal</option>
-                        <option value="lose_weight">Lose weight</option>
-                        <option value="maintain_weight">Maintain weight</option>
-                        <option value="gain_weight">Gain weight</option>
-                        <option value="build_muscle">Build muscle</option>
-                        <option value="improve_health">Improve health</option>
+                        {HEALTH_GOALS.map((g) => (
+                            <option key={g.value} value={g.value}>{g.label}</option>
+                        ))}
                     </Select>
                     {hasError("goal") && (
                         <Text fontSize="sm" color="red.500">{getError("goal")}</Text>
+                    )}
+                </FormControl>
+
+                <FormControl isInvalid={hasError("activity")}> 
+                    <FormLabel htmlFor="activity" fontSize="md" fontWeight="semibold" color="gray.700">
+                        Activity Level
+                    </FormLabel>
+                    <Select id="activity" {...(register as any)("activity")} bg="gray.50">
+                        <option value="">Select activity level</option>
+                        {ACTIVITY_LEVELS.map((level) => (
+                            <option key={level.value} value={level.value}>{level.label}</option>
+                        ))}
+                    </Select>
+                    {hasError("activity") && (
+                        <Text fontSize="sm" color="red.500">{getError("activity")}</Text>
                     )}
                 </FormControl>
 
@@ -181,22 +200,59 @@ function RegisterForm({onSuccess, onSwitchToLogin}: RegisterFormProps) {
 
                 <FormControl>
                     <FormLabel fontSize="md" fontWeight="semibold" color="gray.700">
-                        Allergies (comma separated)
+                        Allergies (select all that apply)
                     </FormLabel>
-                    <Input
-                        placeholder="e.g. nuts, shellfish"
+                    <Select
                         bg="gray.50"
-                        {...(register as any)("_allergies_input")}
-                        onBlur={(e: any) => {
-                            const raw = e.target.value || "";
-                            const arr = raw
-                                .split(",")
-                                .map((s: string) => s.trim())
-                                .filter((s: string) => s.length > 0);
-                            setValue("allergies", arr);
+                        placeholder="Select an allergy to add"
+                        onChange={(e) => {
+                            const value = e.target.value;
+                            if (value && !selectedAllergies.includes(value)) {
+                                const newAllergies = [...selectedAllergies, value];
+                                setSelectedAllergies(newAllergies);
+                                (setValue as any)("allergies", newAllergies);
+                            }
+                            e.target.value = ""; // Reset select
                         }}
-                    />
-                    <Text fontSize="sm" color="gray.500">Tip: separate multiple allergies with commas</Text>
+                    >
+                        {ALLERGIES.filter(a => !selectedAllergies.includes(a.value)).map((allergy) => (
+                            <option key={allergy.value} value={allergy.value}>
+                                {allergy.label}
+                            </option>
+                        ))}
+                    </Select>
+                    
+                    {selectedAllergies.length > 0 && (
+                        <Box mt={2}>
+                            <Wrap spacing={2}>
+                                {selectedAllergies.map((allergy) => {
+                                    const allergyLabel = ALLERGIES.find(a => a.value === allergy)?.label || allergy;
+                                    return (
+                                        <WrapItem key={allergy}>
+                                            <Tag
+                                                size="md"
+                                                borderRadius="full"
+                                                variant="solid"
+                                                colorScheme="blue"
+                                            >
+                                                <TagLabel>{allergyLabel}</TagLabel>
+                                                <TagCloseButton
+                                                    onClick={() => {
+                                                        const newAllergies = selectedAllergies.filter(a => a !== allergy);
+                                                        setSelectedAllergies(newAllergies);
+                                                        (setValue as any)("allergies", newAllergies);
+                                                    }}
+                                                />
+                                            </Tag>
+                                        </WrapItem>
+                                    );
+                                })}
+                            </Wrap>
+                        </Box>
+                    )}
+                    <Text fontSize="sm" color="gray.500" mt={1}>
+                        Select allergies from the dropdown to add them
+                    </Text>
                 </FormControl>
 
                 <VStack align="start" w="full" spacing={2}>
@@ -259,6 +315,6 @@ function RegisterForm({onSuccess, onSwitchToLogin}: RegisterFormProps) {
             </VStack>
         </form>
     );
-}
+};
 
 export default RegisterForm;

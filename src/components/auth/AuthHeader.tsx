@@ -2,10 +2,10 @@ import {animationPresets} from "@/styles/animation";
 import type {AuthHeaderProps} from "@/types";
 import {Box, Divider, Heading, Text, VStack} from "@chakra-ui/react";
 
-function AuthHeader({
+const AuthHeader = ({
     title = "Meal Genie",
     subtitle = "What to eat? Let MealGenie decide.",
-}: AuthHeaderProps) {
+}: AuthHeaderProps) => {
     return (
         <VStack spacing={4} textAlign="center">
             <Box p={4} animation={animationPresets.pulse}>
@@ -30,6 +30,6 @@ function AuthHeader({
             <Divider />
         </VStack>
     );
-}
+};
 
 export default AuthHeader;

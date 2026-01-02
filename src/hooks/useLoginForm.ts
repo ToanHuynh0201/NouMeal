@@ -1,8 +1,8 @@
-import {loginSchema} from "@/lib/validationSchemas";
-import {useAuth} from "./useAuth";
+import { loginSchema } from "@/lib/validationSchemas";
+import { useAuth } from "./useAuth";
 import useFormValidation from "./useFormValidation";
-import {VALIDATION_MODES} from "@/constants/forms";
-import {useCallback} from "react";
+import { VALIDATION_MODES } from "@/constants/forms";
+import { useCallback } from "react";
 
 /**
  * Custom hook for managing login form state and actions
@@ -11,76 +11,73 @@ import {useCallback} from "react";
  * @returns {Object} Form state, handlers, and validation
  */
 export const useLoginForm = (onSuccess: any, options: any = {}) => {
-    const {login, isLoading, error, clearError} = useAuth();
-    const {
-        register,
-        handleSubmit,
-        formState: {errors, isSubmitting, isValid},
-        hasError,
-        getError,
-        reset,
-    } = useFormValidation(
-        loginSchema,
-        {
-            email: "",
-            password: "",
-        },
-        {
-            mode: options.validationMode || VALIDATION_MODES.onChange,
-            ...options.formOptions,
-        }
-    );
+	const { login, isLoading, error, clearError } = useAuth();
+	const {
+		register,
+		handleSubmit,
+		formState: { errors, isSubmitting, isValid },
+		hasError,
+		getError,
+		reset,
+	} = useFormValidation(
+		loginSchema,
+		{
+			email: "",
+			password: "",
+		},
+		{
+			mode: options.validationMode || VALIDATION_MODES.onChange,
+			...options.formOptions,
+		},
+	);
 
-    const onSubmit = useCallback(
-        async (data: any) => {
-            try {
-                // Clear any previous errors
-                clearError();
+	const onSubmit = useCallback(
+		async (data: any) => {
+			try {
+				// Clear any previous errors
+				clearError();
 
-                await login(data.email, data.password);
+				const response = await login(data.email, data.password);
 
-                // Reset form on successful login
-                reset();
+				// Reset form on successful login
+				reset();
 
-                if (onSuccess) {
-                    onSuccess();
-                }
-            } catch (err) {
-                // Error is handled by the auth context
-                console.error("Login error:", err);
-            }
-        },
-        [login, clearError, reset, onSuccess]
-    );
+				if (onSuccess) {
+					// Pass user data to onSuccess callback
+					onSuccess(response?.data?.user);
+				}
+			} catch (err) {
+				// Error is handled by the auth context
+				console.error("Login error:", err);
+			}
+		},
+		[login, clearError, reset, onSuccess],
+	);
 
-    // const onSubmit = () => {
-    //     onSuccess();
-    // };
+	// Check if form has validation errors
+	const hasFormErrors = Object.keys(errors).length > 0 && !isValid;
 
-    // Check if form has validation errors
-    const hasFormErrors = Object.keys(errors).length > 0 && !isValid;
+	// Form state
+	const formState = {
+		isLoading: isLoading || isSubmitting,
+		isValid,
+		hasFormErrors,
+		error,
+		errors,
+	};
 
-    // Form state
-    const formState = {
-        isLoading: isLoading || isSubmitting,
-        isValid,
-        hasFormErrors,
-        error,
-        errors,
-    };
+	// Form handlers
+	const formHandlers = {
+		register,
+		handleSubmit: handleSubmit(onSubmit),
+		hasError,
+		getError,
+		clearError,
+		reset,
+	};
 
-    // Form handlers
-    const formHandlers = {
-        register,
-        handleSubmit: handleSubmit(onSubmit),
-        hasError,
-        getError,
-        clearError,
-        reset,
-    };
-
-    return {
-        ...formState,
-        ...formHandlers,
-    };
+	return {
+		...formState,
+		...formHandlers,
+	};
 };
