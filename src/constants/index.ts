@@ -5,7 +5,8 @@
 // API Configuration
 export const API_CONFIG = {
 	BASE_URL: "http://localhost:3000/api/v1",
-	TIMEOUT: 10000, // 10 seconds
+	AI_URL: import.meta.env.VITE_API_AI_URL || "http://localhost:5002/api/v1",
+	TIMEOUT: 100000, // 10 seconds
 	RETRY_ATTEMPTS: 3,
 	RETRY_DELAY: 1000,
 };
