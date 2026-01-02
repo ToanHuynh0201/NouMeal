@@ -33,6 +33,23 @@ export interface RecognizedFood {
     confidence: number; // 0-100
     category: string;
     estimatedWeight?: string;
+    weight?: string; // From API response
+}
+
+export interface NutritionValue {
+    value: number;
+    unit: string;
+}
+
+export interface NutritionAnalysis {
+    calories: NutritionValue;
+    protein: NutritionValue;
+    carbs: NutritionValue;
+    fat: NutritionValue;
+    fiber: NutritionValue;
+    sugar: NutritionValue;
+    sodium: NutritionValue;
+    cholesterol: NutritionValue;
 }
 
 export interface ImageRecognitionResult {
@@ -48,4 +65,74 @@ export interface ImageRecognitionResult {
 export interface ImageUploadRequest {
     image: File | string;
     analysisType?: "nutrition" | "ingredients" | "full";
+}
+
+// API Request/Response Types
+export interface AnalyzeFoodRequest {
+    dietary_goals: string;
+    health_condition: string;
+    image: string; // base64 image string
+}
+
+export interface AnalyzeFoodData {
+    session_id: string;
+    status: string;
+    dietary_goals: string;
+    health_condition: string;
+    recognized_foods: RecognizedFood[];
+    nutrition_analysis: NutritionAnalysis;
+    recommendations: string[];
+    processing_time: string;
+}
+
+export interface AnalyzeFoodResponse {
+    success: boolean;
+    message: string;
+    data: AnalyzeFoodData;
+}
+
+// Meal Suggestion API Types (Backend)
+export interface ApiMealSuggestionRequest {
+    query: string;
+}
+
+export interface ApiNutritionValue {
+    value: number;
+    unit: string;
+}
+
+export interface ApiNutritionFacts {
+    calories: ApiNutritionValue;
+    protein: ApiNutritionValue;
+    carbs: ApiNutritionValue;
+    fat: ApiNutritionValue;
+    fiber: ApiNutritionValue;
+    sugar: ApiNutritionValue;
+    sodium: ApiNutritionValue;
+    cholesterol: ApiNutritionValue;
+}
+
+export interface ApiMeal {
+    name: string;
+    description: string;
+    difficulty: "EASY" | "MEDIUM" | "HARD";
+    ingredients: string[];
+    instructions: string[];
+    match_percentage: number;
+    nutrition_facts: ApiNutritionFacts;
+    prep_time: string;
+    servings: number;
+    tags: string[];
+}
+
+export interface ApiMealSuggestionData {
+    meals: ApiMeal[];
+    query: string;
+    total_suggestions: number;
+}
+
+export interface ApiMealSuggestionResponse {
+    success: boolean;
+    message: string;
+    data: ApiMealSuggestionData;
 }

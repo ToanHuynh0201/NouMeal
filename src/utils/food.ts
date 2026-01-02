@@ -246,9 +246,10 @@ export const convertWeeklyMenuToDailyMenus = (weeklyData: any): DailyMenu[] => {
 			? convertFoodToRecipe(day.meals.dinner[0])
 			: createDefaultRecipe("dinner");
 
-		// Handle both 'snack' and 'snacks' field names, and ensure it's an array
-		const snackArray = day.meals?.snacks || day.meals?.snack;
-		const snackRecipes = (Array.isArray(snackArray) ? snackArray : [])
+		const snackArray = Array.isArray(day.meals?.snack)
+			? day.meals.snack
+			: [];
+		const snackRecipes = snackArray
 			.slice(0, 2)
 			.map(convertFoodToRecipe);
 

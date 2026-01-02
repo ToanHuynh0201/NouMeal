@@ -81,6 +81,9 @@ const RecipeCard = ({
 		snack: "🍎",
 	};
 
+	// Check if recipe has a valid image (not the default Unsplash image)
+	const hasImage = recipe.image && !recipe.image.includes("unsplash.com");
+
 	return (
 		<Card
 			bg={cardBg}
