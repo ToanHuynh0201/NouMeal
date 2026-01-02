@@ -4,8 +4,12 @@ import type {
 	Comment,
 	CreatePostData,
 	CreatePostRequest,
+	PaginationParams,
+	PaginationInfo,
 } from "../types/community";
 import api from "@/lib/api";
+import { getStorageItem } from "@/utils";
+import { AUTH_CONFIG } from "@/constants";
 
 // Mock data cho demo
 const mockPosts: Post[] = [
@@ -262,17 +266,69 @@ export const communityService = {
 		});
 	},
 
-	// Lấy posts của user hiện tại
-	getUserPosts: async (): Promise<Post[]> => {
-		return new Promise((resolve) => {
-			setTimeout(() => {
-				// Giả lập lấy posts của user hiện tại (user1)
-				const userPosts = mockPosts.filter(
-					(p) => p.author.id === "user1",
-				);
-				resolve(userPosts);
-			}, 500);
-		});
+	// Lấy posts của user với pagination
+	getUserPosts: async (
+		userId?: string,
+		params?: PaginationParams,
+	): Promise<{ posts: Post[]; pagination: PaginationInfo }> => {
+		try {
+			// Get current user if userId not provided
+			if (!userId) {
+				const user = getStorageItem(AUTH_CONFIG.USER_STORAGE_KEY);
+				userId = user?._id || user?.id;
+			}
+
+			if (!userId) {
+				throw new Error("User ID not found");
+			}
+
+			// Build query params
+			const queryParams = new URLSearchParams({
+				page: String(params?.page || 1),
+				limit: String(params?.limit || 10),
+				sortBy: params?.sortBy || "createdAt",
+				sortOrder: params?.sortOrder || "desc",
+			});
+
+			const response = await api.get(
+				`/posts/user/${userId}?${queryParams.toString()}`,
+			);
+
+			// Convert API posts to Post interface
+			const posts: Post[] = response.data.data.posts.map(
+				(apiPost: any) => ({
+					id: apiPost._id,
+					author: {
+						id: apiPost.author._id,
+						name: apiPost.author.username,
+						avatar: apiPost.author.avatar,
+					},
+					title: apiPost.food_review?.dish_name || "",
+					description: apiPost.text,
+					images: apiPost.images || [],
+					tags: apiPost.food_review?.tags || [],
+					ingredients: apiPost.food_review?.ingredients,
+					instructions: apiPost.food_review?.instructions,
+					createdAt: apiPost.createdAt,
+					reactions: [
+						{ type: "like", count: 0, userReacted: false },
+						{ type: "love", count: 0, userReacted: false },
+						{ type: "delicious", count: 0, userReacted: false },
+						{ type: "wow", count: 0, userReacted: false },
+					],
+					comments: [],
+				}),
+			);
+			console.log(posts);
+
+			return {
+				posts,
+				pagination: response.data.data.pagination,
+			};
+		} catch (error) {
+			console.error("Error fetching user posts:", error);
+			throw error;
+		}
 	},
 
 	// Tạo post mới - Call API thực

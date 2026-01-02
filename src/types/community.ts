@@ -113,3 +113,26 @@ export interface ApiPostResponse {
 		updatedAt: string;
 	};
 }
+
+// Pagination types
+export interface PaginationParams {
+	page?: number;
+	limit?: number;
+	sortBy?: string;
+	sortOrder?: "asc" | "desc";
+}
+
+export interface PaginationInfo {
+	page: number;
+	limit: number;
+	total: number;
+	pages: number;
+}
+
+export interface GetUserPostsResponse {
+	success: boolean;
+	data: {
+		posts: any[]; // API posts format
+		pagination: PaginationInfo;
+	};
+}
