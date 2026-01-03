@@ -37,19 +37,9 @@ export interface Post {
 }
 
 export interface CreatePostData {
-	title: string;
-	description: string;
-	images: string[];
-	tags: string[];
-	ingredients?: string[];
-	instructions?: string[];
-	nutrition?: {
-		calories: number;
-		protein: number;
-		carbohydrates: number;
-		fat: number;
-		fiber: number;
-	};
+	text: string;
+	foods: string[]; // Array of food IDs
+	visibility?: "public" | "private" | "friends";
 }
 
 export interface CreateCommentData {
@@ -60,58 +50,53 @@ export interface CreateCommentData {
 
 // API Request/Response types
 export interface CreatePostRequest {
-	post_type: "food_review";
 	text: string;
-	images: string[];
-	food_review: {
-		dish_name: string;
-		calories: number;
-		protein: number;
-		carbohydrates: number;
-		fat: number;
-		fiber: number;
-		rating: number;
-		tags: string[];
-		ingredients?: string[];
-		instructions?: string[];
-	};
+	foods: string[]; // Array of food IDs
 	visibility: "public" | "private" | "friends";
+}
+
+export interface FoodInPost {
+	_id: string;
+	name: string;
+	description: string;
+	imageUrl: string;
+	category: string;
+	nutritionalInfo: {
+		calories?: number;
+		protein?: number;
+		carbohydrates?: number;
+		fat?: number;
+		fiber?: number;
+		[key: string]: any;
+	};
+}
+
+export interface PostDetail {
+	_id: string;
+	author: {
+		_id: string;
+		name: string;
+		email: string;
+		avatar?: string;
+	};
+	text: string;
+	foods: FoodInPost[];
+	engagement: {
+		likes_count: number;
+		comments_count: number;
+		shares_count: number;
+	};
+	visibility: string;
+	hashtags: string[];
+	is_edited: boolean;
+	createdAt: string;
+	updatedAt: string;
 }
 
 export interface ApiPostResponse {
 	success: boolean;
 	message: string;
-	data: {
-		_id: string;
-		post_type: string;
-		author: {
-			_id: string;
-			username: string;
-			avatar?: string;
-		};
-		text: string;
-		images: string[];
-		food_review?: {
-			dish_name: string;
-			calories: number;
-			protein: number;
-			carbohydrates: number;
-			fat: number;
-			fiber: number;
-			rating: number;
-			tags: string[];
-			ingredients?: string[];
-			instructions?: string[];
-		};
-		engagement: {
-			likes: number;
-			comments: number;
-			shares: number;
-		};
-		visibility: string;
-		createdAt: string;
-		updatedAt: string;
-	};
+	data: PostDetail;
 }
 
 // Pagination types

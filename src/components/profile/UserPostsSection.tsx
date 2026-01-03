@@ -10,8 +10,10 @@ import {
 	Select,
 	Box,
 	Flex,
+	useDisclosure,
 } from "@chakra-ui/react";
 import { PostCard } from "@/components/community/PostCard";
+import PostDetailModal from "@/components/community/PostDetailModal";
 import type { Post, PaginationInfo } from "@/types/community";
 import { communityService } from "@/services/communityService";
 import { useAuth } from "@/hooks/useAuth";
@@ -27,12 +29,10 @@ const UserPostsSection = () => {
 	});
 	const [sortBy, setSortBy] = useState<string>("createdAt");
 	const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+	const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
+	const { isOpen, onOpen, onClose } = useDisclosure();
 	const toast = useToast();
 	const { user } = useAuth();
-
-	useEffect(() => {
-		fetchUserPosts();
-	}, [pagination.page, sortBy, sortOrder]);
 
 	const fetchUserPosts = async () => {
 		try {
@@ -43,7 +43,6 @@ const UserPostsSection = () => {
 				sortBy,
 				sortOrder,
 			});
-			console.log(result);
 
 			setPosts(result.posts);
 			setPagination(result.pagination);
@@ -60,6 +59,10 @@ const UserPostsSection = () => {
 			setIsLoading(false);
 		}
 	};
+
+	useEffect(() => {
+		fetchUserPosts();
+	}, [pagination.page, sortBy, sortOrder]);
 
 	const handlePostUpdate = (updatedPost: Post) => {
 		setPosts((prevPosts) =>
@@ -82,6 +85,11 @@ const UserPostsSection = () => {
 	const handleSortOrderToggle = () => {
 		setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
 		setPagination((prev) => ({ ...prev, page: 1 }));
+	};
+
+	const handlePostClick = (postId: string) => {
+		setSelectedPostId(postId);
+		onOpen();
 	};
 
 	if (isLoading) {
@@ -151,12 +159,26 @@ const UserPostsSection = () => {
 
 			{/* Posts List */}
 			{posts.map((post) => (
-				<PostCard
+				<Box
 					key={post.id}
-					post={post}
-					onReactionUpdate={handlePostUpdate}
-				/>
+					onClick={() => handlePostClick(post.id)}
+					cursor="pointer"
+					_hover={{ bg: "gray.50" }}
+					transition="background 0.2s"
+					borderRadius="md">
+					<PostCard
+						post={post}
+						onReactionUpdate={handlePostUpdate}
+					/>
+				</Box>
 			))}
+
+			{/* Post Detail Modal */}
+			<PostDetailModal
+				isOpen={isOpen}
+				onClose={onClose}
+				postId={selectedPostId}
+			/>
 
 			{/* Pagination */}
 			{pagination.pages > 1 && (

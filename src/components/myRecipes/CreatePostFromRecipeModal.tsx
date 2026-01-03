@@ -48,7 +48,6 @@ const CreatePostFromRecipeModal = ({
 	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	// Form state
-	const [title, setTitle] = useState("");
 	const [description, setDescription] = useState("");
 	const [tags, setTags] = useState<string[]>([]);
 	const [newTag, setNewTag] = useState("");
@@ -58,16 +57,13 @@ const CreatePostFromRecipeModal = ({
 		if (recipes.length > 0 && isOpen) {
 			if (recipes.length === 1) {
 				// Single recipe
-				setTitle(recipes[0].title);
-				setDescription(recipes[0].description);
+				setDescription(`Thử món ${recipes[0].title} hôm nay! ${recipes[0].description}`);
 				setTags(recipes[0].tags || []);
 			} else {
-				// Multiple recipes - create menu title
-				setTitle(
-					`Menu cho ngày ${new Date().toLocaleDateString("vi-VN")}`,
-				);
+				// Multiple recipes - create menu description
+				const recipeNames = recipes.map(r => r.title).join(", ");
 				setDescription(
-					`Thực đơn gồm ${recipes.length} món ngon cho cả ngày`,
+					`Chia sẻ menu ${recipes.length} món ngon: ${recipeNames}`,
 				);
 				// Combine unique tags from all recipes
 				const allTags = recipes.flatMap((r) => r.tags || []);
@@ -90,10 +86,10 @@ const CreatePostFromRecipeModal = ({
 	const handleSubmit = async () => {
 		if (recipes.length === 0) return;
 
-		if (!title.trim()) {
+		if (!description.trim()) {
 			toast({
 				title: "Lỗi",
-				description: "Vui lòng nhập tiêu đề",
+				description: "Vui lòng nhập nội dung bài viết",
 				status: "error",
 				duration: 3000,
 				isClosable: true,
@@ -104,60 +100,23 @@ const CreatePostFromRecipeModal = ({
 		setIsSubmitting(true);
 
 		try {
-			// Combine all images from recipes
-			const allImages = recipes.map((r) => r.image).filter((img) => img);
+			// Extract food IDs from recipes
+			const foodIds = recipes.map((r) => r.id);
 
-			// Combine all ingredients from recipes
-			const allIngredients: string[] = [];
-			recipes.forEach((recipe, index) => {
-				if (recipes.length > 1) {
-					allIngredients.push(`--- ${recipe.title} ---`);
+			// Build text content with hashtags
+			let textContent = description.trim();
+
+			// Add hashtags from tags if they don't already exist in text
+			tags.forEach(tag => {
+				if (!textContent.includes(`#${tag}`)) {
+					textContent += ` #${tag}`;
 				}
-				allIngredients.push(...recipe.ingredients);
 			});
-
-			// Combine all instructions from recipes
-			const allInstructions: string[] = [];
-			recipes.forEach((recipe, index) => {
-				if (recipes.length > 1) {
-					allInstructions.push(`${recipe.title}:`);
-				}
-				allInstructions.push(...recipe.instructions);
-			});
-
-			// Calculate total nutrition
-			const totalNutrition = recipes.reduce(
-				(acc, recipe) => {
-					return {
-						calories: acc.calories + recipe.nutrition.calories,
-						protein:
-							acc.protein +
-								parseFloat(recipe.nutrition.protein) || 0,
-						carbohydrates:
-							acc.carbohydrates +
-								parseFloat(recipe.nutrition.carbs) || 0,
-						fat: acc.fat + parseFloat(recipe.nutrition.fat) || 0,
-						fiber:
-							acc.fiber + parseFloat(recipe.nutrition.fiber) || 0,
-					};
-				},
-				{
-					calories: 0,
-					protein: 0,
-					carbohydrates: 0,
-					fat: 0,
-					fiber: 0,
-				},
-			);
 
 			const postData: CreatePostData = {
-				title: title.trim(),
-				description: description.trim(),
-				images: allImages,
-				tags: tags,
-				ingredients: allIngredients,
-				instructions: allInstructions,
-				nutrition: totalNutrition,
+				text: textContent,
+				foods: foodIds,
+				visibility: "public",
 			};
 
 			await communityService.createPost(postData);
@@ -190,7 +149,6 @@ const CreatePostFromRecipeModal = ({
 	};
 
 	const handleClose = () => {
-		setTitle("");
 		setDescription("");
 		setTags([]);
 		setNewTag("");
@@ -201,14 +159,6 @@ const CreatePostFromRecipeModal = ({
 
 	const totalCalories = recipes.reduce(
 		(sum, r) => sum + r.nutrition.calories,
-		0,
-	);
-	const totalIngredients = recipes.reduce(
-		(sum, r) => sum + r.ingredients.length,
-		0,
-	);
-	const totalInstructions = recipes.reduce(
-		(sum, r) => sum + r.instructions.length,
 		0,
 	);
 
@@ -318,27 +268,19 @@ const CreatePostFromRecipeModal = ({
 							)}
 						</Box>
 
-						{/* Title */}
+						{/* Description / Text Content */}
 						<FormControl isRequired>
-							<FormLabel>Tiêu đề bài viết</FormLabel>
-							<Input
-								value={title}
-								onChange={(e) => setTitle(e.target.value)}
-								placeholder="Nhập tiêu đề cho bài viết..."
-								size="lg"
-							/>
-						</FormControl>
-
-						{/* Description */}
-						<FormControl>
-							<FormLabel>Mô tả</FormLabel>
+							<FormLabel>Nội dung bài viết</FormLabel>
 							<Textarea
 								value={description}
 								onChange={(e) => setDescription(e.target.value)}
-								placeholder="Chia sẻ thêm về món ăn này..."
-								rows={4}
+								placeholder="Chia sẻ cảm nghĩ của bạn về món ăn này... (Sử dụng #hashtag để thêm thẻ)"
+								rows={5}
 								resize="vertical"
 							/>
+							<Text fontSize="xs" color="gray.500" mt={1}>
+								Gợi ý: Sử dụng #vietnamese #homecooking #healthy...
+							</Text>
 						</FormControl>
 
 						{/* Tags */}
@@ -399,30 +341,26 @@ const CreatePostFromRecipeModal = ({
 									fontSize="sm"
 									fontWeight="semibold"
 									color="blue.700">
-									📋 Nội dung sẽ được chia sẻ:
+									📊 Thông tin món ăn:
 								</Text>
 								<Text
 									fontSize="xs"
 									color="gray.600">
-									• {totalIngredients} nguyên liệu
-								</Text>
-								<Text
-									fontSize="xs"
-									color="gray.600">
-									• {totalInstructions} bước thực hiện
-								</Text>
-								<Text
-									fontSize="xs"
-									color="gray.600">
-									• Tổng dinh dưỡng: {totalCalories} calo
+									• Tổng calories: {totalCalories} kcal
 								</Text>
 								{recipes.length > 1 && (
 									<Text
 										fontSize="xs"
 										color="gray.600">
-										• {recipes.length} món ăn trong menu
+										• Số lượng món: {recipes.length}
 									</Text>
 								)}
+								<Text
+									fontSize="xs"
+									color="gray.500"
+									fontStyle="italic">
+									Bài viết sẽ hiển thị hình ảnh và thông tin chi tiết của món ăn
+								</Text>
 							</VStack>
 						</Box>
 					</VStack>

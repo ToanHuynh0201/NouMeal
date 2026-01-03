@@ -68,6 +68,7 @@ export const useMyRecipes = () => {
 	const convertRecipeToFoodRequest = useCallback(
 		(recipeData: RecipeFormData): CreateFoodRequest => {
 			return {
+				id: recipeData._id,
 				name: recipeData.title,
 				description: recipeData.description,
 				instructions: recipeData.instructions.map((desc, index) => ({
@@ -100,17 +101,14 @@ export const useMyRecipes = () => {
 	const fetchRecipes = useCallback(
 		async (page: number = 1) => {
 			try {
-				console.log("Fetching recipes for page:", page);
 				setIsLoading(true);
 				const response = await foodService.getUserFoods(page, 10);
 				console.log("API Response:", response);
 
 				if (response.success) {
 					const foods = response.data;
-					console.log("Foods from API:", foods);
 					const convertedRecipes = foods.map(convertFoodToRecipe);
-					console.log("Converted recipes:", convertedRecipes);
-					console.log("About to set recipes state with:", convertedRecipes.length, "recipes");
+
 					setRecipes(convertedRecipes);
 					console.log("Recipes state should be updated now");
 					// Note: API doesn't return meta info, so we'll calculate it
@@ -233,7 +231,8 @@ export const useMyRecipes = () => {
 				if (response.success) {
 					toast({
 						title: "Recipe deleted!",
-						description: "Recipe has been removed from your collection.",
+						description:
+							"Recipe has been removed from your collection.",
 						status: "success",
 						duration: 3000,
 						isClosable: true,

@@ -9,7 +9,17 @@ export interface RecipeFormData {
 	cookingTime: string;
 	servingSize: string;
 	image: string;
-	foodCategory: "fruits" | "vegetables" | "grains" | "protein" | "dairy" | "fats" | "beverages" | "snacks" | "desserts" | "spices";
+	foodCategory:
+		| "fruits"
+		| "vegetables"
+		| "grains"
+		| "protein"
+		| "dairy"
+		| "fats"
+		| "beverages"
+		| "snacks"
+		| "desserts"
+		| "spices";
 	category: "breakfast" | "lunch" | "dinner" | "snack";
 	difficulty: "easy" | "medium" | "hard";
 	ingredients: Array<{ name: string; amount: string }>;
@@ -27,6 +37,7 @@ export interface RecipeFormData {
 		sugar: string;
 		sodium: string;
 	};
+	_id: string;
 }
 
 // Filter options for recipe list

@@ -6,6 +6,8 @@ import type {
 	CreatePostRequest,
 	PaginationParams,
 	PaginationInfo,
+	FoodInPost,
+	PostDetail,
 } from "../types/community";
 import api from "@/lib/api";
 import { getStorageItem } from "@/utils";
@@ -336,22 +338,9 @@ export const communityService = {
 		try {
 			// Prepare API request payload
 			const requestPayload: CreatePostRequest = {
-				post_type: "food_review",
-				text: postData.description,
-				images: postData.images,
-				food_review: {
-					dish_name: postData.title,
-					calories: postData.nutrition?.calories || 0,
-					protein: postData.nutrition?.protein || 0,
-					carbohydrates: postData.nutrition?.carbohydrates || 0,
-					fat: postData.nutrition?.fat || 0,
-					fiber: postData.nutrition?.fiber || 0,
-					rating: 5,
-					tags: postData.tags,
-					ingredients: postData.ingredients,
-					instructions: postData.instructions,
-				},
-				visibility: "public",
+				text: postData.text,
+				foods: postData.foods,
+				visibility: postData.visibility || "public",
 			};
 
 			const response = await api.post("/posts", requestPayload);
@@ -362,15 +351,17 @@ export const communityService = {
 				id: apiPost._id,
 				author: {
 					id: apiPost.author._id,
-					name: apiPost.author.username,
+					name: apiPost.author.name,
 					avatar: apiPost.author.avatar,
 				},
-				title: apiPost.food_review?.dish_name || "",
+				title: apiPost.foods?.[0]?.name || "",
 				description: apiPost.text,
-				images: apiPost.images,
-				tags: apiPost.food_review?.tags || [],
-				ingredients: apiPost.food_review?.ingredients,
-				instructions: apiPost.food_review?.instructions,
+				images:
+					apiPost.foods?.map((food: FoodInPost) => food.imageUrl) ||
+					[],
+				tags: apiPost.hashtags || [],
+				ingredients: [],
+				instructions: [],
 				createdAt: apiPost.createdAt,
 				reactions: [
 					{ type: "like", count: 0, userReacted: false },
@@ -388,6 +379,24 @@ export const communityService = {
 			return newPost;
 		} catch (error) {
 			console.error("Error creating post:", error);
+			throw error;
+		}
+	},
+
+	// Lấy chi tiết post theo ID - Call API thực
+	getPostDetailById: async (postId: string): Promise<PostDetail> => {
+		try {
+			const response = await api.get(`/posts/${postId}`);
+			console.log("Full response:", response);
+			console.log("Response data:", response.data);
+
+			// Check if response has nested data structure
+			if (response.data.data) {
+				return response.data.data;
+			}
+			return response.data;
+		} catch (error) {
+			console.error("Error fetching post detail:", error);
 			throw error;
 		}
 	},
