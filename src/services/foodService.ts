@@ -89,6 +89,15 @@ class FoodService {
 		return await api.delete(`/foods/user/${foodId}`);
 	});
 
+	/**
+	 * Get food details by ID
+	 * @param {string} foodId - The ID of the food to retrieve
+	 * @returns {Promise} Standardized response with success flag and data
+	 */
+	getFoodById = withErrorHandling(async (foodId: string) => {
+		return await api.get(`/foods/${foodId}`);
+	});
+
 	// ============= ADMIN FOOD OPERATIONS =============
 
 	/**

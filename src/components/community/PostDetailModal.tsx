@@ -20,10 +20,14 @@ import {
 	TagLabel,
 	Wrap,
 	WrapItem,
+	useDisclosure,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { communityService } from "@/services/communityService";
-import type { PostDetail } from "@/types/community";
+import { foodService } from "@/services/foodService";
+import RecipeDetailModal from "@/components/menu/RecipeDetailModal";
+import type { PostDetail, FoodInPost } from "@/types/community";
+import type { Recipe } from "@/types/recipe";
 
 interface PostDetailModalProps {
 	isOpen: boolean;
@@ -34,6 +38,12 @@ interface PostDetailModalProps {
 const PostDetailModal = ({ isOpen, onClose, postId }: PostDetailModalProps) => {
 	const [postDetail, setPostDetail] = useState<PostDetail | null>(null);
 	const [isLoading, setIsLoading] = useState(false);
+	const [selectedFood, setSelectedFood] = useState<Recipe | null>(null);
+	const {
+		isOpen: isRecipeOpen,
+		onOpen: onRecipeOpen,
+		onClose: onRecipeClose,
+	} = useDisclosure();
 
 	useEffect(() => {
 		const fetchPostDetail = async () => {
@@ -52,6 +62,53 @@ const PostDetailModal = ({ isOpen, onClose, postId }: PostDetailModalProps) => {
 
 		fetchPostDetail();
 	}, [postId, isOpen]);
+
+	// Convert Food API response to Recipe format for RecipeDetailModal
+	const convertFoodApiToRecipe = (foodData: any): Recipe => {
+		return {
+			id: foodData._id,
+			title: foodData.name,
+			description: foodData.description,
+			cookingTime: "30 mins", // Default value
+			servingSize: "1 serving", // Default value
+			image: foodData.imageUrl,
+			category: foodData.meal || "lunch",
+			difficulty: "medium", // Default value
+			nutrition: {
+				calories: foodData.nutritionalInfo?.calories || 0,
+				protein: `${foodData.nutritionalInfo?.protein || 0}g`,
+				fat: `${foodData.nutritionalInfo?.fat || 0}g`,
+				satFat: "0g",
+				carbs: `${foodData.nutritionalInfo?.carbohydrates || 0}g`,
+				cholesterol: `${foodData.nutritionalInfo?.cholesterol || 0}mg`,
+				fiber: `${foodData.nutritionalInfo?.fiber || 0}g`,
+				sugar: `${foodData.nutritionalInfo?.sugar || 0}g`,
+				sodium: `${foodData.nutritionalInfo?.sodium || 0}mg`,
+			},
+			ingredients: foodData.ingredients?.map((ing: any) =>
+				`${ing.name} - ${ing.amount}`
+			) || [],
+			instructions: foodData.instructions?.map((inst: any) =>
+				inst.description
+			) || [],
+			tags: foodData.tags || [],
+		};
+	};
+
+	const handleFoodClick = async (food: FoodInPost) => {
+		try {
+			// Gọi API để lấy đầy đủ thông tin food
+			const response = await foodService.getFoodById(food._id);
+			const foodData = response.data.data || response.data;
+
+			// Convert sang Recipe format
+			const recipe = convertFoodApiToRecipe(foodData);
+			setSelectedFood(recipe);
+			onRecipeOpen();
+		} catch (error) {
+			console.error("Error fetching food details:", error);
+		}
+	};
 
 	return (
 		<Modal
@@ -177,7 +234,9 @@ const PostDetailModal = ({ isOpen, onClose, postId }: PostDetailModalProps) => {
 												bg="white"
 												shadow="sm"
 												_hover={{ shadow: "md" }}
-												transition="all 0.2s">
+												transition="all 0.2s"
+												cursor="pointer"
+												onClick={() => handleFoodClick(food)}>
 												<Image
 													src={food.imageUrl}
 													alt={food.name}
@@ -369,6 +428,15 @@ const PostDetailModal = ({ isOpen, onClose, postId }: PostDetailModalProps) => {
 					)}
 				</ModalBody>
 			</ModalContent>
+
+			{/* Recipe Detail Modal */}
+			{selectedFood && (
+				<RecipeDetailModal
+					isOpen={isRecipeOpen}
+					onClose={onRecipeClose}
+					recipe={selectedFood}
+				/>
+			)}
 		</Modal>
 	);
 };
