@@ -67,7 +67,7 @@ const UserPostsSection = () => {
 	const handlePostUpdate = (updatedPost: Post) => {
 		setPosts((prevPosts) =>
 			prevPosts.map((post) =>
-				post.id === updatedPost.id ? updatedPost : post,
+				post._id === updatedPost._id ? updatedPost : post,
 			),
 		);
 	};
@@ -160,8 +160,8 @@ const UserPostsSection = () => {
 			{/* Posts List */}
 			{posts.map((post) => (
 				<Box
-					key={post.id}
-					onClick={() => handlePostClick(post.id)}
+					key={post._id}
+					onClick={() => handlePostClick(post._id)}
 					cursor="pointer"
 					_hover={{ bg: "gray.50" }}
 					transition="background 0.2s"

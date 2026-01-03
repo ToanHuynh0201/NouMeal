@@ -52,7 +52,7 @@ export const PostCard = ({ post, onReactionUpdate }: PostCardProps) => {
 		setIsLoading(true);
 		try {
 			const updatedPost = await communityService.toggleReaction(
-				post.id,
+				post._id,
 				reactionType,
 			);
 			if (updatedPost) {
@@ -71,11 +71,7 @@ export const PostCard = ({ post, onReactionUpdate }: PostCardProps) => {
 		parentCommentId?: string,
 	) => {
 		try {
-			const updatedPost = await communityService.addComment(
-				post.id,
-				content,
-				parentCommentId,
-			);
+			const updatedPost = await communityService.addComment(post._id);
 			if (updatedPost) {
 				setCurrentPost(updatedPost);
 				onReactionUpdate?.(updatedPost);
@@ -98,10 +94,18 @@ export const PostCard = ({ post, onReactionUpdate }: PostCardProps) => {
 		return date.toLocaleDateString("vi-VN");
 	};
 
-	const totalReactions = currentPost.reactions.reduce(
-		(sum, r) => sum + r.count,
-		0,
-	);
+	// Get total reactions from engagement
+	const totalReactions = currentPost.engagement?.likes_count || 0;
+
+	// Get images from foods
+	const images = currentPost.foods?.map((food) => food.imageUrl) || [];
+
+	// Get title from first food name or text preview
+	const displayTitle =
+		currentPost.foods?.[0]?.name ||
+		(currentPost.text?.length > 50
+			? currentPost.text.substring(0, 50) + "..."
+			: currentPost.text);
 
 	return (
 		<Box
@@ -142,26 +146,28 @@ export const PostCard = ({ post, onReactionUpdate }: PostCardProps) => {
 			<Box
 				px={4}
 				pb={3}>
-				<Text
-					fontSize="xl"
-					fontWeight="bold"
-					color={textColor}
-					mb={2}>
-					{currentPost.title}
-				</Text>
+				{displayTitle && (
+					<Text
+						fontSize="xl"
+						fontWeight="bold"
+						color={textColor}
+						mb={2}>
+						{displayTitle}
+					</Text>
+				)}
 				<Text
 					color={mutedTextColor}
 					mb={3}>
-					{currentPost.description}
+					{currentPost.text}
 				</Text>
 
-				{/* Tags */}
-				{currentPost.tags.length > 0 && (
+				{/* Hashtags */}
+				{currentPost.hashtags?.length > 0 && (
 					<Flex
 						flexWrap="wrap"
 						gap={2}
 						mb={3}>
-						{currentPost.tags.map((tag, index) => (
+						{currentPost.hashtags.map((tag, index) => (
 							<Tag
 								key={index}
 								colorScheme="blue"
@@ -173,23 +179,21 @@ export const PostCard = ({ post, onReactionUpdate }: PostCardProps) => {
 				)}
 			</Box>
 
-			{/* Images */}
-			{currentPost.images.length > 0 && (
+			{/* Images from Foods */}
+			{images.length > 0 && (
 				<Grid
 					templateColumns={
-						currentPost.images.length === 1
-							? "1fr"
-							: "repeat(2, 1fr)"
+						images.length === 1 ? "1fr" : "repeat(2, 1fr)"
 					}
 					gap={1}>
-					{currentPost.images.map((image, index) => (
+					{images.map((image, index) => (
 						<Box
 							key={index}
-							h={currentPost.images.length === 1 ? "96" : "64"}
+							h={images.length === 1 ? "96" : "64"}
 							overflow="hidden">
 							<Image
 								src={image}
-								alt={`${currentPost.title} - ${index + 1}`}
+								alt={`Food ${index + 1}`}
 								w="full"
 								h="full"
 								objectFit="cover"
@@ -258,22 +262,34 @@ export const PostCard = ({ post, onReactionUpdate }: PostCardProps) => {
 				</Box>
 			)}
 
-			{/* Reactions Summary */}
+			{/* Engagement Summary */}
 			<Box
 				px={4}
 				py={2}
 				borderTop="1px"
 				borderColor={borderColor}>
-				<Text
-					fontSize="sm"
-					color={mutedTextColor}>
-					{totalReactions > 0
-						? `${totalReactions} lượt thả cảm xúc`
-						: "Chưa có cảm xúc nào"}
-				</Text>
+				<HStack spacing={4}>
+					<Text
+						fontSize="sm"
+						color={mutedTextColor}>
+						{totalReactions > 0
+							? `${totalReactions} lượt thích`
+							: "Chưa có lượt thích"}
+					</Text>
+					<Text
+						fontSize="sm"
+						color={mutedTextColor}>
+						{currentPost.engagement?.comments_count || 0} bình luận
+					</Text>
+					<Text
+						fontSize="sm"
+						color={mutedTextColor}>
+						{currentPost.engagement?.shares_count || 0} chia sẻ
+					</Text>
+				</HStack>
 			</Box>
 
-			{/* Reaction Buttons */}
+			{/* Reaction Button (Like only for now) */}
 			<Box
 				px={4}
 				py={3}
@@ -282,46 +298,24 @@ export const PostCard = ({ post, onReactionUpdate }: PostCardProps) => {
 				<HStack
 					spacing={2}
 					justify="space-around">
-					{(Object.keys(reactionIcons) as ReactionType[]).map(
-						(reactionType) => {
-							const reaction = currentPost.reactions.find(
-								(r) => r.type === reactionType,
-							);
-							const config = reactionIcons[reactionType];
-							const isActive = reaction?.userReacted || false;
-
-							return (
-								<Button
-									key={reactionType}
-									size="sm"
-									variant={isActive ? "solid" : "ghost"}
-									colorScheme={
-										isActive ? config.colorScheme : "gray"
-									}
-									leftIcon={
-										<Icon
-											as={config.icon}
-											boxSize={5}
-										/>
-									}
-									onClick={() => handleReaction(reactionType)}
-									isDisabled={isLoading}
-									_hover={{ transform: "scale(1.05)" }}
-									transition="all 0.2s">
-									{reaction?.count || 0}
-								</Button>
-							);
-						},
-					)}
+					<Button
+						size="sm"
+						variant="ghost"
+						colorScheme="gray"
+						leftIcon={
+							<Icon
+								as={FiThumbsUp}
+								boxSize={5}
+							/>
+						}
+						onClick={() => handleReaction("like")}
+						isDisabled={isLoading}
+						_hover={{ transform: "scale(1.05)" }}
+						transition="all 0.2s">
+						Thích
+					</Button>
 				</HStack>
 			</Box>
-
-			{/* Comments Section */}
-			<CommentSection
-				postId={currentPost.id}
-				comments={currentPost.comments}
-				onAddComment={handleAddComment}
-			/>
 		</Box>
 	);
 };

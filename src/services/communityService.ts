@@ -1,12 +1,10 @@
 import type {
 	Post,
 	ReactionType,
-	Comment,
 	CreatePostData,
 	CreatePostRequest,
 	PaginationParams,
 	PaginationInfo,
-	FoodInPost,
 	PostDetail,
 } from "../types/community";
 import api from "@/lib/api";
@@ -16,176 +14,163 @@ import { AUTH_CONFIG } from "@/constants";
 // Mock data cho demo
 const mockPosts: Post[] = [
 	{
-		id: "1",
+		_id: "1",
 		author: {
-			id: "user1",
+			_id: "user1",
 			name: "Nguyễn Văn A",
 			avatar: "https://i.pravatar.cc/150?img=1",
 		},
-		title: "Phở Bò Hà Nội Truyền Thống",
-		description:
-			"Chia sẻ công thức nấu phở bò Hà Nội đúng chuẩn, thơm ngon như hàng quán.",
-		images: [
-			"https://images.unsplash.com/photo-1591814468924-caf88d1232e1?w=800",
-		],
-		tags: ["phở", "món việt", "món chính"],
-		ingredients: [
-			"1kg xương bò",
-			"500g thịt bò",
-			"Hành, gừng",
-			"Gia vị: hồi, quế, thảo quả",
-			"Bánh phở tươi",
-			"Rau thơm: hành, ngò, giá",
-		],
-		instructions: [
-			"Chần xương bò qua nước sôi",
-			"Nấu nước dùng với xương và gia vị trong 4-6 giờ",
-			"Thái thịt bò mỏng",
-			"Trụng bánh phở, cho vào tô",
-			"Chan nước dùng nóng, thêm rau thơm",
-		],
+		text: "Chia sẻ công thức nấu phở bò Hà Nội đúng chuẩn, thơm ngon như hàng quán.",
+		foods: [],
+		engagement: {
+			likes_count: 45,
+			comments_count: 1,
+			shares_count: 0,
+		},
+		visibility: "public",
+		hashtags: ["phở", "món việt", "món chính"],
+		is_edited: false,
 		createdAt: "2025-11-04T10:30:00Z",
-		reactions: [
-			{ type: "like", count: 45, userReacted: false },
-			{ type: "love", count: 32, userReacted: true },
-			{ type: "delicious", count: 28, userReacted: false },
-			{ type: "wow", count: 15, userReacted: false },
-		],
-		comments: [
-			{
-				id: "c1",
-				author: {
-					id: "user2",
-					name: "Trần Thị B",
-					avatar: "https://i.pravatar.cc/150?img=5",
-				},
-				content:
-					"Công thức rất chi tiết, mình đã thử và rất thành công! Cảm ơn bạn nhiều.",
-				createdAt: "2025-11-04T11:00:00Z",
-				replies: [
-					{
-						id: "c1-r1",
-						author: {
-							id: "user1",
-							name: "Nguyễn Văn A",
-							avatar: "https://i.pravatar.cc/150?img=1",
-						},
-						content:
-							"Vui vì bạn thích! Chúc bạn nấu ăn ngon nhé 😊",
-						createdAt: "2025-11-04T11:30:00Z",
-					},
-				],
-			},
-		],
+		updatedAt: "2025-11-04T10:30:00Z",
 	},
 	{
-		id: "2",
+		_id: "2",
 		author: {
-			id: "user2",
+			_id: "user2",
 			name: "Trần Thị B",
 			avatar: "https://i.pravatar.cc/150?img=5",
 		},
-		title: "Thực đơn ăn kiêng giảm cân trong 1 tuần",
-		description:
-			"Thực đơn eat clean giúp giảm cân hiệu quả mà vẫn đầy đủ dinh dưỡng.",
-		images: [
-			"https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800",
-			"https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800",
-		],
-		tags: ["giảm cân", "eat clean", "healthy", "thực đơn"],
+		text: "Thực đơn eat clean giúp giảm cân hiệu quả mà vẫn đầy đủ dinh dưỡng.",
+		foods: [],
+		engagement: {
+			likes_count: 89,
+			comments_count: 0,
+			shares_count: 0,
+		},
+		visibility: "public",
+		hashtags: ["giảm cân", "eat clean", "healthy", "thực đơn"],
+		is_edited: false,
 		createdAt: "2025-11-03T15:20:00Z",
-		reactions: [
-			{ type: "like", count: 89, userReacted: true },
-			{ type: "love", count: 67, userReacted: false },
-			{ type: "delicious", count: 23, userReacted: false },
-			{ type: "wow", count: 34, userReacted: false },
-		],
-		comments: [],
+		updatedAt: "2025-11-03T15:20:00Z",
 	},
 	{
-		id: "3",
+		_id: "3",
 		author: {
-			id: "user3",
+			_id: "user3",
 			name: "Lê Văn C",
 			avatar: "https://i.pravatar.cc/150?img=12",
 		},
-		title: "Bánh Mì Việt Nam - Món ăn sáng tuyệt vời",
-		description:
-			"Hướng dẫn làm bánh mì thịt nguội tại nhà, đơn giản mà ngon không kém ngoài hàng.",
-		images: [
-			"https://images.unsplash.com/photo-1598511726623-d2e9996892f0?w=800",
-		],
-		tags: ["bánh mì", "món việt", "ăn sáng"],
-		ingredients: [
-			"Bánh mì que",
-			"Pate gan",
-			"Thịt nguội",
-			"Dưa leo, rau mùi, đồ chua",
-			"Tương ớt, tương đen",
-		],
-		instructions: [
-			"Nướng bánh mì cho giòn",
-			"Xẻ bánh, phết pate",
-			"Thêm thịt nguội, đồ chua, rau thơm",
-			"Chan tương, thưởng thức",
-		],
+		text: "Hướng dẫn làm bánh mì thịt nguội tại nhà, đơn giản mà ngon không kém ngoài hàng.",
+		foods: [],
+		engagement: {
+			likes_count: 56,
+			comments_count: 0,
+			shares_count: 0,
+		},
+		visibility: "public",
+		hashtags: ["bánh mì", "món việt", "ăn sáng"],
+		is_edited: false,
 		createdAt: "2025-11-02T08:15:00Z",
-		reactions: [
-			{ type: "like", count: 56, userReacted: false },
-			{ type: "love", count: 41, userReacted: false },
-			{ type: "delicious", count: 72, userReacted: true },
-			{ type: "wow", count: 19, userReacted: false },
-		],
-		comments: [],
+		updatedAt: "2025-11-02T08:15:00Z",
 	},
 	{
-		id: "4",
+		_id: "4",
 		author: {
-			id: "user4",
+			_id: "user4",
 			name: "Phạm Thị D",
 			avatar: "https://i.pravatar.cc/150?img=9",
 		},
-		title: "Lẩu Thái Chua Cay - Hoàn hảo cho ngày mưa",
-		description:
-			"Công thức nấu lẩu Thái tom yum chuẩn vị, chua cay đậm đà.",
-		images: [
-			"https://images.unsplash.com/photo-1606491956689-2ea866880c84?w=800",
-		],
-		tags: ["lẩu", "món thái", "chua cay"],
-		ingredients: [
-			"Tôm, mực, hải sản",
-			"Nấm các loại",
-			"Sả, gừng, ớt",
-			"Nước cốt me, nước mắm",
-			"Rau ăn kèm",
-		],
+		text: "Công thức nấu lẩu Thái tom yum chuẩn vị, chua cay đậm đà.",
+		foods: [],
+		engagement: {
+			likes_count: 63,
+			comments_count: 0,
+			shares_count: 0,
+		},
+		visibility: "public",
+		hashtags: ["lẩu", "món thái", "chua cay"],
+		is_edited: false,
 		createdAt: "2025-11-01T18:45:00Z",
-		reactions: [
-			{ type: "like", count: 63, userReacted: false },
-			{ type: "love", count: 55, userReacted: false },
-			{ type: "delicious", count: 48, userReacted: false },
-			{ type: "wow", count: 29, userReacted: false },
-		],
-		comments: [],
+		updatedAt: "2025-11-01T18:45:00Z",
 	},
 ];
 
 export const communityService = {
-	// Lấy tất cả posts
-	getPosts: async (): Promise<Post[]> => {
-		// Simulate API call
-		return new Promise((resolve) => {
-			setTimeout(() => {
-				resolve(mockPosts);
-			}, 500);
-		});
+	// Lấy tất cả posts với pagination và filters
+	getPosts: async (params?: {
+		page?: number;
+		limit?: number;
+		hashtags?: string[];
+		search?: string;
+		sortBy?: string;
+		sortOrder?: "asc" | "desc";
+	}) => {
+		try {
+			// Build query params
+			const queryParams = new URLSearchParams({
+				page: String(params?.page || 1),
+				limit: String(params?.limit || 10),
+				sortBy: params?.sortBy || "createdAt",
+				sortOrder: params?.sortOrder || "desc",
+			});
+
+			// Add hashtags if provided
+			if (params?.hashtags && params.hashtags.length > 0) {
+				params.hashtags.forEach((tag) => {
+					queryParams.append("hashtags", tag);
+				});
+			}
+
+			// Add search if provided
+			if (params?.search) {
+				queryParams.set("search", params.search);
+			}
+
+			const response = await api.get(`/posts?${queryParams.toString()}`);
+
+			// Handle different response structures
+			const responseData = response.data.data || response.data;
+			let posts = [];
+			let pagination = {
+				page: params?.page || 1,
+				limit: params?.limit || 10,
+				total: 0,
+				pages: 0,
+			};
+
+			// Check if response has posts field
+			if (responseData.posts && Array.isArray(responseData.posts)) {
+				posts = responseData.posts;
+				pagination = responseData.pagination || pagination;
+			} else if (Array.isArray(responseData)) {
+				// Direct array of posts
+				posts = responseData;
+			}
+
+			return {
+				posts,
+				pagination,
+			};
+		} catch (error) {
+			console.error("Error fetching posts:", error);
+			// Return empty result instead of throwing
+			return {
+				posts: [],
+				pagination: {
+					page: params?.page || 1,
+					limit: params?.limit || 10,
+					total: 0,
+					pages: 0,
+				},
+			};
+		}
 	},
 
 	// Lấy một post theo ID
 	getPostById: async (id: string): Promise<Post | undefined> => {
 		return new Promise((resolve) => {
 			setTimeout(() => {
-				const post = mockPosts.find((p) => p.id === id);
+				const post = mockPosts.find((p) => p._id === id);
 				resolve(post);
 			}, 300);
 		});
@@ -198,26 +183,11 @@ export const communityService = {
 	): Promise<Post | undefined> => {
 		return new Promise((resolve) => {
 			setTimeout(() => {
-				const post = mockPosts.find((p) => p.id === postId);
+				const post = mockPosts.find((p) => p._id === postId);
 				if (post) {
-					const reaction = post.reactions.find(
-						(r) => r.type === reactionType,
-					);
-					if (reaction) {
-						if (reaction.userReacted) {
-							reaction.count--;
-							reaction.userReacted = false;
-						} else {
-							// Remove other reactions from user
-							post.reactions.forEach((r) => {
-								if (r.userReacted) {
-									r.count--;
-									r.userReacted = false;
-								}
-							});
-							reaction.count++;
-							reaction.userReacted = true;
-						}
+					// Update engagement counts (simplified for mock)
+					if (reactionType === "like") {
+						post.engagement.likes_count++;
 					}
 				}
 				resolve(post);
@@ -226,42 +196,13 @@ export const communityService = {
 	},
 
 	// Thêm comment mới
-	addComment: async (
-		postId: string,
-		content: string,
-		parentCommentId?: string,
-	): Promise<Post | undefined> => {
+	addComment: async (postId: string): Promise<Post | undefined> => {
 		return new Promise((resolve) => {
 			setTimeout(() => {
-				const post = mockPosts.find((p) => p.id === postId);
+				const post = mockPosts.find((p) => p._id === postId);
 				if (post) {
-					const newComment: Comment = {
-						id: `c${Date.now()}`,
-						author: {
-							id: "currentUser",
-							name: "Current User",
-							avatar: "https://i.pravatar.cc/150?img=68",
-						},
-						content,
-						createdAt: new Date().toISOString(),
-						replies: [],
-					};
-
-					if (parentCommentId) {
-						// Add as reply to existing comment
-						const parentComment = post.comments.find(
-							(c) => c.id === parentCommentId,
-						);
-						if (parentComment) {
-							if (!parentComment.replies) {
-								parentComment.replies = [];
-							}
-							parentComment.replies.push(newComment);
-						}
-					} else {
-						// Add as new top-level comment
-						post.comments.push(newComment);
-					}
+					// Update comment count
+					post.engagement.comments_count++;
 				}
 				resolve(post);
 			}, 300);
@@ -287,7 +228,7 @@ export const communityService = {
 			// Build query params
 			const queryParams = new URLSearchParams({
 				page: String(params?.page || 1),
-				limit: String(params?.limit || 10),
+				limit: String(params?.limit || 1),
 				sortBy: params?.sortBy || "createdAt",
 				sortOrder: params?.sortOrder || "desc",
 			});
@@ -296,35 +237,9 @@ export const communityService = {
 				`/posts/user/${userId}?${queryParams.toString()}`,
 			);
 
-			// Convert API posts to Post interface
-			const posts: Post[] = response.data.data.posts.map(
-				(apiPost: any) => ({
-					id: apiPost._id,
-					author: {
-						id: apiPost.author._id,
-						name: apiPost.author.username,
-						avatar: apiPost.author.avatar,
-					},
-					title: apiPost.food_review?.dish_name || "",
-					description: apiPost.text,
-					images: apiPost.images || [],
-					tags: apiPost.food_review?.tags || [],
-					ingredients: apiPost.food_review?.ingredients,
-					instructions: apiPost.food_review?.instructions,
-					createdAt: apiPost.createdAt,
-					reactions: [
-						{ type: "like", count: 0, userReacted: false },
-						{ type: "love", count: 0, userReacted: false },
-						{ type: "delicious", count: 0, userReacted: false },
-						{ type: "wow", count: 0, userReacted: false },
-					],
-					comments: [],
-				}),
-			);
-			console.log(posts);
-
+			// Return API response directly
 			return {
-				posts,
+				posts: response.data.data.posts,
 				pagination: response.data.data.pagination,
 			};
 		} catch (error) {
@@ -345,32 +260,8 @@ export const communityService = {
 
 			const response = await api.post("/posts", requestPayload);
 
-			// Convert API response to Post interface
-			const apiPost = response.data.data;
-			const newPost: Post = {
-				id: apiPost._id,
-				author: {
-					id: apiPost.author._id,
-					name: apiPost.author.name,
-					avatar: apiPost.author.avatar,
-				},
-				title: apiPost.foods?.[0]?.name || "",
-				description: apiPost.text,
-				images:
-					apiPost.foods?.map((food: FoodInPost) => food.imageUrl) ||
-					[],
-				tags: apiPost.hashtags || [],
-				ingredients: [],
-				instructions: [],
-				createdAt: apiPost.createdAt,
-				reactions: [
-					{ type: "like", count: 0, userReacted: false },
-					{ type: "love", count: 0, userReacted: false },
-					{ type: "delicious", count: 0, userReacted: false },
-					{ type: "wow", count: 0, userReacted: false },
-				],
-				comments: [],
-			};
+			// Return API response directly
+			const newPost: Post = response.data.data;
 
 			// Also add to mock posts for local display
 			mockPosts.unshift(newPost);

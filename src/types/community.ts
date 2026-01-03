@@ -19,21 +19,36 @@ export interface Comment {
 }
 
 export interface Post {
-	id: string;
+	_id: string;
 	author: {
-		id: string;
+		_id: string;
 		name: string;
+		email?: string;
 		avatar?: string;
 	};
-	title: string;
-	description: string;
-	images: string[];
-	tags: string[];
+	text: string;
+	foods: FoodInPost[];
+	engagement: {
+		likes_count: number;
+		comments_count: number;
+		shares_count: number;
+	};
+	visibility: string;
+	hashtags: string[];
+	is_edited: boolean;
+	createdAt: string;
+	updatedAt: string;
+	post_type?: string;
+	// Legacy fields for backward compatibility
+	id?: string;
+	title?: string;
+	description?: string;
+	images?: string[];
+	tags?: string[];
 	ingredients?: string[];
 	instructions?: string[];
-	createdAt: string;
-	reactions: Reaction[];
-	comments: Comment[];
+	reactions?: Reaction[];
+	comments?: Comment[];
 }
 
 export interface CreatePostData {
