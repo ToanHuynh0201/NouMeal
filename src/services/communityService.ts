@@ -166,16 +166,6 @@ export const communityService = {
 		}
 	},
 
-	// Lấy một post theo ID
-	getPostById: async (id: string): Promise<Post | undefined> => {
-		return new Promise((resolve) => {
-			setTimeout(() => {
-				const post = mockPosts.find((p) => p._id === id);
-				resolve(post);
-			}, 300);
-		});
-	},
-
 	// Toggle reaction cho post
 	toggleReaction: async (
 		postId: string,
