@@ -36,6 +36,7 @@ export const ROUTES = {
 	IMAGE_RECOGNITION: "/image-recognition",
 	MY_RECIPES: "/my-recipes",
 	COMMUNITY: "/community",
+	USER_POSTS: "/user/:userId/posts",
 	ROOT: "/",
 	// Admin routes
 	ADMIN_OVERALL: "/admin/overall",

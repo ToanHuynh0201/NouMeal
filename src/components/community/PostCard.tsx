@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
 	Box,
 	Button,
@@ -21,6 +22,7 @@ import { IoSparkles, IoStar } from "react-icons/io5";
 import type { Post, ReactionType } from "../../types/community";
 import { communityService } from "../../services/communityService";
 import { CommentSection } from "./CommentSection";
+import { ROUTES } from "@/constants";
 
 interface PostCardProps {
 	post: Post;
@@ -38,6 +40,7 @@ const reactionIcons: Record<
 };
 
 export const PostCard = ({ post, onReactionUpdate }: PostCardProps) => {
+	const navigate = useNavigate();
 	const [isLoading, setIsLoading] = useState(false);
 	const [currentPost, setCurrentPost] = useState(post);
 
@@ -79,6 +82,13 @@ export const PostCard = ({ post, onReactionUpdate }: PostCardProps) => {
 		} catch (error) {
 			console.error("Error adding comment:", error);
 		}
+	};
+
+	const handleNavigateToUserPosts = () => {
+		const userId = currentPost.author._id;
+		const userPostsPath = ROUTES.USER_POSTS.replace(':userId', userId);
+		console.log('Navigating to user posts:', { userId, userPostsPath });
+		navigate(userPostsPath);
 	};
 
 	const formatDate = (dateString: string) => {
@@ -125,13 +135,21 @@ export const PostCard = ({ post, onReactionUpdate }: PostCardProps) => {
 					name={currentPost.author.name}
 					src={currentPost.author.avatar}
 					bg="blue.500"
+					cursor="pointer"
+					onClick={handleNavigateToUserPosts}
+					_hover={{ opacity: 0.8, transform: "scale(1.05)" }}
+					transition="all 0.2s"
 				/>
 				<VStack
 					align="start"
 					spacing={0}>
 					<Text
 						fontWeight="semibold"
-						color={textColor}>
+						color={textColor}
+						cursor="pointer"
+						onClick={handleNavigateToUserPosts}
+						_hover={{ color: "blue.500", textDecoration: "underline" }}
+						transition="all 0.2s">
 						{currentPost.author.name}
 					</Text>
 					<Text

@@ -22,12 +22,16 @@ const UserRoute = ({children}: UserRouteProps) => {
 			const isAdmin = authService.isAdmin();
 			const subdomainInfo = getSubdomainInfo();
 
+			console.log('UserRoute subdomain check:', { isAdmin, subdomainInfo, location: location.pathname });
+
 			// Redirect user away from admin subdomain if they're there
 			if (!isAdmin && subdomainInfo.isAdmin) {
+				console.log('Redirecting user away from admin subdomain');
 				redirectToSubdomain(false);
 			}
 			// Redirect admin to admin subdomain if they're not there
 			else if (isAdmin && !subdomainInfo.isAdmin) {
+				console.log('Redirecting admin to admin subdomain');
 				redirectToSubdomain(true);
 			}
 		}
