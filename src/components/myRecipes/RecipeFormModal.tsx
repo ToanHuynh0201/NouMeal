@@ -83,6 +83,7 @@ const RecipeFormModal = ({
     useEffect(() => {
         if (editingRecipe) {
             setFormData({
+                _id: editingRecipe.id,
                 title: editingRecipe.title,
                 description: editingRecipe.description,
                 cookingTime: editingRecipe.cookingTime,

@@ -37,7 +37,7 @@ export interface RecipeFormData {
 		sugar: string;
 		sodium: string;
 	};
-	_id: string;
+	_id?: string;
 }
 
 // Filter options for recipe list
