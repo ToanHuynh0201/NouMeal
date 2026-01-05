@@ -14,9 +14,7 @@ class AiService {
 	 * @returns {Promise<AnalyzeFoodResponse>} Standardized response with food analysis data
 	 */
 	analyzeFood = withErrorHandling(async (request: AnalyzeFoodRequest) => {
-		const data = await this.customApi.post("/analyze-food", request);
-
-		return data;
+		return await this.customApi.post("/analyze-food", request);
 	});
 
 	/**
