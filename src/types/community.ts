@@ -36,6 +36,7 @@ export interface Post {
 	visibility: string;
 	hashtags: string[];
 	is_edited: boolean;
+	is_liked?: boolean; // Track if current user has liked this post
 	createdAt: string;
 	updatedAt: string;
 	post_type?: string;
@@ -104,6 +105,7 @@ export interface PostDetail {
 	visibility: string;
 	hashtags: string[];
 	is_edited: boolean;
+	is_liked?: boolean; // Track if current user has liked this post
 	createdAt: string;
 	updatedAt: string;
 }

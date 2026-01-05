@@ -166,7 +166,28 @@ export const communityService = {
 		}
 	},
 
-	// Toggle reaction cho post
+	// Toggle like cho post - Call API thực
+	toggleLike: async (
+		postId: string,
+		isLiked: boolean,
+	): Promise<{ post_id: string; likes_count: number }> => {
+		try {
+			if (isLiked) {
+				// Unlike: DELETE request
+				const response = await api.delete(`/posts/${postId}/like`, {});
+				return response.data.data;
+			} else {
+				// Like: POST request
+				const response = await api.post(`/posts/${postId}/like`, {});
+				return response.data.data;
+			}
+		} catch (error) {
+			console.error("Error toggling like:", error);
+			throw error;
+		}
+	},
+
+	// Toggle reaction cho post (deprecated - use toggleLike instead)
 	toggleReaction: async (
 		postId: string,
 		reactionType: ReactionType,

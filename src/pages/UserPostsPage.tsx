@@ -43,9 +43,7 @@ export default function UserPostsPage() {
 	}, [userId, page]);
 
 	const loadUserPosts = async () => {
-		console.log('Loading user posts for userId:', userId);
 		if (!userId) {
-			console.warn('No userId provided');
 			return;
 		}
 
@@ -57,7 +55,6 @@ export default function UserPostsPage() {
 					limit: 12,
 				});
 
-			console.log('Loaded user posts:', { count: userPosts.length, pagination });
 			setPosts(userPosts);
 			setTotalPages(pagination.pages);
 		} catch (error) {

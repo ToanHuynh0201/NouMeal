@@ -49,21 +49,31 @@ export const PostCard = ({ post, onReactionUpdate }: PostCardProps) => {
 	const textColor = useColorModeValue("gray.800", "white");
 	const mutedTextColor = useColorModeValue("gray.600", "gray.400");
 
-	const handleReaction = async (reactionType: ReactionType) => {
+	const handleLike = async () => {
 		if (isLoading) return;
 
 		setIsLoading(true);
 		try {
-			const updatedPost = await communityService.toggleReaction(
-				post._id,
-				reactionType,
+			const isCurrentlyLiked = currentPost.is_liked || false;
+			const result = await communityService.toggleLike(
+				currentPost._id,
+				isCurrentlyLiked,
 			);
-			if (updatedPost) {
-				setCurrentPost(updatedPost);
-				onReactionUpdate?.(updatedPost);
-			}
+
+			// Update local state with new like count and status
+			const updatedPost = {
+				...currentPost,
+				is_liked: !isCurrentlyLiked,
+				engagement: {
+					...currentPost.engagement,
+					likes_count: result.likes_count,
+				},
+			};
+
+			setCurrentPost(updatedPost);
+			onReactionUpdate?.(updatedPost);
 		} catch (error) {
-			console.error("Error toggling reaction:", error);
+			console.error("Error toggling like:", error);
 		} finally {
 			setIsLoading(false);
 		}
@@ -87,7 +97,6 @@ export const PostCard = ({ post, onReactionUpdate }: PostCardProps) => {
 	const handleNavigateToUserPosts = () => {
 		const userId = currentPost.author._id;
 		const userPostsPath = ROUTES.USER_POSTS.replace(':userId', userId);
-		console.log('Navigating to user posts:', { userId, userPostsPath });
 		navigate(userPostsPath);
 	};
 
@@ -307,7 +316,7 @@ export const PostCard = ({ post, onReactionUpdate }: PostCardProps) => {
 				</HStack>
 			</Box>
 
-			{/* Reaction Button (Like only for now) */}
+			{/* Like Button */}
 			<Box
 				px={4}
 				py={3}
@@ -319,18 +328,19 @@ export const PostCard = ({ post, onReactionUpdate }: PostCardProps) => {
 					<Button
 						size="sm"
 						variant="ghost"
-						colorScheme="gray"
+						colorScheme={currentPost.is_liked ? "blue" : "gray"}
 						leftIcon={
 							<Icon
 								as={FiThumbsUp}
 								boxSize={5}
+								color={currentPost.is_liked ? "blue.500" : undefined}
 							/>
 						}
-						onClick={() => handleReaction("like")}
+						onClick={handleLike}
 						isDisabled={isLoading}
 						_hover={{ transform: "scale(1.05)" }}
 						transition="all 0.2s">
-						Thích
+						{currentPost.is_liked ? "Đã thích" : "Thích"}
 					</Button>
 				</HStack>
 			</Box>
