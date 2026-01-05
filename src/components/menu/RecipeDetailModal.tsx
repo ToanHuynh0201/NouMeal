@@ -5,6 +5,7 @@ import {
 	ModalHeader,
 	ModalCloseButton,
 	ModalBody,
+	ModalFooter,
 	Box,
 	Heading,
 	Text,
@@ -24,27 +25,82 @@ import {
 	CardBody,
 	useColorModeValue,
 	Stack,
+	Button,
+	useDisclosure,
+	useToast,
 } from "@chakra-ui/react";
-import { FiClock, FiUsers } from "react-icons/fi";
+import { FiClock, FiUsers, FiBookmark } from "react-icons/fi";
 import { CheckCircleIcon } from "@chakra-ui/icons";
 import { animationPresets } from "@/styles/animation";
 import type { Recipe } from "@/types/recipe";
+import RecipeFormModal from "../myRecipes/RecipeFormModal";
+import { useState } from "react";
+import type { RecipeFormData } from "@/types/myRecipe";
+import { useMyRecipes } from "@/hooks/useMyRecipes";
 
 interface RecipeDetailModalProps {
 	isOpen: boolean;
 	onClose: () => void;
 	recipe: Recipe | null;
+	showSaveButton?: boolean;
 }
 
 const RecipeDetailModal = ({
 	isOpen,
 	onClose,
 	recipe,
+	showSaveButton = false,
 }: RecipeDetailModalProps) => {
 	const cardBg = useColorModeValue("white", "gray.800");
 	const borderColor = useColorModeValue("gray.200", "gray.600");
+	const toast = useToast();
+
+	const {
+		isOpen: isFormOpen,
+		onOpen: onFormOpen,
+		onClose: onFormClose,
+	} = useDisclosure();
+	const [editingRecipe, setEditingRecipe] = useState<Recipe | null>(null);
+	const [isSaving, setIsSaving] = useState(false);
+
+	const { addRecipe } = useMyRecipes();
 
 	if (!recipe) return null;
+
+	const handleSaveToMyRecipes = () => {
+		setEditingRecipe(recipe);
+		onFormOpen();
+	};
+
+	const handleSaveRecipe = async (recipeData: RecipeFormData) => {
+		try {
+			setIsSaving(true);
+			await addRecipe(recipeData);
+
+			toast({
+				title: "Recipe saved!",
+				description: `${recipeData.title} has been added to your recipes.`,
+				status: "success",
+				duration: 3000,
+				isClosable: true,
+				position: "top",
+			});
+
+			onFormClose();
+		} catch (error) {
+			console.error("Error saving recipe:", error);
+			toast({
+				title: "Error saving recipe",
+				description: "Failed to save recipe. Please try again.",
+				status: "error",
+				duration: 3000,
+				isClosable: true,
+				position: "top",
+			});
+		} finally {
+			setIsSaving(false);
+		}
+	};
 
 	const difficultyColor = {
 		easy: "green",
@@ -459,7 +515,28 @@ const RecipeDetailModal = ({
 						</GridItem>
 					</Grid>
 				</ModalBody>
+
+				{showSaveButton && (
+					<ModalFooter borderTop="1px" borderColor={borderColor}>
+						<Button
+							leftIcon={<Icon as={FiBookmark} />}
+							colorScheme="purple"
+							onClick={handleSaveToMyRecipes}
+							isLoading={isSaving}
+							size="lg">
+							Save to My Recipes
+						</Button>
+					</ModalFooter>
+				)}
 			</ModalContent>
+
+			{/* Recipe Form Modal */}
+			<RecipeFormModal
+				isOpen={isFormOpen}
+				onClose={onFormClose}
+				onSave={handleSaveRecipe}
+				editingRecipe={editingRecipe}
+			/>
 		</Modal>
 	);
 };

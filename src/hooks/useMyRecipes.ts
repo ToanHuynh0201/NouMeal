@@ -68,7 +68,7 @@ export const useMyRecipes = () => {
 	const convertRecipeToFoodRequest = useCallback(
 		(recipeData: RecipeFormData): CreateFoodRequest => {
 			return {
-				id: recipeData._id,
+				id: recipeData._id!,
 				name: recipeData.title,
 				description: recipeData.description,
 				instructions: recipeData.instructions.map((desc, index) => ({

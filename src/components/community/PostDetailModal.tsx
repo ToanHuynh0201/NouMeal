@@ -451,6 +451,7 @@ const PostDetailModal = ({ isOpen, onClose, postId }: PostDetailModalProps) => {
 					isOpen={isRecipeOpen}
 					onClose={onRecipeClose}
 					recipe={selectedFood}
+					showSaveButton={true}
 				/>
 			)}
 		</Modal>

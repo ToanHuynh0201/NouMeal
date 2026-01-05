@@ -116,6 +116,17 @@ export interface Recipe {
 	cookingTime: string;
 	servingSize: string;
 	image: string;
+	foodCategory?:
+		| "fruits"
+		| "vegetables"
+		| "grains"
+		| "protein"
+		| "dairy"
+		| "fats"
+		| "beverages"
+		| "snacks"
+		| "desserts"
+		| "spices";
 	category: "breakfast" | "lunch" | "dinner" | "snack";
 	difficulty: "easy" | "medium" | "hard";
 	nutrition: NutritionInfo;
