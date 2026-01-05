@@ -14,12 +14,14 @@ import {
 	InputGroup,
 	InputLeftElement,
 	Icon,
+	useDisclosure,
 } from "@chakra-ui/react";
 import { FiSearch } from "react-icons/fi";
 import type { Post, PaginationInfo } from "../../types/community";
 import { communityService } from "../../services/communityService";
 import { PostCard } from "./PostCard";
 import LoadingSpinner from "../common/LoadingSpinner";
+import PostDetailModal from "./PostDetailModal";
 
 export const PostList = () => {
 	const [posts, setPosts] = useState<Post[]>([]);
@@ -39,6 +41,10 @@ export const PostList = () => {
 	const [hashtags, setHashtags] = useState<string[]>([]);
 	const [sortBy, setSortBy] = useState("createdAt");
 	const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+
+	// Post Detail Modal
+	const { isOpen, onOpen, onClose } = useDisclosure();
+	const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
 
 	useEffect(() => {
 		loadPosts();
@@ -108,6 +114,11 @@ export const PostList = () => {
 	const handleSortOrderToggle = () => {
 		setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
 		setPagination((prev) => ({ ...prev, page: 1 }));
+	};
+
+	const handlePostClick = (postId: string) => {
+		setSelectedPostId(postId);
+		onOpen();
 	};
 
 	if (isLoading) {
@@ -264,6 +275,7 @@ export const PostList = () => {
 							key={post._id}
 							post={post}
 							onReactionUpdate={handleReactionUpdate}
+							onPostClick={handlePostClick}
 						/>
 					))}
 
@@ -341,6 +353,13 @@ export const PostList = () => {
 					)}
 				</>
 			)}
+
+			{/* Post Detail Modal */}
+			<PostDetailModal
+				isOpen={isOpen}
+				onClose={onClose}
+				postId={selectedPostId}
+			/>
 		</VStack>
 	);
 };

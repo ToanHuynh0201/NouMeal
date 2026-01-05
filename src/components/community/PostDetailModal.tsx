@@ -85,12 +85,13 @@ const PostDetailModal = ({ isOpen, onClose, postId }: PostDetailModalProps) => {
 				sugar: `${foodData.nutritionalInfo?.sugar || 0}g`,
 				sodium: `${foodData.nutritionalInfo?.sodium || 0}mg`,
 			},
-			ingredients: foodData.ingredients?.map((ing: any) =>
-				`${ing.name} - ${ing.amount}`
-			) || [],
-			instructions: foodData.instructions?.map((inst: any) =>
-				inst.description
-			) || [],
+			ingredients:
+				foodData.ingredients?.map(
+					(ing: any) => `${ing.name} - ${ing.amount}`,
+				) || [],
+			instructions:
+				foodData.instructions?.map((inst: any) => inst.description) ||
+				[],
 			tags: foodData.tags || [],
 		};
 	};
@@ -108,6 +109,19 @@ const PostDetailModal = ({ isOpen, onClose, postId }: PostDetailModalProps) => {
 		} catch (error) {
 			console.error("Error fetching food details:", error);
 		}
+	};
+
+	const formatDate = (dateString: string) => {
+		const date = new Date(dateString);
+		const now = new Date();
+		const diffInHours = Math.floor(
+			(now.getTime() - date.getTime()) / (1000 * 60 * 60),
+		);
+
+		if (diffInHours < 1) return "Vừa xong";
+		if (diffInHours < 24) return `${diffInHours} giờ trước`;
+		if (diffInHours < 48) return "Hôm qua";
+		return date.toLocaleDateString("vi-VN");
 	};
 
 	return (
@@ -135,12 +149,12 @@ const PostDetailModal = ({ isOpen, onClose, postId }: PostDetailModalProps) => {
 							align="stretch">
 							{/* Author Info */}
 							<HStack spacing={3}>
-								{/* <Avatar
+								<Avatar
 									size="md"
 									// name={postDetail.author.name}
 									src={postDetail.author.avatar}
-								/> */}
-								{/* <VStack
+								/>
+								<VStack
 									align="start"
 									spacing={0}>
 									<Text
@@ -160,7 +174,7 @@ const PostDetailModal = ({ isOpen, onClose, postId }: PostDetailModalProps) => {
 										{postDetail.is_edited &&
 											" • Đã chỉnh sửa"}
 									</Text>
-								</VStack> */}
+								</VStack>
 								<Badge
 									ml="auto"
 									colorScheme={
@@ -236,7 +250,9 @@ const PostDetailModal = ({ isOpen, onClose, postId }: PostDetailModalProps) => {
 												_hover={{ shadow: "md" }}
 												transition="all 0.2s"
 												cursor="pointer"
-												onClick={() => handleFoodClick(food)}>
+												onClick={() =>
+													handleFoodClick(food)
+												}>
 												<Image
 													src={food.imageUrl}
 													alt={food.name}

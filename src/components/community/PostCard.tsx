@@ -27,6 +27,7 @@ import { ROUTES } from "@/constants";
 interface PostCardProps {
 	post: Post;
 	onReactionUpdate?: (updatedPost: Post) => void;
+	onPostClick?: (postId: string) => void;
 }
 
 const reactionIcons: Record<
@@ -39,7 +40,7 @@ const reactionIcons: Record<
 	wow: { icon: IoStar, label: "Tuyệt vời", colorScheme: "yellow" },
 };
 
-export const PostCard = ({ post, onReactionUpdate }: PostCardProps) => {
+export const PostCard = ({ post, onReactionUpdate, onPostClick }: PostCardProps) => {
 	const navigate = useNavigate();
 	const [isLoading, setIsLoading] = useState(false);
 	const [currentPost, setCurrentPost] = useState(post);
@@ -49,7 +50,10 @@ export const PostCard = ({ post, onReactionUpdate }: PostCardProps) => {
 	const textColor = useColorModeValue("gray.800", "white");
 	const mutedTextColor = useColorModeValue("gray.600", "gray.400");
 
-	const handleLike = async () => {
+	const handleLike = async (e?: React.MouseEvent) => {
+		if (e) {
+			e.stopPropagation();
+		}
 		if (isLoading) return;
 
 		setIsLoading(true);
@@ -94,10 +98,24 @@ export const PostCard = ({ post, onReactionUpdate }: PostCardProps) => {
 		}
 	};
 
-	const handleNavigateToUserPosts = () => {
+	const handleNavigateToUserPosts = (e: React.MouseEvent) => {
+		e.stopPropagation();
 		const userId = currentPost.author._id;
 		const userPostsPath = ROUTES.USER_POSTS.replace(':userId', userId);
 		navigate(userPostsPath);
+	};
+
+	const handleCardClick = (e: React.MouseEvent) => {
+		// Prevent navigation if clicking on interactive elements
+		const target = e.target as HTMLElement;
+		if (
+			target.closest('button') ||
+			target.closest('a') ||
+			target.closest('[role="button"]')
+		) {
+			return;
+		}
+		onPostClick?.(currentPost._id);
 	};
 
 	const formatDate = (dateString: string) => {
@@ -132,8 +150,10 @@ export const PostCard = ({ post, onReactionUpdate }: PostCardProps) => {
 			borderRadius="lg"
 			shadow="md"
 			overflow="hidden"
-			_hover={{ shadow: "lg" }}
-			transition="all 0.3s">
+			_hover={{ shadow: "lg", transform: "translateY(-2px)" }}
+			transition="all 0.3s"
+			cursor="pointer"
+			onClick={handleCardClick}>
 			{/* Author Info */}
 			<Flex
 				p={4}
