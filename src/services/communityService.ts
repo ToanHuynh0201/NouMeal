@@ -1,6 +1,5 @@
 import type {
 	Post,
-	ReactionType,
 	CreatePostData,
 	CreatePostRequest,
 	PaginationParams,
@@ -14,90 +13,6 @@ import type {
 import api from "@/lib/api";
 import { getStorageItem } from "@/utils";
 import { AUTH_CONFIG } from "@/constants";
-
-// Mock data cho demo
-const mockPosts: Post[] = [
-	{
-		_id: "1",
-		author: {
-			_id: "user1",
-			name: "Nguyễn Văn A",
-			avatar: "https://i.pravatar.cc/150?img=1",
-		},
-		text: "Chia sẻ công thức nấu phở bò Hà Nội đúng chuẩn, thơm ngon như hàng quán.",
-		foods: [],
-		engagement: {
-			likes_count: 45,
-			comments_count: 1,
-			shares_count: 0,
-		},
-		visibility: "public",
-		hashtags: ["phở", "món việt", "món chính"],
-		is_edited: false,
-		createdAt: "2025-11-04T10:30:00Z",
-		updatedAt: "2025-11-04T10:30:00Z",
-	},
-	{
-		_id: "2",
-		author: {
-			_id: "user2",
-			name: "Trần Thị B",
-			avatar: "https://i.pravatar.cc/150?img=5",
-		},
-		text: "Thực đơn eat clean giúp giảm cân hiệu quả mà vẫn đầy đủ dinh dưỡng.",
-		foods: [],
-		engagement: {
-			likes_count: 89,
-			comments_count: 0,
-			shares_count: 0,
-		},
-		visibility: "public",
-		hashtags: ["giảm cân", "eat clean", "healthy", "thực đơn"],
-		is_edited: false,
-		createdAt: "2025-11-03T15:20:00Z",
-		updatedAt: "2025-11-03T15:20:00Z",
-	},
-	{
-		_id: "3",
-		author: {
-			_id: "user3",
-			name: "Lê Văn C",
-			avatar: "https://i.pravatar.cc/150?img=12",
-		},
-		text: "Hướng dẫn làm bánh mì thịt nguội tại nhà, đơn giản mà ngon không kém ngoài hàng.",
-		foods: [],
-		engagement: {
-			likes_count: 56,
-			comments_count: 0,
-			shares_count: 0,
-		},
-		visibility: "public",
-		hashtags: ["bánh mì", "món việt", "ăn sáng"],
-		is_edited: false,
-		createdAt: "2025-11-02T08:15:00Z",
-		updatedAt: "2025-11-02T08:15:00Z",
-	},
-	{
-		_id: "4",
-		author: {
-			_id: "user4",
-			name: "Phạm Thị D",
-			avatar: "https://i.pravatar.cc/150?img=9",
-		},
-		text: "Công thức nấu lẩu Thái tom yum chuẩn vị, chua cay đậm đà.",
-		foods: [],
-		engagement: {
-			likes_count: 63,
-			comments_count: 0,
-			shares_count: 0,
-		},
-		visibility: "public",
-		hashtags: ["lẩu", "món thái", "chua cay"],
-		is_edited: false,
-		createdAt: "2025-11-01T18:45:00Z",
-		updatedAt: "2025-11-01T18:45:00Z",
-	},
-];
 
 export const communityService = {
 	// Lấy tất cả posts với pagination và filters
@@ -201,39 +116,6 @@ export const communityService = {
 		}
 	},
 
-	// Toggle reaction cho post (deprecated - use toggleLike instead)
-	toggleReaction: async (
-		postId: string,
-		reactionType: ReactionType,
-	): Promise<Post | undefined> => {
-		return new Promise((resolve) => {
-			setTimeout(() => {
-				const post = mockPosts.find((p) => p._id === postId);
-				if (post) {
-					// Update engagement counts (simplified for mock)
-					if (reactionType === "like") {
-						post.engagement.likes_count++;
-					}
-				}
-				resolve(post);
-			}, 200);
-		});
-	},
-
-	// Thêm comment mới
-	addComment: async (postId: string): Promise<Post | undefined> => {
-		return new Promise((resolve) => {
-			setTimeout(() => {
-				const post = mockPosts.find((p) => p._id === postId);
-				if (post) {
-					// Update comment count
-					post.engagement.comments_count++;
-				}
-				resolve(post);
-			}, 300);
-		});
-	},
-
 	// Lấy posts của user với pagination
 	getUserPosts: async (
 		userId?: string,
@@ -297,8 +179,6 @@ export const communityService = {
 			// Return API response directly
 			const newPost: Post = response.data.data;
 
-			// Also add to mock posts for local display
-			mockPosts.unshift(newPost);
 			console.log(newPost);
 
 			return newPost;
@@ -351,6 +231,7 @@ export const communityService = {
 			const response = await api.get(
 				`/comments/post/${postId}?${queryParams.toString()}`,
 			);
+			console.log(response.data);
 
 			return response.data;
 		} catch (error) {
