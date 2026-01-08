@@ -21,11 +21,15 @@ import {
 	Wrap,
 	WrapItem,
 	useDisclosure,
+	Button,
+	Icon,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
+import { FiThumbsUp } from "react-icons/fi";
 import { communityService } from "@/services/communityService";
 import { foodService } from "@/services/foodService";
 import RecipeDetailModal from "@/components/menu/RecipeDetailModal";
+import { CommentSection } from "@/components/community/CommentSection";
 import type { PostDetail, FoodInPost } from "@/types/community";
 import type { Recipe } from "@/types/recipe";
 
@@ -38,6 +42,7 @@ interface PostDetailModalProps {
 const PostDetailModal = ({ isOpen, onClose, postId }: PostDetailModalProps) => {
 	const [postDetail, setPostDetail] = useState<PostDetail | null>(null);
 	const [isLoading, setIsLoading] = useState(false);
+	const [isLikeLoading, setIsLikeLoading] = useState(false);
 	const [selectedFood, setSelectedFood] = useState<Recipe | null>(null);
 	const {
 		isOpen: isRecipeOpen,
@@ -45,23 +50,55 @@ const PostDetailModal = ({ isOpen, onClose, postId }: PostDetailModalProps) => {
 		onClose: onRecipeClose,
 	} = useDisclosure();
 
+	const fetchPostDetail = async () => {
+		if (!postId || !isOpen) return;
+
+		try {
+			setIsLoading(true);
+			const data = await communityService.getPostDetailById(postId);
+			setPostDetail(data);
+		} catch (error) {
+			console.error("Error fetching post detail:", error);
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
 	useEffect(() => {
-		const fetchPostDetail = async () => {
-			if (!postId || !isOpen) return;
-
-			try {
-				setIsLoading(true);
-				const data = await communityService.getPostDetailById(postId);
-				setPostDetail(data);
-			} catch (error) {
-				console.error("Error fetching post detail:", error);
-			} finally {
-				setIsLoading(false);
-			}
-		};
-
 		fetchPostDetail();
 	}, [postId, isOpen]);
+
+	const handleCommentAdded = () => {
+		// Refresh post detail to update comment count
+		fetchPostDetail();
+	};
+
+	const handleLike = async () => {
+		if (!postDetail || isLikeLoading) return;
+
+		setIsLikeLoading(true);
+		try {
+			const isCurrentlyLiked = postDetail.is_liked || false;
+			const result = await communityService.toggleLike(
+				postDetail._id,
+				isCurrentlyLiked,
+			);
+
+			// Update local state with new like count and status
+			setPostDetail({
+				...postDetail,
+				is_liked: !isCurrentlyLiked,
+				engagement: {
+					...postDetail.engagement,
+					likes_count: result.likes_count,
+				},
+			});
+		} catch (error) {
+			console.error("Error toggling like:", error);
+		} finally {
+			setIsLikeLoading(false);
+		}
+	};
 
 	// Convert Food API response to Recipe format for RecipeDetailModal
 	const convertFoodApiToRecipe = (foodData: any): Recipe => {
@@ -436,6 +473,37 @@ const PostDetailModal = ({ isOpen, onClose, postId }: PostDetailModalProps) => {
 									</Text>
 								</VStack>
 							</HStack>
+
+							<Divider />
+
+							{/* Like Button */}
+							<Box py={2}>
+								<Button
+									size="md"
+									width="full"
+									variant="ghost"
+									colorScheme={postDetail.is_liked ? "blue" : "gray"}
+									leftIcon={
+										<Icon
+											as={FiThumbsUp}
+											boxSize={5}
+											color={postDetail.is_liked ? "blue.500" : undefined}
+										/>
+									}
+									onClick={handleLike}
+									isLoading={isLikeLoading}
+									_hover={{ transform: "scale(1.02)" }}
+									transition="all 0.2s">
+									{postDetail.is_liked ? "Đã thích" : "Thích"}
+								</Button>
+							</Box>
+
+							{/* Comment Section */}
+							<CommentSection
+								postId={postId || ""}
+								initialCount={postDetail.engagement?.comments_count || 0}
+								onCommentAdded={handleCommentAdded}
+							/>
 						</VStack>
 					) : (
 						<Center py={10}>

@@ -83,19 +83,18 @@ export const PostCard = ({ post, onReactionUpdate, onPostClick }: PostCardProps)
 		}
 	};
 
-	const handleAddComment = async (
-		content: string,
-		parentCommentId?: string,
-	) => {
-		try {
-			const updatedPost = await communityService.addComment(post._id);
-			if (updatedPost) {
-				setCurrentPost(updatedPost);
-				onReactionUpdate?.(updatedPost);
-			}
-		} catch (error) {
-			console.error("Error adding comment:", error);
-		}
+	const handleCommentAdded = () => {
+		// Refresh post to update comment count
+		// Update local comment count immediately for better UX
+		const updatedPost = {
+			...currentPost,
+			engagement: {
+				...currentPost.engagement,
+				comments_count: (currentPost.engagement?.comments_count || 0) + 1,
+			},
+		};
+		setCurrentPost(updatedPost);
+		onReactionUpdate?.(updatedPost);
 	};
 
 	const handleNavigateToUserPosts = (e: React.MouseEvent) => {
@@ -364,6 +363,13 @@ export const PostCard = ({ post, onReactionUpdate, onPostClick }: PostCardProps)
 					</Button>
 				</HStack>
 			</Box>
+
+			{/* Comment Section */}
+			<CommentSection
+				postId={currentPost._id}
+				initialCount={currentPost.engagement?.comments_count || 0}
+				onCommentAdded={handleCommentAdded}
+			/>
 		</Box>
 	);
 };

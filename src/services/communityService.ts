@@ -6,6 +6,10 @@ import type {
 	PaginationParams,
 	PaginationInfo,
 	PostDetail,
+	CreateCommentData,
+	GetCommentsParams,
+	CommentsResponse,
+	CreateCommentResponse,
 } from "../types/community";
 import api from "@/lib/api";
 import { getStorageItem } from "@/utils";
@@ -127,6 +131,7 @@ export const communityService = {
 			}
 
 			const response = await api.get(`/posts?${queryParams.toString()}`);
+			console.log(response);
 
 			// Handle different response structures
 			const responseData = response.data.data || response.data;
@@ -146,6 +151,15 @@ export const communityService = {
 				// Direct array of posts
 				posts = responseData;
 			}
+
+			// Map has_liked to is_liked for consistency
+			posts = posts.map((post: any) => ({
+				...post,
+				is_liked:
+					post.has_liked !== undefined
+						? post.has_liked
+						: post.is_liked,
+			}));
 
 			return {
 				posts,
@@ -248,9 +262,18 @@ export const communityService = {
 				`/posts/user/${userId}?${queryParams.toString()}`,
 			);
 
-			// Return API response directly
+			// Map has_liked to is_liked for consistency
+			const posts = response.data.data.posts.map((post: any) => ({
+				...post,
+				is_liked:
+					post.has_liked !== undefined
+						? post.has_liked
+						: post.is_liked,
+			}));
+
+			// Return API response with mapped posts
 			return {
-				posts: response.data.data.posts,
+				posts,
 				pagination: response.data.data.pagination,
 			};
 		} catch (error) {
@@ -293,12 +316,58 @@ export const communityService = {
 			console.log("Response data:", response.data);
 
 			// Check if response has nested data structure
-			if (response.data.data) {
-				return response.data.data;
-			}
-			return response.data;
+			let postDetail = response.data.data || response.data;
+
+			// Map has_liked to is_liked for consistency
+			postDetail = {
+				...postDetail,
+				is_liked:
+					postDetail.has_liked !== undefined
+						? postDetail.has_liked
+						: postDetail.is_liked,
+			};
+
+			return postDetail;
 		} catch (error) {
 			console.error("Error fetching post detail:", error);
+			throw error;
+		}
+	},
+
+	// Lấy comments của post - Call API thực
+	getComments: async (
+		postId: string,
+		params?: GetCommentsParams,
+	): Promise<CommentsResponse> => {
+		try {
+			// Build query params
+			const queryParams = new URLSearchParams({
+				page: String(params?.page || 1),
+				limit: String(params?.limit || 10),
+				sortBy: params?.sortBy || "createdAt",
+				order: params?.order || "asc",
+			});
+
+			const response = await api.get(
+				`/comments/post/${postId}?${queryParams.toString()}`,
+			);
+
+			return response.data;
+		} catch (error) {
+			console.error("Error fetching comments:", error);
+			throw error;
+		}
+	},
+
+	// Thêm comment mới - Call API thực
+	createComment: async (
+		commentData: CreateCommentData,
+	): Promise<CreateCommentResponse> => {
+		try {
+			const response = await api.post("/comments", commentData);
+			return response.data;
+		} catch (error) {
+			console.error("Error creating comment:", error);
 			throw error;
 		}
 	},

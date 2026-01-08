@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
 	Box,
 	Button,
@@ -10,26 +10,27 @@ import {
 	Textarea,
 	useColorModeValue,
 	Collapse,
+	Spinner,
+	Center,
+	useToast,
 } from "@chakra-ui/react";
 import { FiSend, FiMessageCircle } from "react-icons/fi";
 import type { Comment } from "../../types/community";
+import { communityService } from "../../services/communityService";
 
 interface CommentSectionProps {
 	postId: string;
-	comments: Comment[];
-	onAddComment: (content: string, parentCommentId?: string) => void;
+	initialCount?: number;
+	onCommentAdded?: () => void;
 }
 
 const CommentItem = ({
 	comment,
-	onReply,
 	level = 0,
 }: {
 	comment: Comment;
-	onReply: (parentId: string) => void;
 	level?: number;
 }) => {
-	const [showReplyForm, setShowReplyForm] = useState(false);
 	const bgColor = useColorModeValue("gray.50", "gray.700");
 	const textColor = useColorModeValue("gray.800", "white");
 	const mutedTextColor = useColorModeValue("gray.600", "gray.400");
@@ -45,10 +46,6 @@ const CommentItem = ({
 		if (diffInHours < 24) return `${diffInHours} giờ trước`;
 		if (diffInHours < 48) return "Hôm qua";
 		return date.toLocaleDateString("vi-VN");
-	};
-
-	const handleReplyClick = () => {
-		setShowReplyForm(!showReplyForm);
 	};
 
 	return (
@@ -81,7 +78,7 @@ const CommentItem = ({
 							fontSize="sm"
 							color={textColor}
 							mt={1}>
-							{comment.content}
+							{comment.content.text}
 						</Text>
 					</Box>
 					<HStack
@@ -89,30 +86,7 @@ const CommentItem = ({
 						color={mutedTextColor}
 						spacing={3}>
 						<Text>{formatDate(comment.createdAt)}</Text>
-						{level < 2 && (
-							<Button
-								size="xs"
-								variant="ghost"
-								colorScheme="blue"
-								onClick={handleReplyClick}>
-								Trả lời
-							</Button>
-						)}
 					</HStack>
-
-					{showReplyForm && (
-						<Box
-							w="full"
-							mt={2}>
-							<ReplyForm
-								onSubmit={(content) => {
-									onReply(comment.id);
-									setShowReplyForm(false);
-								}}
-								onCancel={() => setShowReplyForm(false)}
-							/>
-						</Box>
-					)}
 				</VStack>
 			</Flex>
 
@@ -123,9 +97,8 @@ const CommentItem = ({
 					spacing={2}>
 					{comment.replies.map((reply) => (
 						<CommentItem
-							key={reply.id}
+							key={reply._id}
 							comment={reply}
-							onReply={onReply}
 							level={level + 1}
 						/>
 					))}
@@ -135,78 +108,126 @@ const CommentItem = ({
 	);
 };
 
-const ReplyForm = ({
-	onSubmit,
-	onCancel,
-}: {
-	onSubmit: (content: string) => void;
-	onCancel: () => void;
-}) => {
-	const [content, setContent] = useState("");
-
-	const handleSubmit = () => {
-		if (content.trim()) {
-			onSubmit(content);
-			setContent("");
-		}
-	};
-
-	return (
-		<VStack
-			align="stretch"
-			spacing={2}>
-			<Textarea
-				placeholder="Viết phản hồi..."
-				size="sm"
-				value={content}
-				onChange={(e) => setContent(e.target.value)}
-				resize="none"
-				rows={2}
-			/>
-			<HStack justify="flex-end">
-				<Button
-					size="sm"
-					variant="ghost"
-					onClick={onCancel}>
-					Hủy
-				</Button>
-				<Button
-					size="sm"
-					colorScheme="blue"
-					onClick={handleSubmit}
-					isDisabled={!content.trim()}>
-					Gửi
-				</Button>
-			</HStack>
-		</VStack>
-	);
-};
-
 export const CommentSection = ({
 	postId,
-	comments,
-	onAddComment,
+	initialCount = 0,
+	onCommentAdded,
 }: CommentSectionProps) => {
 	const [newComment, setNewComment] = useState("");
 	const [showComments, setShowComments] = useState(false);
+	const [comments, setComments] = useState<Comment[]>([]);
+	const [isLoading, setIsLoading] = useState(false);
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	const [page, setPage] = useState(1);
+	const [hasMore, setHasMore] = useState(false);
+	const [totalComments, setTotalComments] = useState(initialCount);
 	const borderColor = useColorModeValue("gray.200", "gray.600");
+	const toast = useToast();
 
-	const handleSubmit = () => {
-		if (newComment.trim()) {
-			onAddComment(newComment);
-			setNewComment("");
+	// Fetch comments when expanding the section
+	const fetchComments = async (pageNum: number = 1) => {
+		if (!postId) return;
+
+		try {
+			setIsLoading(true);
+			const response = await communityService.getComments(postId, {
+				page: pageNum,
+				limit: 10,
+				sortBy: "createdAt",
+				order: "asc",
+			});
+
+			if (response.success) {
+				if (pageNum === 1) {
+					setComments(response.data.comments);
+				} else {
+					setComments((prev) => [...prev, ...response.data.comments]);
+				}
+				setTotalComments(response.data.pagination.total);
+				setHasMore(
+					response.data.pagination.page < response.data.pagination.totalPages
+				);
+				setPage(pageNum);
+			}
+		} catch (error) {
+			console.error("Error fetching comments:", error);
+			toast({
+				title: "Lỗi",
+				description: "Không thể tải bình luận",
+				status: "error",
+				duration: 3000,
+				isClosable: true,
+			});
+		} finally {
+			setIsLoading(false);
 		}
 	};
 
-	const handleReply = (parentCommentId: string) => {
-		// This will be handled by the ReplyForm component
+	const handleToggleComments = () => {
+		if (!showComments && comments.length === 0) {
+			fetchComments(1);
+		}
+		setShowComments(!showComments);
+	};
+
+	const handleSubmit = async () => {
+		if (!newComment.trim() || !postId) return;
+
+		try {
+			setIsSubmitting(true);
+			const response = await communityService.createComment({
+				post: postId,
+				content: {
+					text: newComment.trim(),
+					media: [],
+				},
+				visibility: "public",
+			});
+
+			if (response.success) {
+				toast({
+					title: "Thành công",
+					description: "Đã thêm bình luận",
+					status: "success",
+					duration: 2000,
+					isClosable: true,
+				});
+
+				setNewComment("");
+				// Refresh comments
+				await fetchComments(1);
+
+				// Notify parent component
+				if (onCommentAdded) {
+					onCommentAdded();
+				}
+			}
+		} catch (error) {
+			console.error("Error creating comment:", error);
+			toast({
+				title: "Lỗi",
+				description: "Không thể thêm bình luận",
+				status: "error",
+				duration: 3000,
+				isClosable: true,
+			});
+		} finally {
+			setIsSubmitting(false);
+		}
+	};
+
+	const handleLoadMore = () => {
+		if (!isLoading && hasMore) {
+			fetchComments(page + 1);
+		}
 	};
 
 	return (
 		<Box
 			borderTop="1px"
 			borderColor={borderColor}
-			pt={3}>
+			pt={3}
+			onClick={(e) => e.stopPropagation()}>
 			{/* Comment Count & Toggle */}
 			<Flex
 				justify="space-between"
@@ -217,8 +238,8 @@ export const CommentSection = ({
 					size="sm"
 					variant="ghost"
 					leftIcon={<FiMessageCircle />}
-					onClick={() => setShowComments(!showComments)}>
-					{comments.length} bình luận
+					onClick={handleToggleComments}>
+					{totalComments} bình luận
 				</Button>
 			</Flex>
 
@@ -230,23 +251,6 @@ export const CommentSection = ({
 					spacing={4}
 					px={4}
 					pb={3}>
-					{/* Comments List */}
-					{comments.length > 0 && (
-						<VStack
-							align="stretch"
-							spacing={3}
-							maxH="400px"
-							overflowY="auto">
-							{comments.map((comment) => (
-								<CommentItem
-									key={comment.id}
-									comment={comment}
-									onReply={handleReply}
-								/>
-							))}
-						</VStack>
-					)}
-
 					{/* Add Comment Form */}
 					<HStack
 						align="start"
@@ -274,12 +278,50 @@ export const CommentSection = ({
 									colorScheme="blue"
 									rightIcon={<FiSend />}
 									onClick={handleSubmit}
-									isDisabled={!newComment.trim()}>
+									isDisabled={!newComment.trim()}
+									isLoading={isSubmitting}>
 									Bình luận
 								</Button>
 							</Flex>
 						</VStack>
 					</HStack>
+
+					{/* Comments List */}
+					{isLoading && comments.length === 0 ? (
+						<Center py={4}>
+							<Spinner size="md" color="blue.500" />
+						</Center>
+					) : comments.length > 0 ? (
+						<VStack
+							align="stretch"
+							spacing={3}>
+							{comments.map((comment) => (
+								<CommentItem
+									key={comment._id}
+									comment={comment}
+								/>
+							))}
+
+							{/* Load More Button */}
+							{hasMore && (
+								<Center>
+									<Button
+										size="sm"
+										variant="ghost"
+										onClick={handleLoadMore}
+										isLoading={isLoading}>
+										Xem thêm bình luận
+									</Button>
+								</Center>
+							)}
+						</VStack>
+					) : (
+						<Center py={4}>
+							<Text fontSize="sm" color="gray.500">
+								Chưa có bình luận nào
+							</Text>
+						</Center>
+					)}
 				</VStack>
 			</Collapse>
 		</Box>

@@ -7,14 +7,23 @@ export interface Reaction {
 }
 
 export interface Comment {
-	id: string;
+	_id: string;
+	post: string;
 	author: {
-		id: string;
+		_id: string;
 		name: string;
 		avatar?: string;
+		email?: string;
 	};
-	content: string;
+	content: {
+		text: string;
+		media: string[];
+	};
+	visibility: string;
 	createdAt: string;
+	updatedAt: string;
+	// For UI compatibility
+	id?: string;
 	replies?: Comment[];
 }
 
@@ -59,9 +68,38 @@ export interface CreatePostData {
 }
 
 export interface CreateCommentData {
-	postId: string;
-	content: string;
-	parentCommentId?: string;
+	post: string;
+	content: {
+		text: string;
+		media?: string[];
+	};
+	visibility?: "public" | "private" | "friends";
+}
+
+export interface GetCommentsParams {
+	page?: number;
+	limit?: number;
+	sortBy?: string;
+	order?: "asc" | "desc";
+}
+
+export interface CommentsResponse {
+	success: boolean;
+	data: {
+		comments: Comment[];
+		pagination: {
+			page: number;
+			limit: number;
+			total: number;
+			totalPages: number;
+		};
+	};
+}
+
+export interface CreateCommentResponse {
+	success: boolean;
+	message: string;
+	data: Comment;
 }
 
 // API Request/Response types
