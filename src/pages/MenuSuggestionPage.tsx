@@ -834,6 +834,7 @@ const MenuSuggestionPage = () => {
 				isOpen={isOpen}
 				onClose={onClose}
 				recipe={selectedRecipe}
+				showSaveButton={true}
 			/>
 		</MainLayout>
 	);

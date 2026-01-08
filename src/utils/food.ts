@@ -35,6 +35,7 @@ export const convertFoodToRecipe = (food: Food): Recipe => {
 		cookingTime: "Varies", // API doesn't provide cooking time
 		servingSize: "1 serving", // API doesn't provide serving size
 		image: getDefaultImageForCategory(food.category),
+		foodCategory: food.category, // Food category from API
 		category: food.meal || getCategoryFromMealType(food.category),
 		difficulty: "medium" as const,
 		nutrition: {
@@ -201,6 +202,7 @@ const createDefaultRecipe = (
 		cookingTime: "N/A",
 		servingSize: "N/A",
 		image: getDefaultImageForCategory(mealType),
+		foodCategory: "grains", // Default food category
 		category: mealType,
 		difficulty: "easy",
 		nutrition: {
