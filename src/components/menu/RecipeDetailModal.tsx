@@ -27,7 +27,6 @@ import {
 	Stack,
 	Button,
 	useDisclosure,
-	useToast,
 } from "@chakra-ui/react";
 import { FiClock, FiUsers, FiBookmark } from "react-icons/fi";
 import { CheckCircleIcon } from "@chakra-ui/icons";
@@ -53,7 +52,6 @@ const RecipeDetailModal = ({
 }: RecipeDetailModalProps) => {
 	const cardBg = useColorModeValue("white", "gray.800");
 	const borderColor = useColorModeValue("gray.200", "gray.600");
-	const toast = useToast();
 
 	const {
 		isOpen: isFormOpen,
@@ -72,31 +70,22 @@ const RecipeDetailModal = ({
 		onFormOpen();
 	};
 
+	const handleFormClose = () => {
+		// Đóng RecipeFormModal
+		onFormClose();
+		setEditingRecipe(null);
+		setIsSaving(false);
+	};
+
 	const handleSaveRecipe = async (recipeData: RecipeFormData) => {
 		try {
 			setIsSaving(true);
 			await addRecipe(recipeData);
-
-			toast({
-				title: "Recipe saved!",
-				description: `${recipeData.title} has been added to your recipes.`,
-				status: "success",
-				duration: 3000,
-				isClosable: true,
-				position: "top",
-			});
-
-			onFormClose();
+			// Toast sẽ được hiển thị bởi RecipeFormModal, không cần hiển thị ở đây nữa
+			handleFormClose();
 		} catch (error) {
 			console.error("Error saving recipe:", error);
-			toast({
-				title: "Error saving recipe",
-				description: "Failed to save recipe. Please try again.",
-				status: "error",
-				duration: 3000,
-				isClosable: true,
-				position: "top",
-			});
+			// Toast lỗi sẽ được hiển thị bởi RecipeFormModal
 		} finally {
 			setIsSaving(false);
 		}
@@ -112,20 +101,21 @@ const RecipeDetailModal = ({
 	const hasImage = recipe.image && !recipe.image.includes("unsplash.com");
 
 	return (
-		<Modal
-			isOpen={isOpen}
-			onClose={onClose}
-			size="6xl"
-			scrollBehavior="inside">
-			<ModalOverlay
-				bg="blackAlpha.600"
-				backdropFilter="blur(8px)"
-			/>
-			<ModalContent
-				bg={cardBg}
-				borderRadius="2xl"
-				maxH="90vh"
-				animation={animationPresets.fadeInUp}>
+		<>
+			<Modal
+				isOpen={isOpen && !isFormOpen}
+				onClose={onClose}
+				size="6xl"
+				scrollBehavior="inside">
+				<ModalOverlay
+					bg="blackAlpha.600"
+					backdropFilter="blur(8px)"
+				/>
+				<ModalContent
+					bg={cardBg}
+					borderRadius="2xl"
+					maxH="90vh"
+					animation={animationPresets.fadeInUp}>
 				<ModalHeader
 					borderBottom="1px"
 					borderColor={borderColor}
@@ -529,15 +519,16 @@ const RecipeDetailModal = ({
 					</ModalFooter>
 				)}
 			</ModalContent>
-
-			{/* Recipe Form Modal */}
-			<RecipeFormModal
-				isOpen={isFormOpen}
-				onClose={onFormClose}
-				onSave={handleSaveRecipe}
-				editingRecipe={editingRecipe}
-			/>
 		</Modal>
+
+		{/* Recipe Form Modal */}
+		<RecipeFormModal
+			isOpen={isFormOpen}
+			onClose={handleFormClose}
+			onSave={handleSaveRecipe}
+			editingRecipe={editingRecipe}
+		/>
+		</>
 	);
 };
 
