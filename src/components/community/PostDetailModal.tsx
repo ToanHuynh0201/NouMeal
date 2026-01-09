@@ -44,6 +44,7 @@ const PostDetailModal = ({ isOpen, onClose, postId }: PostDetailModalProps) => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [isLikeLoading, setIsLikeLoading] = useState(false);
 	const [selectedFood, setSelectedFood] = useState<Recipe | null>(null);
+	const [shouldReopenPostModal, setShouldReopenPostModal] = useState(false);
 	const {
 		isOpen: isRecipeOpen,
 		onOpen: onRecipeOpen,
@@ -142,10 +143,21 @@ const PostDetailModal = ({ isOpen, onClose, postId }: PostDetailModalProps) => {
 			// Convert sang Recipe format
 			const recipe = convertFoodApiToRecipe(foodData);
 			setSelectedFood(recipe);
+
+			// Đánh dấu rằng cần mở lại PostDetailModal sau khi đóng RecipeDetailModal
+			setShouldReopenPostModal(true);
 			onRecipeOpen();
 		} catch (error) {
 			console.error("Error fetching food details:", error);
 		}
+	};
+
+	const handleRecipeClose = () => {
+		// Đóng RecipeDetailModal
+		onRecipeClose();
+		setSelectedFood(null);
+		// Reset flag
+		setShouldReopenPostModal(false);
 	};
 
 	const formatDate = (dateString: string) => {
@@ -162,13 +174,14 @@ const PostDetailModal = ({ isOpen, onClose, postId }: PostDetailModalProps) => {
 	};
 
 	return (
-		<Modal
-			isOpen={isOpen}
-			onClose={onClose}
-			size="3xl"
-			scrollBehavior="inside">
-			<ModalOverlay backdropFilter="blur(4px)" />
-			<ModalContent>
+		<>
+			<Modal
+				isOpen={isOpen && !isRecipeOpen}
+				onClose={onClose}
+				size="3xl"
+				scrollBehavior="inside">
+				<ModalOverlay backdropFilter="blur(4px)" />
+				<ModalContent>
 				<ModalHeader>Chi tiết bài viết</ModalHeader>
 				<ModalCloseButton />
 
@@ -512,17 +525,18 @@ const PostDetailModal = ({ isOpen, onClose, postId }: PostDetailModalProps) => {
 					)}
 				</ModalBody>
 			</ModalContent>
-
-			{/* Recipe Detail Modal */}
-			{selectedFood && (
-				<RecipeDetailModal
-					isOpen={isRecipeOpen}
-					onClose={onRecipeClose}
-					recipe={selectedFood}
-					showSaveButton={true}
-				/>
-			)}
 		</Modal>
+
+		{/* Recipe Detail Modal */}
+		{selectedFood && (
+			<RecipeDetailModal
+				isOpen={isRecipeOpen}
+				onClose={handleRecipeClose}
+				recipe={selectedFood}
+				showSaveButton={true}
+			/>
+		)}
+		</>
 	);
 };
 
