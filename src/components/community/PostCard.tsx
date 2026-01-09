@@ -17,9 +17,8 @@ import {
 	useColorModeValue,
 	Icon,
 } from "@chakra-ui/react";
-import { FiThumbsUp, FiHeart } from "react-icons/fi";
-import { IoSparkles, IoStar } from "react-icons/io5";
-import type { Post, ReactionType } from "../../types/community";
+import { FiThumbsUp, FiMessageCircle } from "react-icons/fi";
+import type { Post } from "../../types/community";
 import { communityService } from "../../services/communityService";
 import { CommentSection } from "./CommentSection";
 import { ROUTES } from "@/constants";
@@ -30,20 +29,15 @@ interface PostCardProps {
 	onPostClick?: (postId: string) => void;
 }
 
-const reactionIcons: Record<
-	ReactionType,
-	{ icon: any; label: string; colorScheme: string }
-> = {
-	like: { icon: FiThumbsUp, label: "Thích", colorScheme: "blue" },
-	love: { icon: FiHeart, label: "Yêu thích", colorScheme: "red" },
-	delicious: { icon: IoSparkles, label: "Ngon", colorScheme: "orange" },
-	wow: { icon: IoStar, label: "Tuyệt vời", colorScheme: "yellow" },
-};
-
-export const PostCard = ({ post, onReactionUpdate, onPostClick }: PostCardProps) => {
+export const PostCard = ({
+	post,
+	onReactionUpdate,
+	onPostClick,
+}: PostCardProps) => {
 	const navigate = useNavigate();
 	const [isLoading, setIsLoading] = useState(false);
 	const [currentPost, setCurrentPost] = useState(post);
+	const [showComments, setShowComments] = useState(false);
 
 	const bgColor = useColorModeValue("white", "gray.800");
 	const borderColor = useColorModeValue("gray.200", "gray.600");
@@ -90,7 +84,8 @@ export const PostCard = ({ post, onReactionUpdate, onPostClick }: PostCardProps)
 			...currentPost,
 			engagement: {
 				...currentPost.engagement,
-				comments_count: (currentPost.engagement?.comments_count || 0) + 1,
+				comments_count:
+					(currentPost.engagement?.comments_count || 0) + 1,
 			},
 		};
 		setCurrentPost(updatedPost);
@@ -100,7 +95,7 @@ export const PostCard = ({ post, onReactionUpdate, onPostClick }: PostCardProps)
 	const handleNavigateToUserPosts = (e: React.MouseEvent) => {
 		e.stopPropagation();
 		const userId = currentPost.author._id;
-		const userPostsPath = ROUTES.USER_POSTS.replace(':userId', userId);
+		const userPostsPath = ROUTES.USER_POSTS.replace(":userId", userId);
 		navigate(userPostsPath);
 	};
 
@@ -108,8 +103,8 @@ export const PostCard = ({ post, onReactionUpdate, onPostClick }: PostCardProps)
 		// Prevent navigation if clicking on interactive elements
 		const target = e.target as HTMLElement;
 		if (
-			target.closest('button') ||
-			target.closest('a') ||
+			target.closest("button") ||
+			target.closest("a") ||
 			target.closest('[role="button"]')
 		) {
 			return;
@@ -176,7 +171,10 @@ export const PostCard = ({ post, onReactionUpdate, onPostClick }: PostCardProps)
 						color={textColor}
 						cursor="pointer"
 						onClick={handleNavigateToUserPosts}
-						_hover={{ color: "blue.500", textDecoration: "underline" }}
+						_hover={{
+							color: "blue.500",
+							textDecoration: "underline",
+						}}
 						transition="all 0.2s">
 						{currentPost.author.name}
 					</Text>
@@ -335,7 +333,7 @@ export const PostCard = ({ post, onReactionUpdate, onPostClick }: PostCardProps)
 				</HStack>
 			</Box>
 
-			{/* Like Button */}
+			{/* Action Buttons */}
 			<Box
 				px={4}
 				py={3}
@@ -352,14 +350,38 @@ export const PostCard = ({ post, onReactionUpdate, onPostClick }: PostCardProps)
 							<Icon
 								as={FiThumbsUp}
 								boxSize={5}
-								color={currentPost.is_liked ? "blue.500" : undefined}
+								color={
+									currentPost.is_liked
+										? "blue.500"
+										: undefined
+								}
 							/>
 						}
 						onClick={handleLike}
 						isDisabled={isLoading}
 						_hover={{ transform: "scale(1.05)" }}
-						transition="all 0.2s">
+						transition="all 0.2s"
+						flex={1}>
 						{currentPost.is_liked ? "Đã thích" : "Thích"}
+					</Button>
+					<Button
+						size="sm"
+						variant="ghost"
+						colorScheme="gray"
+						leftIcon={
+							<Icon
+								as={FiMessageCircle}
+								boxSize={5}
+							/>
+						}
+						onClick={(e) => {
+							e.stopPropagation();
+							setShowComments(!showComments);
+						}}
+						_hover={{ transform: "scale(1.05)" }}
+						transition="all 0.2s"
+						flex={1}>
+						Bình luận
 					</Button>
 				</HStack>
 			</Box>
@@ -369,6 +391,8 @@ export const PostCard = ({ post, onReactionUpdate, onPostClick }: PostCardProps)
 				postId={currentPost._id}
 				initialCount={currentPost.engagement?.comments_count || 0}
 				onCommentAdded={handleCommentAdded}
+				showComments={showComments}
+				onToggleComments={setShowComments}
 			/>
 		</Box>
 	);

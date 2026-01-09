@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
 	Box,
 	Button,
@@ -17,11 +18,14 @@ import {
 import { FiSend, FiMessageCircle } from "react-icons/fi";
 import type { Comment } from "../../types/community";
 import { communityService } from "../../services/communityService";
+import { ROUTES } from "@/constants";
 
 interface CommentSectionProps {
 	postId: string;
 	initialCount?: number;
 	onCommentAdded?: () => void;
+	showComments?: boolean;
+	onToggleComments?: (show: boolean) => void;
 }
 
 const CommentItem = ({
@@ -31,6 +35,7 @@ const CommentItem = ({
 	comment: Comment;
 	level?: number;
 }) => {
+	const navigate = useNavigate();
 	const bgColor = useColorModeValue("gray.50", "gray.700");
 	const textColor = useColorModeValue("gray.800", "white");
 	const mutedTextColor = useColorModeValue("gray.600", "gray.400");
@@ -48,16 +53,29 @@ const CommentItem = ({
 		return date.toLocaleDateString("vi-VN");
 	};
 
+	const handleNavigateToUserPosts = (e: React.MouseEvent) => {
+		e.stopPropagation();
+		const userId = comment.author._id;
+		const userPostsPath = ROUTES.USER_POSTS.replace(":userId", userId);
+		navigate(userPostsPath);
+	};
+
 	return (
 		<Box ml={level > 0 ? 8 : 0}>
 			<Flex
 				gap={3}
-				mb={3}>
+				mb={3}
+				align="start">
 				<Avatar
 					size="sm"
 					name={comment.author.name}
 					src={comment.author.avatar}
 					bg="blue.500"
+					cursor="pointer"
+					onClick={handleNavigateToUserPosts}
+					_hover={{ opacity: 0.8, transform: "scale(1.05)" }}
+					transition="all 0.2s"
+					flexShrink={0}
 				/>
 				<VStack
 					align="start"
@@ -71,7 +89,15 @@ const CommentItem = ({
 						<Text
 							fontWeight="semibold"
 							fontSize="sm"
-							color={textColor}>
+							color={textColor}
+							cursor="pointer"
+							onClick={handleNavigateToUserPosts}
+							_hover={{
+								color: "blue.500",
+								textDecoration: "underline",
+							}}
+							transition="all 0.2s"
+							display="inline-block">
 							{comment.author.name}
 						</Text>
 						<Text
@@ -112,9 +138,11 @@ export const CommentSection = ({
 	postId,
 	initialCount = 0,
 	onCommentAdded,
+	showComments: externalShowComments,
+	onToggleComments,
 }: CommentSectionProps) => {
 	const [newComment, setNewComment] = useState("");
-	const [showComments, setShowComments] = useState(false);
+	const [internalShowComments, setInternalShowComments] = useState(false);
 	const [comments, setComments] = useState<Comment[]>([]);
 	const [isLoading, setIsLoading] = useState(false);
 	const [isSubmitting, setIsSubmitting] = useState(false);
@@ -123,6 +151,12 @@ export const CommentSection = ({
 	const [totalComments, setTotalComments] = useState(initialCount);
 	const borderColor = useColorModeValue("gray.200", "gray.600");
 	const toast = useToast();
+
+	// Use external showComments if provided, otherwise use internal state
+	const showComments =
+		externalShowComments !== undefined
+			? externalShowComments
+			: internalShowComments;
 
 	// Fetch comments when expanding the section
 	const fetchComments = async (pageNum: number = 1) => {
@@ -134,7 +168,7 @@ export const CommentSection = ({
 				page: pageNum,
 				limit: 10,
 				sortBy: "createdAt",
-				order: "asc",
+				order: "desc",
 			});
 
 			if (response.success) {
@@ -163,11 +197,22 @@ export const CommentSection = ({
 		}
 	};
 
+	// Fetch comments when showComments changes to true
+	useEffect(() => {
+		if (showComments && comments.length === 0) {
+			fetchComments(1);
+		}
+	}, [showComments]);
+
 	const handleToggleComments = () => {
 		if (!showComments && comments.length === 0) {
 			fetchComments(1);
 		}
-		setShowComments(!showComments);
+		if (onToggleComments) {
+			onToggleComments(!showComments);
+		} else {
+			setInternalShowComments(!showComments);
+		}
 	};
 
 	const handleSubmit = async () => {
@@ -224,25 +269,9 @@ export const CommentSection = ({
 
 	return (
 		<Box
-			borderTop="1px"
-			borderColor={borderColor}
-			pt={3}
-			onClick={(e) => e.stopPropagation()}>
-			{/* Comment Count & Toggle */}
-			<Flex
-				justify="space-between"
-				align="center"
-				mb={3}
-				px={4}>
-				<Button
-					size="sm"
-					variant="ghost"
-					leftIcon={<FiMessageCircle />}
-					onClick={handleToggleComments}>
-					{totalComments} bình luận
-				</Button>
-			</Flex>
-
+			onClick={(e) => e.stopPropagation()}
+			borderTop={showComments ? "1px" : "none"}
+			borderColor={borderColor}>
 			<Collapse
 				in={showComments}
 				animateOpacity>
@@ -250,7 +279,8 @@ export const CommentSection = ({
 					align="stretch"
 					spacing={4}
 					px={4}
-					pb={3}>
+					pb={3}
+					pt={3}>
 					{/* Add Comment Form */}
 					<HStack
 						align="start"
