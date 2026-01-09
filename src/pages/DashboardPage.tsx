@@ -59,7 +59,6 @@ function DashboardPage() {
 				setFoodLogsLoading(false);
 			}
 		};
-		console.log(user);
 
 		fetchTodayFoodLogs();
 	}, []);
@@ -375,11 +374,11 @@ function DashboardPage() {
 																fontSize="lg"
 																fontWeight="bold"
 																color="orange.600">
-																{
+																{Math.round(
 																	progressData
 																		.remaining
-																		.calories
-																}
+																		.calories,
+																)}
 															</Text>
 														</VStack>
 													</CardBody>

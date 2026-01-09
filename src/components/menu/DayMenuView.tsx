@@ -111,7 +111,8 @@ const DayMenuView = ({ dailyMenu, onRecipeClick, onLogFood, remainingMeals = [] 
 		return (
 			<VStack
 				align="stretch"
-				spacing={3}>
+				spacing={3}
+				h="full">
 				<HStack spacing={2}>
 					<Box
 						bg={bgColor}
@@ -153,7 +154,10 @@ const DayMenuView = ({ dailyMenu, onRecipeClick, onLogFood, remainingMeals = [] 
 					_hover={{
 						transform: "translateY(-6px)",
 						shadow: "xl",
-					}}>
+					}}
+					display="flex"
+					flexDirection="column"
+					h="full">
 					<Box
 						position="relative"
 						h="180px"
@@ -181,10 +185,11 @@ const DayMenuView = ({ dailyMenu, onRecipeClick, onLogFood, remainingMeals = [] 
 							{recipe.category}
 						</Badge>
 					</Box>
-					<CardBody p={4}>
+					<CardBody p={4} display="flex" flexDirection="column" flex={1}>
 						<VStack
 							align="start"
-							spacing={2.5}>
+							spacing={2.5}
+							flex={1}>
 							<Heading
 								size="sm"
 								noOfLines={2}
@@ -392,7 +397,10 @@ const DayMenuView = ({ dailyMenu, onRecipeClick, onLogFood, remainingMeals = [] 
 									_hover={{
 										transform: "translateY(-6px)",
 										shadow: "xl",
-									}}>
+									}}
+									display="flex"
+									flexDirection="column"
+									h="full">
 									<Box
 										position="relative"
 										h="180px"
@@ -420,10 +428,11 @@ const DayMenuView = ({ dailyMenu, onRecipeClick, onLogFood, remainingMeals = [] 
 											{snack.category}
 										</Badge>
 									</Box>
-									<CardBody p={4}>
+									<CardBody p={4} display="flex" flexDirection="column" flex={1}>
 										<VStack
 											align="start"
-											spacing={2.5}>
+											spacing={2.5}
+											flex={1}>
 											<Heading
 												size="sm"
 												noOfLines={2}

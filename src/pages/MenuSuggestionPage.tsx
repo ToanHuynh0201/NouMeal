@@ -57,8 +57,11 @@ const MenuSuggestionPage = () => {
 		useDailyCalorieNeeds();
 
 	// Fetch today's progress
-	const { data: progressData, isLoading: isLoadingProgress } =
-		useTodayProgress();
+	const {
+		data: progressData,
+		isLoading: isLoadingProgress,
+		refetch: refetchProgress,
+	} = useTodayProgress();
 
 	// State for food recommendations
 	const [recommendations, setRecommendations] =
@@ -133,7 +136,7 @@ const MenuSuggestionPage = () => {
 
 		if (result.success) {
 			// Refresh today's progress after logging food
-			window.location.reload();
+			await refetchProgress();
 		} else {
 			throw new Error(result.error || "Failed to log food");
 		}

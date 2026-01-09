@@ -35,7 +35,6 @@ export const useMyRecipes = () => {
 
 	// Convert Food API response to Recipe type
 	const convertFoodToRecipe = useCallback((food: Food): Recipe => {
-		console.log("Converting food to recipe:", food);
 		return {
 			id: food._id,
 			title: food.name,
@@ -103,21 +102,17 @@ export const useMyRecipes = () => {
 			try {
 				setIsLoading(true);
 				const response = await foodService.getUserFoods(page, 10);
-				console.log("API Response:", response);
-
 				if (response.success) {
 					const foods = response.data;
 					const convertedRecipes = foods.map(convertFoodToRecipe);
 
 					setRecipes(convertedRecipes);
-					console.log("Recipes state should be updated now");
 					// Note: API doesn't return meta info, so we'll calculate it
 					setCurrentPage(page);
 					setTotalPages(1);
 					setTotalItems(foods.length);
 				}
 			} catch (error) {
-				console.error("Error fetching recipes:", error);
 				toast({
 					title: "Error loading recipes",
 					description:
@@ -136,7 +131,6 @@ export const useMyRecipes = () => {
 
 	// Load recipes on mount
 	useEffect(() => {
-		console.log("useEffect triggered, fetching recipes");
 		fetchRecipes(currentPage);
 	}, []); // Only run on mount
 
@@ -146,7 +140,6 @@ export const useMyRecipes = () => {
 			try {
 				const foodRequest = convertRecipeToFoodRequest(recipeData);
 				const response = await foodService.createUserFood(foodRequest);
-				console.log(response);
 
 				if (response.success) {
 					const newRecipe = convertFoodToRecipe(response.data);
@@ -266,7 +259,6 @@ export const useMyRecipes = () => {
 
 	// Filter and sort recipes
 	const filteredAndSortedRecipes = useMemo(() => {
-		console.log("Filtering and sorting recipes. Current recipes:", recipes);
 		let result = [...recipes];
 
 		// Apply category filter
@@ -329,7 +321,6 @@ export const useMyRecipes = () => {
 			return sortOrder === "asc" ? comparison : -comparison;
 		});
 
-		console.log("Filtered and sorted recipes:", result);
 		return result;
 	}, [recipes, filters, sortBy, sortOrder]);
 
@@ -356,7 +347,6 @@ export const useMyRecipes = () => {
 
 	// Get statistics
 	const statistics = useMemo(() => {
-		console.log("Calculating statistics for recipes:", recipes);
 		const total = recipes.length;
 		const categories = {
 			breakfast: recipes.filter((r) => r.category === "breakfast").length,
@@ -385,7 +375,6 @@ export const useMyRecipes = () => {
 			difficulties,
 			avgCalories,
 		};
-		console.log("Statistics:", stats);
 		return stats;
 	}, [recipes]);
 
