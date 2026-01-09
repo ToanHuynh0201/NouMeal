@@ -252,4 +252,59 @@ export const communityService = {
 			throw error;
 		}
 	},
+
+	// Cập nhật comment - Call API thực
+	updateComment: async (
+		commentId: string,
+		content: { text: string; media: string[] },
+	): Promise<{ success: boolean; data: any }> => {
+		try {
+			const response = await api.put(`/comments/${commentId}`, {
+				content,
+			});
+			return response.data;
+		} catch (error) {
+			console.error("Error updating comment:", error);
+			throw error;
+		}
+	},
+
+	// Xóa comment - Call API thực
+	deleteComment: async (
+		commentId: string,
+	): Promise<{ success: boolean; message: string }> => {
+		try {
+			const response = await api.delete(`/comments/${commentId}`);
+			return response.data;
+		} catch (error) {
+			console.error("Error deleting comment:", error);
+			throw error;
+		}
+	},
+
+	// Like comment - Call API thực
+	likeComment: async (
+		commentId: string,
+	): Promise<{ success: boolean; data: { comment_id: string; likes_count: number; has_liked: boolean } }> => {
+		try {
+			const response = await api.post(`/comments/${commentId}/like`, {});
+			return response.data;
+		} catch (error) {
+			console.error("Error liking comment:", error);
+			throw error;
+		}
+	},
+
+	// Unlike comment - Call API thực
+	unlikeComment: async (
+		commentId: string,
+	): Promise<{ success: boolean; data: { comment_id: string; likes_count: number; has_liked: boolean } }> => {
+		try {
+			const response = await api.post(`/comments/${commentId}/unlike`, {});
+			return response.data;
+		} catch (error) {
+			console.error("Error unliking comment:", error);
+			throw error;
+		}
+	},
 };

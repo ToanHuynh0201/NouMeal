@@ -20,6 +20,8 @@ export interface Comment {
 		media: string[];
 	};
 	visibility: string;
+	likes_count?: number;
+	has_liked?: boolean;
 	createdAt: string;
 	updatedAt: string;
 	// For UI compatibility

@@ -14,11 +14,23 @@ import {
 	Spinner,
 	Center,
 	useToast,
+	IconButton,
+	Menu,
+	MenuButton,
+	MenuList,
+	MenuItem,
 } from "@chakra-ui/react";
-import { FiSend, FiMessageCircle } from "react-icons/fi";
+import {
+	FiSend,
+	FiMoreVertical,
+	FiEdit2,
+	FiTrash2,
+	FiThumbsUp,
+} from "react-icons/fi";
 import type { Comment } from "../../types/community";
 import { communityService } from "../../services/communityService";
-import { ROUTES } from "@/constants";
+import { ROUTES, AUTH_CONFIG } from "@/constants";
+import { getStorageItem } from "@/utils";
 
 interface CommentSectionProps {
 	postId: string;
@@ -31,14 +43,28 @@ interface CommentSectionProps {
 const CommentItem = ({
 	comment,
 	level = 0,
+	onEdit,
+	onDelete,
+	onLike,
 }: {
 	comment: Comment;
 	level?: number;
+	onEdit?: (commentId: string, newText: string) => void;
+	onDelete?: (commentId: string) => void;
+	onLike?: (commentId: string, isLiked: boolean) => void;
 }) => {
 	const navigate = useNavigate();
+	const [isEditing, setIsEditing] = useState(false);
+	const [editText, setEditText] = useState(comment.content.text);
+	const [localComment, setLocalComment] = useState(comment);
 	const bgColor = useColorModeValue("gray.50", "gray.700");
 	const textColor = useColorModeValue("gray.800", "white");
 	const mutedTextColor = useColorModeValue("gray.600", "gray.400");
+	const toast = useToast();
+
+	// Get current user
+	const currentUser = getStorageItem(AUTH_CONFIG.USER_STORAGE_KEY);
+	const isOwner = currentUser && currentUser._id === comment.author._id;
 
 	const formatDate = (dateString: string) => {
 		const date = new Date(dateString);
@@ -59,6 +85,45 @@ const CommentItem = ({
 		const userPostsPath = ROUTES.USER_POSTS.replace(":userId", userId);
 		navigate(userPostsPath);
 	};
+
+	const handleEditClick = () => {
+		setIsEditing(true);
+		setEditText(comment.content.text);
+	};
+
+	const handleCancelEdit = () => {
+		setIsEditing(false);
+		setEditText(comment.content.text);
+	};
+
+	const handleSaveEdit = () => {
+		if (!editText.trim()) {
+			toast({
+				title: "Lỗi",
+				description: "Nội dung bình luận không được để trống",
+				status: "error",
+				duration: 2000,
+				isClosable: true,
+			});
+			return;
+		}
+		onEdit?.(comment._id, editText.trim());
+		setIsEditing(false);
+	};
+
+	const handleDeleteClick = () => {
+		onDelete?.(comment._id);
+	};
+
+	const handleLikeClick = () => {
+		const isLiked = localComment.has_liked || false;
+		onLike?.(comment._id, isLiked);
+	};
+
+	// Update local comment when parent comment changes
+	useEffect(() => {
+		setLocalComment(comment);
+	}, [comment]);
 
 	return (
 		<Box ml={level > 0 ? 8 : 0}>
@@ -85,33 +150,105 @@ const CommentItem = ({
 						bg={bgColor}
 						p={3}
 						borderRadius="lg"
-						w="full">
-						<Text
-							fontWeight="semibold"
-							fontSize="sm"
-							color={textColor}
-							cursor="pointer"
-							onClick={handleNavigateToUserPosts}
-							_hover={{
-								color: "blue.500",
-								textDecoration: "underline",
-							}}
-							transition="all 0.2s"
-							display="inline-block">
-							{comment.author.name}
-						</Text>
-						<Text
-							fontSize="sm"
-							color={textColor}
-							mt={1}>
-							{comment.content.text}
-						</Text>
+						w="full"
+						position="relative">
+						<Flex
+							justify="space-between"
+							align="start"
+							mb={isEditing ? 0 : 1}>
+							<Text
+								fontWeight="semibold"
+								fontSize="sm"
+								color={textColor}
+								cursor="pointer"
+								onClick={handleNavigateToUserPosts}
+								_hover={{
+									color: "blue.500",
+									textDecoration: "underline",
+								}}
+								transition="all 0.2s"
+								display="inline-block">
+								{comment.author.name}
+							</Text>
+							{isOwner && !isEditing && (
+								<Menu>
+									<MenuButton
+										as={IconButton}
+										icon={<FiMoreVertical />}
+										variant="ghost"
+										size="xs"
+										aria-label="Options"
+									/>
+									<MenuList>
+										<MenuItem
+											icon={<FiEdit2 />}
+											onClick={handleEditClick}>
+											Chỉnh sửa
+										</MenuItem>
+										<MenuItem
+											icon={<FiTrash2 />}
+											onClick={handleDeleteClick}
+											color="red.500">
+											Xóa
+										</MenuItem>
+									</MenuList>
+								</Menu>
+							)}
+						</Flex>
+						{isEditing ? (
+							<VStack
+								spacing={2}
+								align="stretch"
+								mt={2}>
+								<Textarea
+									value={editText}
+									onChange={(e) =>
+										setEditText(e.target.value)
+									}
+									size="sm"
+									resize="none"
+									rows={2}
+								/>
+								<HStack justify="flex-end">
+									<Button
+										size="xs"
+										variant="ghost"
+										onClick={handleCancelEdit}>
+										Hủy
+									</Button>
+									<Button
+										size="xs"
+										colorScheme="blue"
+										onClick={handleSaveEdit}>
+										Lưu
+									</Button>
+								</HStack>
+							</VStack>
+						) : (
+							<Text
+								fontSize="sm"
+								color={textColor}>
+								{comment.content.text}
+							</Text>
+						)}
 					</Box>
 					<HStack
 						fontSize="xs"
 						color={mutedTextColor}
 						spacing={3}>
-						<Text>{formatDate(comment.createdAt)}</Text>
+						<Text>{formatDate(localComment.createdAt)}</Text>
+						<Button
+							size="xs"
+							variant="ghost"
+							leftIcon={<FiThumbsUp />}
+							onClick={handleLikeClick}
+							colorScheme={
+								localComment.has_liked ? "blue" : "gray"
+							}
+							_hover={{ transform: "scale(1.05)" }}
+							transition="all 0.2s">
+							{localComment.likes_count || 0}
+						</Button>
 					</HStack>
 				</VStack>
 			</Flex>
@@ -126,6 +263,9 @@ const CommentItem = ({
 							key={reply._id}
 							comment={reply}
 							level={level + 1}
+							onEdit={onEdit}
+							onDelete={onDelete}
+							onLike={onLike}
 						/>
 					))}
 				</VStack>
@@ -179,7 +319,8 @@ export const CommentSection = ({
 				}
 				setTotalComments(response.data.pagination.total);
 				setHasMore(
-					response.data.pagination.page < response.data.pagination.totalPages
+					response.data.pagination.page <
+						response.data.pagination.totalPages,
 				);
 				setPage(pageNum);
 			}
@@ -261,6 +402,118 @@ export const CommentSection = ({
 		}
 	};
 
+	const handleEditComment = async (commentId: string, newText: string) => {
+		try {
+			const response = await communityService.updateComment(commentId, {
+				text: newText,
+				media: [],
+			});
+
+			if (response.success) {
+				toast({
+					title: "Thành công",
+					description: "Đã cập nhật bình luận",
+					status: "success",
+					duration: 2000,
+					isClosable: true,
+				});
+
+				// Update comment in local state
+				setComments((prev) =>
+					prev.map((comment) =>
+						comment._id === commentId
+							? {
+									...comment,
+									content: {
+										...comment.content,
+										text: newText,
+									},
+							  }
+							: comment,
+					),
+				);
+			}
+		} catch (error) {
+			console.error("Error updating comment:", error);
+			toast({
+				title: "Lỗi",
+				description: "Không thể cập nhật bình luận",
+				status: "error",
+				duration: 3000,
+				isClosable: true,
+			});
+		}
+	};
+
+	const handleDeleteComment = async (commentId: string) => {
+		try {
+			const response = await communityService.deleteComment(commentId);
+
+			if (response.success) {
+				toast({
+					title: "Thành công",
+					description: "Đã xóa bình luận",
+					status: "success",
+					duration: 2000,
+					isClosable: true,
+				});
+
+				// Remove comment from local state
+				setComments((prev) =>
+					prev.filter((comment) => comment._id !== commentId),
+				);
+				setTotalComments((prev) => prev - 1);
+
+				// Notify parent component to update comment count
+				if (onCommentAdded) {
+					// This will trigger a re-fetch or decrement in parent
+					onCommentAdded();
+				}
+			}
+		} catch (error) {
+			console.error("Error deleting comment:", error);
+			toast({
+				title: "Lỗi",
+				description: "Không thể xóa bình luận",
+				status: "error",
+				duration: 3000,
+				isClosable: true,
+			});
+		}
+	};
+
+	const handleLikeComment = async (commentId: string, isLiked: boolean) => {
+		try {
+			const response = isLiked
+				? await communityService.unlikeComment(commentId)
+				: await communityService.likeComment(commentId);
+
+			if (response.success) {
+				// Update comment in local state
+				setComments((prev) =>
+					prev.map((comment) =>
+						comment._id === commentId
+							? {
+									...comment,
+									likes_count: response.data.likes_count,
+									has_liked: response.data.has_liked,
+							  }
+							: comment,
+					),
+				);
+			}
+		} catch (error) {
+			console.error("Error liking/unliking comment:", error);
+			toast({
+				title: "Lỗi",
+				description: "Không thể thực hiện thao tác",
+				status: "error",
+				duration: 2000,
+				isClosable: true,
+			});
+		}
+	};
+
 	const handleLoadMore = () => {
 		if (!isLoading && hasMore) {
 			fetchComments(page + 1);
@@ -319,7 +572,10 @@ export const CommentSection = ({
 					{/* Comments List */}
 					{isLoading && comments.length === 0 ? (
 						<Center py={4}>
-							<Spinner size="md" color="blue.500" />
+							<Spinner
+								size="md"
+								color="blue.500"
+							/>
 						</Center>
 					) : comments.length > 0 ? (
 						<VStack
@@ -329,6 +585,9 @@ export const CommentSection = ({
 								<CommentItem
 									key={comment._id}
 									comment={comment}
+									onEdit={handleEditComment}
+									onDelete={handleDeleteComment}
+									onLike={handleLikeComment}
 								/>
 							))}
 
@@ -347,7 +606,9 @@ export const CommentSection = ({
 						</VStack>
 					) : (
 						<Center py={4}>
-							<Text fontSize="sm" color="gray.500">
+							<Text
+								fontSize="sm"
+								color="gray.500">
 								Chưa có bình luận nào
 							</Text>
 						</Center>
