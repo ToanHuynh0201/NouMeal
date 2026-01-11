@@ -12,6 +12,12 @@ import axios, { type AxiosInstance } from "axios";
 class ApiService {
 	private baseUrl: string;
 	private api: AxiosInstance;
+	private isRefreshing: boolean = false;
+	private failedQueue: Array<{
+		resolve: (value?: any) => void;
+		reject: (reason?: any) => void;
+	}> = [];
+
 	constructor(customBaseUrl = null) {
 		this.baseUrl = customBaseUrl || API_CONFIG.BASE_URL;
 		this.api = this._createAxiosInstance();
@@ -73,6 +79,12 @@ class ApiService {
 			async (error: any) => {
 				const parsedError = parseError(error);
 
+				console.log("🔍 Response error:", {
+					url: error.config?.url,
+					status: parsedError.status,
+					message: parsedError.message,
+				});
+
 				// Don't trigger logout for login endpoint errors
 				if (this._isLoginEndpoint(error.config?.url)) {
 					logError(parsedError, { context: "api.response" });
@@ -81,14 +93,19 @@ class ApiService {
 
 				// Handle auth errors with token refresh attempt
 				if (shouldLogout(parsedError)) {
+					console.log(
+						"🔐 Auth error detected, attempting refresh...",
+					);
 					const refreshResult = await this._handleAuthError(
 						error,
 						parsedError,
 					);
 					if (refreshResult) {
+						console.log("✅ Request retry successful");
 						return refreshResult;
 					}
-					this._handleLogout();
+					console.log("❌ Refresh failed, logout handled");
+					// this._handleLogout();
 				}
 
 				logError(parsedError, { context: "api.response" });
@@ -104,7 +121,10 @@ class ApiService {
 	 * @returns {boolean} Whether URL is login endpoint
 	 */
 	_isLoginEndpoint(url: string) {
-		return url?.includes("/users/login");
+		return (
+			url?.includes("/users/login") ||
+			url?.includes("/auth/refresh-token")
+		);
 	}
 
 	/**
@@ -123,6 +143,22 @@ class ApiService {
 	}
 
 	/**
+	 * Process failed requests queue
+	 * @private
+	 */
+	_processQueue(error: any, token: string | null = null) {
+		this.failedQueue.forEach((prom) => {
+			if (error) {
+				prom.reject(error);
+			} else {
+				prom.resolve(token);
+			}
+		});
+
+		this.failedQueue = [];
+	}
+
+	/**
 	 * Attempt to refresh token and retry original request
 	 * @private
 	 * @param {Object} originalError - Original error object
@@ -132,9 +168,26 @@ class ApiService {
 		const refreshToken = getStorageItem(
 			AUTH_CONFIG.REFRESH_TOKEN_STORAGE_KEY,
 		);
+
 		if (!refreshToken) {
 			return false;
 		}
+
+		// If already refreshing, queue this request
+		if (this.isRefreshing) {
+			return new Promise((resolve, reject) => {
+				this.failedQueue.push({ resolve, reject });
+			})
+				.then((token) => {
+					originalError.config.headers.Authorization = `Bearer ${token}`;
+					return this.api(originalError.config);
+				})
+				.catch((err) => {
+					return Promise.reject(err);
+				});
+		}
+
+		this.isRefreshing = true;
 
 		try {
 			const refreshResponse = await this._performTokenRefresh(
@@ -154,10 +207,19 @@ class ApiService {
 					);
 				}
 
+				// Process queued requests
+				this._processQueue(null, accessToken);
+				this.isRefreshing = false;
+
 				return this._retryOriginalRequest(originalError, accessToken);
 			}
 		} catch (refreshError) {
+			this._processQueue(refreshError, null);
+			this.isRefreshing = false;
 			logError(parseError(refreshError), { context: "api.refresh" });
+
+			// Logout if refresh fails
+			// this._handleLogout();
 		}
 
 		return false;
@@ -170,9 +232,23 @@ class ApiService {
 	 * @returns {Promise<Object>} Refresh response
 	 */
 	async _performTokenRefresh(refreshToken: any) {
-		return axios.post(`${API_CONFIG.BASE_URL}/auth/refresh-token`, {
-			refreshToken,
-		});
+		console.log("🔄 Attempting token refresh...");
+		try {
+			const response = await axios.post(
+				`${API_CONFIG.BASE_URL}/auth/refresh-token`,
+				{ refreshToken },
+				{
+					headers: {
+						"Content-Type": "application/json",
+					},
+				},
+			);
+			console.log("✅ Token refresh successful");
+			return response;
+		} catch (error) {
+			console.error("❌ Token refresh failed:", error);
+			throw error;
+		}
 	}
 
 	/**
@@ -185,7 +261,7 @@ class ApiService {
 	_retryOriginalRequest(originalError: any, accessToken: any) {
 		const originalRequest = originalError.config;
 		originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-		return axios(originalRequest);
+		return this.api(originalRequest);
 	}
 
 	/**
