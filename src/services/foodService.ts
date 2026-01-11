@@ -1,6 +1,9 @@
 import api from "@/lib/api";
 import { withErrorHandling } from "@/utils";
-import type { CreateFoodRequest } from "@/types/recipe";
+import type {
+	CreateFoodRequest,
+	CheckFoodAppropriateRequest,
+} from "@/types/recipe";
 
 class FoodService {
 	/**
@@ -67,6 +70,20 @@ class FoodService {
 			return await api.get("/foods/user", {
 				params: { page, limit },
 			});
+		},
+	);
+
+	/**
+	 * Check if a food is appropriate for the current user
+	 * @param {CheckFoodAppropriateRequest} foodData - Food data to check
+	 * @returns {Promise<CheckFoodAppropriateResponse>} Standardized response with isAppropriate flag
+	 */
+	checkFoodAppropriate = withErrorHandling(
+		async (foodData: CheckFoodAppropriateRequest) => {
+			const data = await api.post("/foods/check-appropriate", foodData);
+			console.log(data);
+
+			return await api.post("/foods/check-appropriate", foodData);
 		},
 	);
 

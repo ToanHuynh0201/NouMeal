@@ -111,6 +111,31 @@ export interface CreateUserFoodResponse {
 	data: Food;
 }
 
+export interface CheckFoodAppropriateRequest {
+	name: string;
+	description: string;
+	category: string;
+	meal: "breakfast" | "lunch" | "dinner" | "snack";
+	tags: DietaryPreferenceTag[];
+	allergens: string[];
+	instructions: FoodInstruction[];
+	nutritionalInfo: {
+		calories: number;
+		protein: number;
+		carbohydrates: number;
+		fat: number;
+	};
+}
+
+export interface CheckFoodAppropriateResponse {
+	success: boolean;
+	message: string;
+	data: {
+		isAppropriate: boolean;
+		userId: string;
+	};
+}
+
 export interface Recipe {
 	id: string;
 	title: string;

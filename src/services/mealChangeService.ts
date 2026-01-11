@@ -49,7 +49,6 @@ export class MealChangeService {
 	 * Check if it's a new day (different from last stored date)
 	 */
 	isNewDay(): boolean {
-		const todayKey = this.getTodayKey();
 		const allKeys = Object.keys(localStorage);
 		const changeKeys = allKeys.filter((key) =>
 			key.startsWith(STORAGE_KEY_PREFIX),
@@ -75,7 +74,8 @@ export class MealChangeService {
 		const allKeys = Object.keys(localStorage);
 		const oldKeys = allKeys.filter(
 			(key) =>
-				key.startsWith(STORAGE_KEY_PREFIX) && key !== this.getStorageKey(),
+				key.startsWith(STORAGE_KEY_PREFIX) &&
+				key !== this.getStorageKey(),
 		);
 
 		// Remove old change records (keep only today)

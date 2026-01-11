@@ -1,6 +1,11 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
 import { useToast } from "@chakra-ui/react";
-import type { Recipe, Food, CreateFoodRequest } from "@/types/recipe";
+import type {
+	Recipe,
+	Food,
+	CreateFoodRequest,
+	CheckFoodAppropriateRequest,
+} from "@/types/recipe";
 import type {
 	RecipeFormData,
 	RecipeFilters,
@@ -134,8 +139,54 @@ export const useMyRecipes = () => {
 		fetchRecipes(currentPage);
 	}, []); // Only run on mount
 
-	// Add new recipe
-	const addRecipe = useCallback(
+	// Convert RecipeFormData to CheckFoodAppropriateRequest
+	const convertRecipeToCheckRequest = useCallback(
+		(recipeData: RecipeFormData): CheckFoodAppropriateRequest => {
+			return {
+				name: recipeData.title,
+				description: recipeData.description,
+				category: recipeData.foodCategory,
+				meal: recipeData.category,
+				tags: recipeData.tags,
+				allergens: recipeData.allergens,
+				instructions: recipeData.instructions.map((desc, index) => ({
+					step: index + 1,
+					description: desc,
+				})),
+				nutritionalInfo: {
+					calories: recipeData.nutrition.calories,
+					protein: parseFloat(recipeData.nutrition.protein) || 0,
+					carbohydrates: parseFloat(recipeData.nutrition.carbs) || 0,
+					fat: parseFloat(recipeData.nutrition.fat) || 0,
+				},
+			};
+		},
+		[],
+	);
+
+	// Check if food is appropriate for user
+	const checkFoodAppropriate = useCallback(
+		async (recipeData: RecipeFormData): Promise<boolean> => {
+			try {
+				const checkRequest = convertRecipeToCheckRequest(recipeData);
+				const response = await foodService.checkFoodAppropriate(
+					checkRequest,
+				);
+
+				if (response.success) {
+					return response.data.isAppropriate;
+				}
+				return true; // If check fails, allow adding
+			} catch (error) {
+				console.error("Error checking food appropriateness:", error);
+				return true; // If check fails, allow adding
+			}
+		},
+		[convertRecipeToCheckRequest],
+	);
+
+	// Create recipe without check (used after user confirms warning)
+	const createRecipe = useCallback(
 		async (recipeData: RecipeFormData) => {
 			try {
 				const foodRequest = convertRecipeToFoodRequest(recipeData);
@@ -176,6 +227,15 @@ export const useMyRecipes = () => {
 			fetchRecipes,
 			currentPage,
 		],
+	);
+
+	// Add new recipe with appropriateness check
+	const addRecipe = useCallback(
+		async (recipeData: RecipeFormData) => {
+			const isAppropriate = await checkFoodAppropriate(recipeData);
+			return { isAppropriate, recipeData };
+		},
+		[checkFoodAppropriate],
 	);
 
 	// Update existing recipe
@@ -390,6 +450,7 @@ export const useMyRecipes = () => {
 		totalPages,
 		totalItems,
 		addRecipe,
+		createRecipe,
 		updateRecipe,
 		deleteRecipe,
 		getRecipeById,

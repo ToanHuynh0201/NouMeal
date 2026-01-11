@@ -43,6 +43,7 @@ import DeleteConfirmDialog from "@/components/myRecipes/DeleteConfirmDialog";
 import EmptyState from "@/components/myRecipes/EmptyState";
 import RecipeDetailModal from "@/components/menu/RecipeDetailModal";
 import CreatePostFromRecipeModal from "@/components/myRecipes/CreatePostFromRecipeModal";
+import { InappropriateFoodWarningModal } from "@/components/myRecipes/InappropriateFoodWarningModal";
 import { useMyRecipes } from "@/hooks/useMyRecipes";
 import useScrollAnimation from "@/hooks/useScrollAnimation";
 import type { Recipe } from "@/types/recipe";
@@ -55,6 +56,7 @@ const MyRecipesPage = () => {
 		statistics,
 		isLoading,
 		addRecipe,
+		createRecipe,
 		updateRecipe,
 		deleteRecipe,
 		updateFilters,
@@ -85,12 +87,20 @@ const MyRecipesPage = () => {
 		onOpen: onShareOpen,
 		onClose: onShareClose,
 	} = useDisclosure();
+	const {
+		isOpen: isWarningOpen,
+		onOpen: onWarningOpen,
+		onClose: onWarningClose,
+	} = useDisclosure();
 
 	// Selected recipe states
 	const [editingRecipe, setEditingRecipe] = useState<Recipe | null>(null);
 	const [deletingRecipe, setDeletingRecipe] = useState<Recipe | null>(null);
 	const [viewingRecipe, setViewingRecipe] = useState<Recipe | null>(null);
 	const [sharingRecipe, setSharingRecipe] = useState<Recipe | null>(null);
+	const [pendingRecipe, setPendingRecipe] = useState<RecipeFormData | null>(
+		null,
+	);
 
 	// Selection mode for creating menu posts
 	const [isSelectionMode, setIsSelectionMode] = useState(false);
@@ -154,12 +164,37 @@ const MyRecipesPage = () => {
 		}
 	};
 
-	const handleSaveRecipe = (recipeData: RecipeFormData) => {
+	const handleSaveRecipe = async (recipeData: RecipeFormData) => {
 		if (editingRecipe) {
+			// Update existing recipe - no need to check appropriateness
 			updateRecipe(editingRecipe.id, recipeData);
 		} else {
-			addRecipe(recipeData);
+			// Add new recipe - check if appropriate
+			const result = await addRecipe(recipeData);
+			console.log(result);
+
+			if (result.isAppropriate) {
+				// Food is appropriate, create directly
+				await createRecipe(recipeData);
+			} else {
+				// Food is not appropriate, show warning modal
+				setPendingRecipe(recipeData);
+				onWarningOpen();
+			}
 		}
+	};
+
+	const handleConfirmAddInappropriate = async () => {
+		if (pendingRecipe) {
+			await createRecipe(pendingRecipe);
+			setPendingRecipe(null);
+			onWarningClose();
+		}
+	};
+
+	const handleCancelAddInappropriate = () => {
+		setPendingRecipe(null);
+		onWarningClose();
 	};
 
 	const handleConfirmDelete = () => {
@@ -650,6 +685,13 @@ const MyRecipesPage = () => {
 				onClose={onShareClose}
 				recipes={selectedRecipes}
 				onSuccess={handleShareSuccess}
+			/>
+
+			<InappropriateFoodWarningModal
+				isOpen={isWarningOpen}
+				onClose={handleCancelAddInappropriate}
+				onConfirm={handleConfirmAddInappropriate}
+				foodName={pendingRecipe?.title || ""}
 			/>
 		</MainLayout>
 	);
