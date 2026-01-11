@@ -22,6 +22,7 @@ export interface Comment {
 	visibility: string;
 	likes_count?: number;
 	has_liked?: boolean;
+	replies_count?: number;
 	createdAt: string;
 	updatedAt: string;
 	// For UI compatibility
@@ -76,6 +77,7 @@ export interface CreateCommentData {
 		media?: string[];
 	};
 	visibility?: "public" | "private" | "friends";
+	parent_comment?: string; // ID of parent comment for replies
 }
 
 export interface GetCommentsParams {
@@ -94,6 +96,26 @@ export interface CommentsResponse {
 			limit: number;
 			total: number;
 			totalPages: number;
+		};
+	};
+}
+
+export interface GetRepliesParams {
+	page?: number;
+	limit?: number;
+	sortBy?: string;
+	order?: "asc" | "desc";
+}
+
+export interface RepliesResponse {
+	success: boolean;
+	data: {
+		replies: Comment[];
+		pagination: {
+			page: number;
+			limit: number;
+			total: number;
+			pages: number;
 		};
 	};
 }

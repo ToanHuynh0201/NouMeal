@@ -46,17 +46,28 @@ const CommentItem = ({
 	onEdit,
 	onDelete,
 	onLike,
+	onReply,
 }: {
 	comment: Comment;
 	level?: number;
 	onEdit?: (commentId: string, newText: string) => void;
 	onDelete?: (commentId: string) => void;
 	onLike?: (commentId: string, isLiked: boolean) => void;
+	onReply?: (parentCommentId: string, replyText: string) => Promise<void>;
 }) => {
 	const navigate = useNavigate();
 	const [isEditing, setIsEditing] = useState(false);
+	const [isReplying, setIsReplying] = useState(false);
+	const [showReplies, setShowReplies] = useState(false);
+	const [replies, setReplies] = useState<Comment[]>([]);
+	const [isLoadingReplies, setIsLoadingReplies] = useState(false);
+	const [hasLoadedReplies, setHasLoadedReplies] = useState(false);
+	const [replyPage, setReplyPage] = useState(1);
+	const [hasMoreReplies, setHasMoreReplies] = useState(false);
 	const [editText, setEditText] = useState(comment.content.text);
+	const [replyText, setReplyText] = useState("");
 	const [localComment, setLocalComment] = useState(comment);
+	const [isSubmittingReply, setIsSubmittingReply] = useState(false);
 	const bgColor = useColorModeValue("gray.50", "gray.700");
 	const textColor = useColorModeValue("gray.800", "white");
 	const mutedTextColor = useColorModeValue("gray.600", "gray.400");
@@ -118,6 +129,122 @@ const CommentItem = ({
 	const handleLikeClick = () => {
 		const isLiked = localComment.has_liked || false;
 		onLike?.(comment._id, isLiked);
+	};
+
+	const handleReplyClick = () => {
+		setIsReplying(true);
+	};
+
+	const handleCancelReply = () => {
+		setIsReplying(false);
+		setReplyText("");
+	};
+
+	const fetchReplies = async (pageNum: number = 1) => {
+		try {
+			setIsLoadingReplies(true);
+			const response = await communityService.getReplies(comment._id, {
+				page: pageNum,
+				limit: 10,
+				sortBy: "createdAt",
+				order: "asc",
+			});
+
+			if (response.success) {
+				if (pageNum === 1) {
+					setReplies(response.data.replies);
+				} else {
+					setReplies((prev) => [...prev, ...response.data.replies]);
+				}
+				setHasMoreReplies(
+					response.data.pagination.page <
+						response.data.pagination.pages,
+				);
+				setReplyPage(pageNum);
+				setHasLoadedReplies(true);
+			}
+		} catch (error) {
+			console.error("Error fetching replies:", error);
+			toast({
+				title: "Lỗi",
+				description: "Không thể tải phản hồi",
+				status: "error",
+				duration: 2000,
+				isClosable: true,
+			});
+		} finally {
+			setIsLoadingReplies(false);
+		}
+	};
+
+	const handleToggleReplies = () => {
+		const newShowReplies = !showReplies;
+		setShowReplies(newShowReplies);
+
+		// Fetch replies when showing them for the first time
+		if (
+			newShowReplies &&
+			!hasLoadedReplies &&
+			(localComment.replies_count || 0) > 0
+		) {
+			fetchReplies(1);
+		}
+	};
+
+	const handleLoadMoreReplies = () => {
+		if (!isLoadingReplies && hasMoreReplies) {
+			fetchReplies(replyPage + 1);
+		}
+	};
+
+	const handleSubmitReply = async () => {
+		if (!replyText.trim()) {
+			toast({
+				title: "Lỗi",
+				description: "Nội dung phản hồi không được để trống",
+				status: "error",
+				duration: 2000,
+				isClosable: true,
+			});
+			return;
+		}
+
+		try {
+			setIsSubmittingReply(true);
+			await onReply?.(comment._id, replyText.trim());
+			setReplyText("");
+			setIsReplying(false);
+
+			// Refresh replies after adding new one
+			if (showReplies) {
+				await fetchReplies(1);
+			}
+
+			// Update local comment replies_count
+			setLocalComment((prev) => ({
+				...prev,
+				replies_count: (prev.replies_count || 0) + 1,
+			}));
+
+			toast({
+				title: "Thành công",
+				description: "Đã thêm phản hồi",
+				status: "success",
+				duration: 2000,
+				isClosable: true,
+			});
+		} catch (error) {
+			console.error("Error submitting reply:", error);
+			toast({
+				title: "Lỗi",
+				description: "Không thể thêm phản hồi",
+				status: "error",
+				duration: 2000,
+				isClosable: true,
+			});
+		} finally {
+			setIsSubmittingReply(false);
+		}
 	};
 
 	// Update local comment when parent comment changes
@@ -249,26 +376,118 @@ const CommentItem = ({
 							transition="all 0.2s">
 							{localComment.likes_count || 0}
 						</Button>
+						{/* Only show Reply button on top-level comments (level 0) */}
+						{level === 0 && (
+							<Button
+								size="xs"
+								variant="ghost"
+								onClick={handleReplyClick}
+								_hover={{ color: "blue.500" }}
+								transition="all 0.2s">
+								Phản hồi
+							</Button>
+						)}
+						{/* Only show replies count on top-level comments */}
+						{level === 0 &&
+							(localComment.replies_count || 0) > 0 && (
+								<Button
+									size="xs"
+									variant="ghost"
+									onClick={handleToggleReplies}
+									isLoading={
+										isLoadingReplies && !hasLoadedReplies
+									}
+									_hover={{ color: "blue.500" }}
+									transition="all 0.2s">
+									{showReplies ? "Ẩn" : "Xem"}{" "}
+									{localComment.replies_count} phản hồi
+								</Button>
+							)}
 					</HStack>
+
+					{/* Reply Input Form */}
+					{isReplying && (
+						<Box
+							mt={2}
+							pl={4}
+							borderLeft="2px"
+							borderColor="blue.300">
+							<VStack
+								spacing={2}
+								align="stretch">
+								<Textarea
+									value={replyText}
+									onChange={(e) =>
+										setReplyText(e.target.value)
+									}
+									placeholder="Viết phản hồi..."
+									size="sm"
+									resize="none"
+									rows={2}
+								/>
+								<HStack justify="flex-end">
+									<Button
+										size="xs"
+										variant="ghost"
+										onClick={handleCancelReply}>
+										Hủy
+									</Button>
+									<Button
+										size="xs"
+										colorScheme="blue"
+										onClick={handleSubmitReply}
+										isLoading={isSubmittingReply}
+										isDisabled={!replyText.trim()}>
+										Gửi
+									</Button>
+								</HStack>
+							</VStack>
+						</Box>
+					)}
 				</VStack>
 			</Flex>
 
 			{/* Nested Replies */}
-			{comment.replies && comment.replies.length > 0 && (
-				<VStack
-					align="stretch"
-					spacing={2}>
-					{comment.replies.map((reply) => (
-						<CommentItem
-							key={reply._id}
-							comment={reply}
-							level={level + 1}
-							onEdit={onEdit}
-							onDelete={onDelete}
-							onLike={onLike}
-						/>
-					))}
-				</VStack>
+			{showReplies && (
+				<Box mt={2}>
+					{isLoadingReplies && replies.length === 0 ? (
+						<Center py={2}>
+							<Spinner
+								size="sm"
+								color="blue.500"
+							/>
+						</Center>
+					) : replies.length > 0 ? (
+						<VStack
+							align="stretch"
+							spacing={2}>
+							{replies.map((reply) => (
+								<CommentItem
+									key={reply._id}
+									comment={reply}
+									level={level + 1}
+									onEdit={onEdit}
+									onDelete={onDelete}
+									onLike={onLike}
+									onReply={onReply}
+								/>
+							))}
+
+							{/* Load More Replies Button */}
+							{hasMoreReplies && (
+								<Center>
+									<Button
+										size="xs"
+										variant="ghost"
+										onClick={handleLoadMoreReplies}
+										isLoading={isLoadingReplies}>
+										Xem thêm phản hồi
+									</Button>
+								</Center>
+							)}
+						</VStack>
+					) : null}
+				</Box>
 			)}
 		</Box>
 	);
@@ -514,6 +733,36 @@ export const CommentSection = ({
 		}
 	};
 
+	const handleReplyComment = async (
+		parentCommentId: string,
+		replyText: string,
+	) => {
+		try {
+			const response = await communityService.createComment({
+				post: postId,
+				content: {
+					text: replyText,
+					media: [],
+				},
+				visibility: "public",
+				parent_comment: parentCommentId,
+			});
+
+			if (response.success) {
+				// Refresh comments to show the new reply
+				await fetchComments(1);
+
+				// Notify parent component
+				if (onCommentAdded) {
+					onCommentAdded();
+				}
+			}
+		} catch (error) {
+			console.error("Error creating reply:", error);
+			throw error; // Re-throw to let CommentItem handle the error toast
+		}
+	};
+
 	const handleLoadMore = () => {
 		if (!isLoading && hasMore) {
 			fetchComments(page + 1);
@@ -588,6 +837,7 @@ export const CommentSection = ({
 									onEdit={handleEditComment}
 									onDelete={handleDeleteComment}
 									onLike={handleLikeComment}
+									onReply={handleReplyComment}
 								/>
 							))}
 

@@ -9,6 +9,8 @@ import type {
 	GetCommentsParams,
 	CommentsResponse,
 	CreateCommentResponse,
+	GetRepliesParams,
+	RepliesResponse,
 } from "../types/community";
 import api from "@/lib/api";
 import { getStorageItem } from "@/utils";
@@ -46,8 +48,6 @@ export const communityService = {
 			}
 
 			const response = await api.get(`/posts?${queryParams.toString()}`);
-			console.log(response);
-
 			// Handle different response structures
 			const responseData = response.data.data || response.data;
 			let posts = [];
@@ -178,9 +178,6 @@ export const communityService = {
 
 			// Return API response directly
 			const newPost: Post = response.data.data;
-
-			console.log(newPost);
-
 			return newPost;
 		} catch (error) {
 			console.error("Error creating post:", error);
@@ -192,8 +189,6 @@ export const communityService = {
 	getPostDetailById: async (postId: string): Promise<PostDetail> => {
 		try {
 			const response = await api.get(`/posts/${postId}`);
-			console.log("Full response:", response);
-			console.log("Response data:", response.data);
 
 			// Check if response has nested data structure
 			let postDetail = response.data.data || response.data;
@@ -231,11 +226,35 @@ export const communityService = {
 			const response = await api.get(
 				`/comments/post/${postId}?${queryParams.toString()}`,
 			);
-			console.log(response.data);
 
 			return response.data;
 		} catch (error) {
 			console.error("Error fetching comments:", error);
+			throw error;
+		}
+	},
+
+	// Lấy replies của comment - Call API thực
+	getReplies: async (
+		commentId: string,
+		params?: GetRepliesParams,
+	): Promise<RepliesResponse> => {
+		try {
+			// Build query params
+			const queryParams = new URLSearchParams({
+				page: String(params?.page || 1),
+				limit: String(params?.limit || 10),
+				sortBy: params?.sortBy || "createdAt",
+				order: params?.order || "asc",
+			});
+
+			const response = await api.get(
+				`/comments/${commentId}/replies?${queryParams.toString()}`,
+			);
+
+			return response.data;
+		} catch (error) {
+			console.error("Error fetching replies:", error);
 			throw error;
 		}
 	},
@@ -285,7 +304,10 @@ export const communityService = {
 	// Like comment - Call API thực
 	likeComment: async (
 		commentId: string,
-	): Promise<{ success: boolean; data: { comment_id: string; likes_count: number; has_liked: boolean } }> => {
+	): Promise<{
+		success: boolean;
+		data: { comment_id: string; likes_count: number; has_liked: boolean };
+	}> => {
 		try {
 			const response = await api.post(`/comments/${commentId}/like`, {});
 			return response.data;
@@ -298,9 +320,15 @@ export const communityService = {
 	// Unlike comment - Call API thực
 	unlikeComment: async (
 		commentId: string,
-	): Promise<{ success: boolean; data: { comment_id: string; likes_count: number; has_liked: boolean } }> => {
+	): Promise<{
+		success: boolean;
+		data: { comment_id: string; likes_count: number; has_liked: boolean };
+	}> => {
 		try {
-			const response = await api.post(`/comments/${commentId}/unlike`, {});
+			const response = await api.post(
+				`/comments/${commentId}/unlike`,
+				{},
+			);
 			return response.data;
 		} catch (error) {
 			console.error("Error unliking comment:", error);
