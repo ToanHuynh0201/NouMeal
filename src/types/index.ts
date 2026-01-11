@@ -180,6 +180,17 @@ export interface FoodRecommendationResponse {
 	snack: Food[];
 }
 
+export interface TodayMealsResponse {
+	date: string;
+	dayName: string;
+	meals: {
+		breakfast: Food[];
+		lunch: Food[];
+		dinner: Food[];
+		snack: Food[];
+	};
+}
+
 // Weekly Menu Types
 export interface NutritionTarget {
 	dailyCalories: number;

@@ -1,4 +1,4 @@
-import type { Food, Recipe, DailyMenu, MealType } from "@/types";
+import type { Food, Recipe, DailyMenu, MealType, TodayMealsResponse } from "@/types";
 
 /**
  * Format meal type for display
@@ -176,6 +176,67 @@ export const convertRecommendationsToDailyMenu = (recommendations: {
 
 	return {
 		date: new Date().toISOString().split("T")[0],
+		breakfast: breakfastRecipe,
+		lunch: lunchRecipe,
+		dinner: dinnerRecipe,
+		snacks: snackRecipes.length > 0 ? snackRecipes : undefined,
+		totalCalories,
+		totalProtein: `${Math.round(totalProtein)}g`,
+		totalCarbs: `${Math.round(totalCarbs)}g`,
+		totalFat: `${Math.round(totalFat)}g`,
+	};
+};
+
+/**
+ * Convert Today's Meals response to DailyMenu
+ * @param {TodayMealsResponse} todayMealsData - Today's meals data from API
+ * @returns {DailyMenu} Daily menu object
+ */
+export const convertTodayMealsToDailyMenu = (todayMealsData: TodayMealsResponse): DailyMenu => {
+	const { meals, date } = todayMealsData;
+
+	const breakfastRecipe = meals.breakfast?.[0]
+		? convertFoodToRecipe(meals.breakfast[0])
+		: createDefaultRecipe("breakfast");
+
+	const lunchRecipe = meals.lunch?.[0]
+		? convertFoodToRecipe(meals.lunch[0])
+		: createDefaultRecipe("lunch");
+
+	const dinnerRecipe = meals.dinner?.[0]
+		? convertFoodToRecipe(meals.dinner[0])
+		: createDefaultRecipe("dinner");
+
+	const snackRecipes = (meals.snack || [])
+		.slice(0, 2)
+		.map(convertFoodToRecipe);
+
+	// Calculate totals
+	const allRecipes = [
+		breakfastRecipe,
+		lunchRecipe,
+		dinnerRecipe,
+		...snackRecipes,
+	];
+	const totalCalories = allRecipes.reduce(
+		(sum, recipe) => sum + recipe.nutrition.calories,
+		0,
+	);
+	const totalProtein = allRecipes.reduce(
+		(sum, recipe) => sum + parseFloat(recipe.nutrition.protein),
+		0,
+	);
+	const totalCarbs = allRecipes.reduce(
+		(sum, recipe) => sum + parseFloat(recipe.nutrition.carbs),
+		0,
+	);
+	const totalFat = allRecipes.reduce(
+		(sum, recipe) => sum + parseFloat(recipe.nutrition.fat),
+		0,
+	);
+
+	return {
+		date: date,
 		breakfast: breakfastRecipe,
 		lunch: lunchRecipe,
 		dinner: dinnerRecipe,
