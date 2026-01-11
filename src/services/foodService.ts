@@ -4,11 +4,11 @@ import type { CreateFoodRequest } from "@/types/recipe";
 
 class FoodService {
 	/**
-	 * Get recommended foods for the current user
+	 * Get today's meals for the current user
 	 * @returns {Promise} Standardized response with success flag and data
 	 */
-	getRecommendedFoods = withErrorHandling(async () => {
-		return await api.get("/foods/recommended");
+	getTodayMeals = withErrorHandling(async () => {
+		return await api.get("/foods/today-meals");
 	});
 
 	/**

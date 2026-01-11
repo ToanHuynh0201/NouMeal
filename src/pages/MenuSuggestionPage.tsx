@@ -35,11 +35,11 @@ import { authService, foodService } from "@/services";
 import type {
 	Recipe,
 	DailyMenu,
-	FoodRecommendationResponse,
+	TodayMealsResponse,
 	WeeklyMenuData,
 } from "@/types";
 import {
-	convertRecommendationsToDailyMenu,
+	convertTodayMealsToDailyMenu,
 	convertWeeklyMenuToDailyMenus,
 } from "@/utils/food";
 
@@ -60,9 +60,9 @@ const MenuSuggestionPage = () => {
 	const { data: progressData, isLoading: isLoadingProgress } =
 		useTodayProgress();
 
-	// State for food recommendations
-	const [recommendations, setRecommendations] =
-		useState<FoodRecommendationResponse | null>(null);
+	// State for today's meals
+	const [todayMealsData, setTodayMealsData] =
+		useState<TodayMealsResponse | null>(null);
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const [error, setError] = useState<string | null>(null);
 
@@ -73,17 +73,17 @@ const MenuSuggestionPage = () => {
 	const [isLoadingWeekly, setIsLoadingWeekly] = useState<boolean>(true);
 	const [weeklyError, setWeeklyError] = useState<string | null>(null);
 
-	// Fetch food recommendations
-	const fetchRecommendations = async () => {
+	// Fetch today's meals
+	const fetchTodayMeals = async () => {
 		setIsLoading(true);
 		setError(null);
 
-		const result = await foodService.getRecommendedFoods();
+		const result = await foodService.getTodayMeals();
 
 		if (result.success) {
-			setRecommendations(result.data);
+			setTodayMealsData(result.data);
 		} else {
-			setError(result.error || "Failed to fetch recommendations");
+			setError(result.error || "Failed to fetch today's meals");
 		}
 
 		setIsLoading(false);
@@ -107,15 +107,15 @@ const MenuSuggestionPage = () => {
 
 	// Fetch on component mount
 	useEffect(() => {
-		fetchRecommendations();
+		fetchTodayMeals();
 		fetchWeeklyMenu();
 	}, []);
 
-	// Convert API recommendations to DailyMenu format
+	// Convert API today's meals to DailyMenu format
 	const todayMenu = useMemo(() => {
-		if (!recommendations) return null;
-		return convertRecommendationsToDailyMenu(recommendations);
-	}, [recommendations]);
+		if (!todayMealsData) return null;
+		return convertTodayMealsToDailyMenu(todayMealsData);
+	}, [todayMealsData]);
 
 	// Convert API weekly menu to DailyMenu[] format
 	const weeklyMenu = useMemo(() => {
@@ -308,7 +308,7 @@ const MenuSuggestionPage = () => {
 										<Button
 											mt={4}
 											colorScheme="red"
-											onClick={fetchRecommendations}
+											onClick={fetchTodayMeals}
 											leftIcon={
 												<Icon as={FiRefreshCw} />
 											}>
