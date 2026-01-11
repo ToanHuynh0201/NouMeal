@@ -129,9 +129,12 @@ export interface CheckFoodAppropriateRequest {
 
 export interface CheckFoodAppropriateResponse {
 	success: boolean;
-	message: string;
+	status: number;
 	data: {
-		isAppropriate: boolean;
+		isAppropriate: {
+			isAppropriate: boolean;
+			isAllergyFree: boolean;
+		};
 		userId: string;
 	};
 }

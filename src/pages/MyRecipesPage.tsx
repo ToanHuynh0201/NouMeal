@@ -25,6 +25,7 @@ import {
 	MenuButton,
 	MenuList,
 	MenuItem,
+	useToast,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import {
@@ -50,6 +51,7 @@ import type { Recipe } from "@/types/recipe";
 import type { RecipeFormData } from "@/types/myRecipe";
 
 const MyRecipesPage = () => {
+	const toast = useToast();
 	const {
 		recipes,
 		filters,
@@ -171,13 +173,26 @@ const MyRecipesPage = () => {
 		} else {
 			// Add new recipe - check if appropriate
 			const result = await addRecipe(recipeData);
-			console.log(result);
+
+			if (!result.isAllergyFree) {
+				// Contains allergens - block completely
+				toast({
+					title: "Cannot Add Recipe",
+					description:
+						"This food contains allergens that you are allergic to. For your safety, we cannot add this recipe.",
+					status: "error",
+					duration: 5000,
+					isClosable: true,
+					position: "top",
+				});
+				return;
+			}
 
 			if (result.isAppropriate) {
-				// Food is appropriate, create directly
+				// Food is appropriate and allergy-free, create directly
 				await createRecipe(recipeData);
 			} else {
-				// Food is not appropriate, show warning modal
+				// Food is not appropriate but allergy-free, show warning modal
 				setPendingRecipe(recipeData);
 				onWarningOpen();
 			}

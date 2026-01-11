@@ -20,9 +20,9 @@ class FoodService {
 	 * @returns {Promise} Standardized response with success flag and data
 	 */
 	changeTodayMeal = withErrorHandling(async (foodId: string) => {
-		return await api.get("/foods/today-meals", {
-			params: { foodId },
-		});
+		const query = new URLSearchParams({ foodId }).toString();
+
+		return await api.get(`/foods/today-meals?${query}`);
 	});
 
 	/**

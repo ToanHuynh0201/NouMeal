@@ -166,7 +166,13 @@ export const useMyRecipes = () => {
 
 	// Check if food is appropriate for user
 	const checkFoodAppropriate = useCallback(
-		async (recipeData: RecipeFormData): Promise<boolean> => {
+		async (
+			recipeData: RecipeFormData,
+		): Promise<{
+			isAppropriate: boolean;
+			isAllergyFree: boolean;
+			canAdd: boolean;
+		}> => {
 			try {
 				const checkRequest = convertRecipeToCheckRequest(recipeData);
 				const response = await foodService.checkFoodAppropriate(
@@ -174,12 +180,25 @@ export const useMyRecipes = () => {
 				);
 
 				if (response.success) {
-					return response.data.isAppropriate;
+					const { isAppropriate, isAllergyFree } = response.data;
+					return {
+						isAppropriate,
+						isAllergyFree,
+						canAdd: isAllergyFree, // Can only add if allergy-free
+					};
 				}
-				return true; // If check fails, allow adding
+				return {
+					isAppropriate: true,
+					isAllergyFree: true,
+					canAdd: true,
+				};
 			} catch (error) {
 				console.error("Error checking food appropriateness:", error);
-				return true; // If check fails, allow adding
+				return {
+					isAppropriate: true,
+					isAllergyFree: true,
+					canAdd: true,
+				};
 			}
 		},
 		[convertRecipeToCheckRequest],
@@ -232,8 +251,8 @@ export const useMyRecipes = () => {
 	// Add new recipe with appropriateness check
 	const addRecipe = useCallback(
 		async (recipeData: RecipeFormData) => {
-			const isAppropriate = await checkFoodAppropriate(recipeData);
-			return { isAppropriate, recipeData };
+			const checkResult = await checkFoodAppropriate(recipeData);
+			return { ...checkResult, recipeData };
 		},
 		[checkFoodAppropriate],
 	);
