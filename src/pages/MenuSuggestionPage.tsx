@@ -18,6 +18,7 @@ import {
 	AlertTitle,
 	AlertDescription,
 	Badge,
+	useToast,
 } from "@chakra-ui/react";
 import { useState, useMemo, useEffect } from "react";
 import { FiCalendar, FiArrowLeft, FiRefreshCw } from "react-icons/fi";
@@ -32,18 +33,22 @@ import useScrollAnimation from "@/hooks/useScrollAnimation";
 import useDailyCalorieNeeds from "@/hooks/useDailyCalorieNeeds";
 import { useTodayProgress } from "@/hooks/useTodayProgress";
 import { authService, foodService } from "@/services";
+import { MealChangeService } from "@/services/mealChangeService";
 import type {
 	Recipe,
 	DailyMenu,
 	TodayMealsResponse,
 	WeeklyMenuData,
+	MealType,
 } from "@/types";
 import {
 	convertTodayMealsToDailyMenu,
 	convertWeeklyMenuToDailyMenus,
 } from "@/utils/food";
+import ChangeMealModal from "@/components/menu/ChangeMealModal";
 
 const MenuSuggestionPage = () => {
+	const toast = useToast();
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
 	const [selectedDayMenu, setSelectedDayMenu] = useState<DailyMenu | null>(
@@ -51,6 +56,18 @@ const MenuSuggestionPage = () => {
 	);
 	const headerSection = useScrollAnimation({ threshold: 0.1 });
 	const user = authService.getCurrentUser();
+
+	// Change meal modal states
+	const {
+		isOpen: isChangeOpen,
+		onOpen: onChangeOpen,
+		onClose: onChangeClose,
+	} = useDisclosure();
+	const [changingMealType, setChangingMealType] = useState<MealType | null>(
+		null,
+	);
+	const [currentFoodId, setCurrentFoodId] = useState<string>("");
+	const [changedMeals, setChangedMeals] = useState<MealType[]>([]);
 
 	// Fetch daily calorie needs
 	const { data: dailyCalorieNeeds, isLoading: isLoadingCalories } =
@@ -108,10 +125,20 @@ const MenuSuggestionPage = () => {
 		setIsLoadingWeekly(false);
 	};
 
-	// Fetch on component mount
+	// Fetch on component mount and initialize meal change tracking
 	useEffect(() => {
 		fetchTodayMeals();
 		fetchWeeklyMenu();
+
+		// Initialize meal change tracking
+		const mealChangeService = new MealChangeService();
+		if (mealChangeService.isNewDay()) {
+			mealChangeService.resetDailyChanges();
+		}
+
+		// Load which meals have been changed today
+		const changedToday = mealChangeService.getChangedMeals();
+		setChangedMeals(changedToday);
 	}, []);
 
 	// Convert API today's meals to DailyMenu format
@@ -139,6 +166,77 @@ const MenuSuggestionPage = () => {
 			await refetchProgress();
 		} else {
 			throw new Error(result.error || "Failed to log food");
+		}
+	};
+
+	// Handle opening change meal modal
+	const handleChangeMeal = (mealType: MealType, currentFoodId: string) => {
+		const mealChangeService = new MealChangeService();
+
+		// Check if change is allowed
+		if (!mealChangeService.canChangeMeal(mealType)) {
+			toast({
+				title: "Change limit reached",
+				description: `You can only change ${mealType} once per day`,
+				status: "warning",
+				duration: 3000,
+				isClosable: true,
+			});
+			return;
+		}
+
+		setChangingMealType(mealType);
+		setCurrentFoodId(currentFoodId);
+		onChangeOpen();
+	};
+
+	// Handle confirming meal change
+	const handleConfirmChange = async (newFoodId: string) => {
+		if (!changingMealType) return;
+
+		try {
+			// Call API to change meal
+			const result = await foodService.changeTodayMeal(newFoodId);
+
+			if (result.success) {
+				// Record change in localStorage
+				const mealChangeService = new MealChangeService();
+				mealChangeService.recordMealChange(changingMealType, newFoodId);
+
+				// Update changed meals state
+				setChangedMeals([...changedMeals, changingMealType]);
+
+				// Show success toast
+				toast({
+					title: "Meal changed successfully",
+					description: `Your ${changingMealType} has been updated`,
+					status: "success",
+					duration: 3000,
+					isClosable: true,
+				});
+
+				// Close modal
+				onChangeClose();
+
+				// Refresh today's meals data
+				await fetchTodayMeals();
+			} else {
+				toast({
+					title: "Failed to change meal",
+					description: result.error || "Please try again",
+					status: "error",
+					duration: 3000,
+					isClosable: true,
+				});
+			}
+		} catch (error) {
+			toast({
+				title: "Error",
+				description: "An error occurred while changing meal",
+				status: "error",
+				duration: 3000,
+				isClosable: true,
+			});
 		}
 	};
 
@@ -637,6 +735,8 @@ const MenuSuggestionPage = () => {
 											dailyMenu={todayMenu}
 											onRecipeClick={handleRecipeClick}
 											onLogFood={handleLogFood}
+											onChangeMeal={handleChangeMeal}
+											disabledMealChanges={changedMeals}
 											remainingMeals={
 												progressData?.remainingMeals ||
 												[]
@@ -838,6 +938,15 @@ const MenuSuggestionPage = () => {
 				onClose={onClose}
 				recipe={selectedRecipe}
 				showSaveButton={true}
+			/>
+
+			{/* Change Meal Modal */}
+			<ChangeMealModal
+				isOpen={isChangeOpen}
+				onClose={onChangeClose}
+				mealType={changingMealType || "breakfast"}
+				currentFoodId={currentFoodId}
+				onConfirmChange={handleConfirmChange}
 			/>
 		</MainLayout>
 	);

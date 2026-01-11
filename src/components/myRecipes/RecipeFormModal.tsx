@@ -32,7 +32,8 @@ import { useState, useEffect } from "react";
 import { FiPlus, FiX } from "react-icons/fi";
 import type { Recipe } from "@/types/recipe";
 import type { RecipeFormData } from "@/types/myRecipe";
-import { ALLERGEN_VALUES } from "@/constants";
+import { ALLERGEN_VALUES, DIETARY_PREFERENCE_TAGS } from "@/constants";
+import type { DietaryPreferenceTag } from "@/types";
 
 interface RecipeFormModalProps {
 	isOpen: boolean;
@@ -62,7 +63,7 @@ const RecipeFormModal = ({
 		difficulty: "easy",
 		ingredients: [{ name: "", amount: "" }],
 		instructions: [""],
-		tags: [""],
+		tags: [],
 		allergens: [],
 		nutrition: {
 			calories: 0,
@@ -245,8 +246,7 @@ const RecipeFormModal = ({
 			instructions: formData.instructions.filter(
 				(item) => item.trim() !== "",
 			),
-			tags: formData.tags.filter((item) => item.trim() !== ""),
-			// Allergens are already validated (selected from predefined list)
+			// Tags and allergens are already validated (selected from predefined lists)
 		};
 
 		if (cleanedData.ingredients.length === 0) {
@@ -758,60 +758,56 @@ const RecipeFormModal = ({
 
 						{/* Tags */}
 						<Box>
-							<HStack
-								justify="space-between"
+							<Text
+								fontSize="lg"
+								fontWeight="bold"
+								color="brand.600"
 								mb={4}>
-								<Text
-									fontSize="lg"
-									fontWeight="bold"
-									color="brand.600">
-									Tags
-								</Text>
-								<Button
-									size="sm"
-									leftIcon={<Icon as={FiPlus} />}
-									colorScheme="purple"
-									variant="outline"
-									onClick={() => handleAddArrayItem("tags")}>
-									Add Tag
-								</Button>
-							</HStack>
-							<VStack
-								spacing={3}
-								align="stretch">
-								{formData.tags.map((tag, index) => (
-									<HStack key={index}>
-										<Input
-											value={tag}
-											onChange={(e) =>
-												handleArrayChange(
-													"tags",
-													index,
-													e.target.value,
-												)
-											}
-											placeholder={`Tag ${
-												index + 1
-											} (e.g., high_protein, low_carb)`}
-										/>
-										<IconButton
-											aria-label="Remove tag"
-											icon={<Icon as={FiX} />}
-											colorScheme="red"
-											variant="ghost"
-											onClick={() =>
-												handleRemoveArrayItem(
-													"tags",
-													index,
-												)
-											}
-											isDisabled={
-												formData.tags.length === 1
-											}
-										/>
-									</HStack>
+								Dietary Preference Tags
+							</Text>
+							<FormControl mb={3}>
+								<Select
+									placeholder="Select a dietary tag to add"
+									onChange={(e) => {
+										const selectedTag = e.target.value as DietaryPreferenceTag;
+										if (selectedTag && !formData.tags.includes(selectedTag)) {
+											setFormData((prev) => ({
+												...prev,
+												tags: [...prev.tags, selectedTag],
+											}));
+										}
+										e.target.value = ""; // Reset select
+									}}>
+									{DIETARY_PREFERENCE_TAGS.map((tag) => (
+										<option key={tag} value={tag}>
+											{tag.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+										</option>
+									))}
+								</Select>
+							</FormControl>
+							<Wrap spacing={3}>
+								{formData.tags.map((tag) => (
+									<WrapItem key={tag}>
+										<Tag
+											size="lg"
+											borderRadius="full"
+											variant="solid"
+											colorScheme="purple">
+											<TagLabel>
+												{tag.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+											</TagLabel>
+											<TagCloseButton
+												onClick={() => {
+													setFormData((prev) => ({
+														...prev,
+														tags: prev.tags.filter((t) => t !== tag),
+													}));
+												}}
+											/>
+										</Tag>
+									</WrapItem>
 								))}
-							</VStack>
+							</Wrap>
 						</Box>
 
 						{/* Allergens */}

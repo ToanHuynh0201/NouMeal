@@ -2,6 +2,8 @@
  * Recipe related types
  */
 
+import type { DietaryPreferenceTag } from "./index";
+
 export interface NutritionInfo {
 	calories: number;
 	protein: string;
@@ -61,7 +63,7 @@ export interface Food {
 	nutritionalInfo: FoodNutritionalInfo;
 	allergens: string[];
 	isActive: boolean;
-	tags: string[];
+	tags: DietaryPreferenceTag[];
 	postedBy: string;
 	createdAt: string;
 	updatedAt: string;
@@ -88,7 +90,7 @@ export interface CreateFoodRequest {
 	ingredients: FoodIngredient[];
 	nutritionalInfo: FoodNutritionalInfo;
 	allergens: string[];
-	tags: string[];
+	tags: DietaryPreferenceTag[];
 }
 
 export interface GetUserFoodsResponse {
@@ -132,7 +134,7 @@ export interface Recipe {
 	nutrition: NutritionInfo;
 	ingredients: string[];
 	instructions: string[];
-	tags: string[];
+	tags: DietaryPreferenceTag[];
 }
 
 export interface DailyMenu {

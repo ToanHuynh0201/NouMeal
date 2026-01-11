@@ -12,6 +12,17 @@ class FoodService {
 	});
 
 	/**
+	 * Change today's meal by providing a new food ID
+	 * @param {string} foodId - The ID of the new food to replace current meal
+	 * @returns {Promise} Standardized response with success flag and data
+	 */
+	changeTodayMeal = withErrorHandling(async (foodId: string) => {
+		return await api.get("/foods/today-meals", {
+			params: { foodId },
+		});
+	});
+
+	/**
 	 * Get weekly menu for the current user
 	 * @returns {Promise} Standardized response with success flag and data
 	 */

@@ -131,6 +131,26 @@ export const ALLERGEN_VALUES = [
 	"other",
 ] as const;
 
+// Dietary Preference Tags
+export const DIETARY_PREFERENCE_TAGS = [
+	"vegetarian",
+	"vegan",
+	"pescatarian",
+	"keto",
+	"paleo",
+	"low_carb",
+	"low_fat",
+	"high_protein",
+	"gluten_free",
+	"dairy_free",
+	"halal",
+	"kosher",
+	"organic",
+	"low_sodium",
+	"diabetic_friendly",
+	"heart_healthy",
+] as const;
+
 // Export profile constants
 export * from "./profile";
 
@@ -145,4 +165,5 @@ export default {
 	ROLES,
 	FOOD_CATEGORIES,
 	ALLERGEN_VALUES,
+	DIETARY_PREFERENCE_TAGS,
 };

@@ -2,6 +2,8 @@
  * Types for My Recipes feature
  */
 
+import type { DietaryPreferenceTag } from "./index";
+
 // Form data for creating/editing recipes
 export interface RecipeFormData {
 	title: string;
@@ -24,7 +26,7 @@ export interface RecipeFormData {
 	difficulty: "easy" | "medium" | "hard";
 	ingredients: Array<{ name: string; amount: string }>;
 	instructions: string[];
-	tags: string[];
+	tags: DietaryPreferenceTag[];
 	allergens: string[];
 	nutrition: {
 		calories: number;

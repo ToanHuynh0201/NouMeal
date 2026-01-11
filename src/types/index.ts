@@ -151,6 +151,24 @@ export type AllergenType =
 	| "mustard"
 	| "other";
 
+export type DietaryPreferenceTag =
+	| "vegetarian"
+	| "vegan"
+	| "pescatarian"
+	| "keto"
+	| "paleo"
+	| "low_carb"
+	| "low_fat"
+	| "high_protein"
+	| "gluten_free"
+	| "dairy_free"
+	| "halal"
+	| "kosher"
+	| "organic"
+	| "low_sodium"
+	| "diabetic_friendly"
+	| "heart_healthy";
+
 export interface FoodInstruction {
 	step: number;
 	description: string;
@@ -168,7 +186,7 @@ export interface Food {
 	nutritionalInfo?: FoodNutritionalInfo;
 	allergens?: AllergenType[];
 	isActive: boolean;
-	tags?: string[];
+	tags?: DietaryPreferenceTag[];
 	createdAt: string;
 	updatedAt: string;
 }
@@ -283,5 +301,22 @@ export interface UsersListResponse {
 	data: {
 		users: User[];
 		pagination: PaginationInfo;
+	};
+}
+
+// Meal Change Tracking Types
+export interface MealChangeRecord {
+	changed: boolean;
+	foodId?: string;
+	changedAt?: string;
+}
+
+export interface DailyMealChanges {
+	[key: string]: {
+		// date as key "2026-01-11"
+		breakfast: MealChangeRecord;
+		lunch: MealChangeRecord;
+		dinner: MealChangeRecord;
+		snack: MealChangeRecord;
 	};
 }

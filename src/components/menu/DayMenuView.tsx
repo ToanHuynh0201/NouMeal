@@ -22,19 +22,22 @@ import {
 	ModalCloseButton,
 	useDisclosure,
 } from "@chakra-ui/react";
-import { FiClock, FiUsers, FiCheck, FiAlertCircle } from "react-icons/fi";
+import { FiClock, FiUsers, FiCheck, FiAlertCircle, FiRefreshCw } from "react-icons/fi";
 import { useState } from "react";
 import useScrollAnimation from "@/hooks/useScrollAnimation";
 import type { Recipe, DailyMenu } from "@/types/recipe";
+import type { MealType } from "@/types";
 
 interface DayMenuViewProps {
 	dailyMenu: DailyMenu;
 	onRecipeClick: (recipe: Recipe) => void;
 	onLogFood?: (foodId: string) => Promise<void>;
+	onChangeMeal?: (mealType: MealType, currentFoodId: string) => void;
+	disabledMealChanges?: MealType[];
 	remainingMeals?: string[];
 }
 
-const DayMenuView = ({ dailyMenu, onRecipeClick, onLogFood, remainingMeals = [] }: DayMenuViewProps) => {
+const DayMenuView = ({ dailyMenu, onRecipeClick, onLogFood, onChangeMeal, disabledMealChanges = [], remainingMeals = [] }: DayMenuViewProps) => {
 	const contentSection = useScrollAnimation({ threshold: 0.1 });
 	const toast = useToast();
 	const [loggingFoods, setLoggingFoods] = useState<Set<string>>(new Set());
@@ -270,27 +273,53 @@ const DayMenuView = ({ dailyMenu, onRecipeClick, onLogFood, remainingMeals = [] 
 									</VStack>
 								</HStack>
 							</HStack>
-							{onLogFood && (
+							{(onLogFood || onChangeMeal) && (
 								<>
 									<Divider />
-									<Button
-										size="sm"
-										colorScheme={categoryColor[recipe.category]}
-										leftIcon={<Icon as={FiCheck} />}
-										w="full"
-										isLoading={loggingFoods.has(recipe.id)}
-										isDisabled={!isMealRemaining(mealType)}
-										onClick={(e) => {
-											e.stopPropagation();
-											openConfirmModal(recipe.id, recipe.title, mealType);
-										}}
-										_hover={{
-											transform: "translateY(-2px)",
-											shadow: "md",
-										}}
-										transition="all 0.2s">
-										Log This Meal
-									</Button>
+									<VStack spacing={2} w="full">
+										{onLogFood && (
+											<Button
+												size="sm"
+												colorScheme={categoryColor[recipe.category]}
+												leftIcon={<Icon as={FiCheck} />}
+												w="full"
+												isLoading={loggingFoods.has(recipe.id)}
+												isDisabled={!isMealRemaining(mealType)}
+												onClick={(e) => {
+													e.stopPropagation();
+													openConfirmModal(recipe.id, recipe.title, mealType);
+												}}
+												_hover={{
+													transform: "translateY(-2px)",
+													shadow: "md",
+												}}
+												transition="all 0.2s">
+												Log This Meal
+											</Button>
+										)}
+										{onChangeMeal && (
+											<Button
+												size="sm"
+												colorScheme="orange"
+												variant="outline"
+												leftIcon={<Icon as={FiRefreshCw} />}
+												w="full"
+												isDisabled={disabledMealChanges.includes(mealType)}
+												onClick={(e) => {
+													e.stopPropagation();
+													onChangeMeal(mealType, recipe.id);
+												}}
+												_hover={{
+													transform: "translateY(-2px)",
+													shadow: "md",
+												}}
+												transition="all 0.2s">
+												{disabledMealChanges.includes(mealType)
+													? "Changed Today"
+													: "Change Meal"}
+											</Button>
+										)}
+									</VStack>
 								</>
 							)}
 						</VStack>
@@ -535,27 +564,53 @@ const DayMenuView = ({ dailyMenu, onRecipeClick, onLogFood, remainingMeals = [] 
 													</VStack>
 												</HStack>
 											</HStack>
-											{onLogFood && (
+											{(onLogFood || onChangeMeal) && (
 												<>
 													<Divider />
-													<Button
-														size="sm"
-														colorScheme="blue"
-														leftIcon={<Icon as={FiCheck} />}
-														w="full"
-														isLoading={loggingFoods.has(snack.id)}
-														isDisabled={!isMealRemaining("snack")}
-														onClick={(e) => {
-															e.stopPropagation();
-															openConfirmModal(snack.id, snack.title, "snack");
-														}}
-														_hover={{
-															transform: "translateY(-2px)",
-															shadow: "md",
-														}}
-														transition="all 0.2s">
-														Log This Snack
-													</Button>
+													<VStack spacing={2} w="full">
+														{onLogFood && (
+															<Button
+																size="sm"
+																colorScheme="blue"
+																leftIcon={<Icon as={FiCheck} />}
+																w="full"
+																isLoading={loggingFoods.has(snack.id)}
+																isDisabled={!isMealRemaining("snack")}
+																onClick={(e) => {
+																	e.stopPropagation();
+																	openConfirmModal(snack.id, snack.title, "snack");
+																}}
+																_hover={{
+																	transform: "translateY(-2px)",
+																	shadow: "md",
+																}}
+																transition="all 0.2s">
+																Log This Snack
+															</Button>
+														)}
+														{onChangeMeal && (
+															<Button
+																size="sm"
+																colorScheme="orange"
+																variant="outline"
+																leftIcon={<Icon as={FiRefreshCw} />}
+																w="full"
+																isDisabled={disabledMealChanges.includes("snack")}
+																onClick={(e) => {
+																	e.stopPropagation();
+																	onChangeMeal("snack", snack.id);
+																}}
+																_hover={{
+																	transform: "translateY(-2px)",
+																	shadow: "md",
+																}}
+																transition="all 0.2s">
+																{disabledMealChanges.includes("snack")
+																	? "Changed Today"
+																	: "Change Snack"}
+															</Button>
+														)}
+													</VStack>
 												</>
 											)}
 										</VStack>

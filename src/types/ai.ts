@@ -3,6 +3,7 @@
  */
 
 import type {Recipe, NutritionInfo} from "./recipe";
+import type { DietaryPreferenceTag } from "./index";
 
 // AI Meal Suggestion Types
 export interface MealSuggestionRequest {
@@ -122,7 +123,7 @@ export interface ApiMeal {
     nutrition_facts: ApiNutritionFacts;
     prep_time: string;
     servings: number;
-    tags: string[];
+    tags: DietaryPreferenceTag[];
 }
 
 export interface ApiMealSuggestionData {
