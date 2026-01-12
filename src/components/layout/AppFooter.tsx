@@ -37,7 +37,7 @@ const AppFooter = () => {
 						fontWeight="500"
 						bgGradient="linear(to-r, purple.600, pink.500)"
 						bgClip="text">
-						© {currentYear} MealGenie
+						© {currentYear} NouMeal
 					</Text>
 					<HStack spacing={6}>
 						<Link

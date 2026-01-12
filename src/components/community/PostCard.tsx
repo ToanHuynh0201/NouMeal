@@ -119,10 +119,10 @@ export const PostCard = ({
 			(now.getTime() - date.getTime()) / (1000 * 60 * 60),
 		);
 
-		if (diffInHours < 1) return "Vừa xong";
-		if (diffInHours < 24) return `${diffInHours} giờ trước`;
-		if (diffInHours < 48) return "Hôm qua";
-		return date.toLocaleDateString("vi-VN");
+		if (diffInHours < 1) return "Just now";
+		if (diffInHours < 24) return `${diffInHours} hours ago`;
+		if (diffInHours < 48) return "Yesterday";
+		return date.toLocaleDateString("en-US");
 	};
 
 	// Get total reactions from engagement
@@ -264,7 +264,7 @@ export const PostCard = ({
 									fontWeight="semibold"
 									color={textColor}
 									mb={2}>
-									🥘 Nguyên liệu:
+									🥘 Ingredients:
 								</Text>
 								<List spacing={1}>
 									{currentPost.ingredients.map(
@@ -286,7 +286,7 @@ export const PostCard = ({
 									fontWeight="semibold"
 									color={textColor}
 									mb={2}>
-									👨‍🍳 Cách làm:
+									👨‍🍳 Instructions:
 								</Text>
 								<OrderedList spacing={1}>
 									{currentPost.instructions.map(
@@ -317,18 +317,18 @@ export const PostCard = ({
 						fontSize="sm"
 						color={mutedTextColor}>
 						{totalReactions > 0
-							? `${totalReactions} lượt thích`
-							: "Chưa có lượt thích"}
+							? `${totalReactions} likes`
+							: "No likes yet"}
 					</Text>
 					<Text
 						fontSize="sm"
 						color={mutedTextColor}>
-						{currentPost.engagement?.comments_count || 0} bình luận
+						{currentPost.engagement?.comments_count || 0} comments
 					</Text>
 					<Text
 						fontSize="sm"
 						color={mutedTextColor}>
-						{currentPost.engagement?.shares_count || 0} chia sẻ
+						{currentPost.engagement?.shares_count || 0} shares
 					</Text>
 				</HStack>
 			</Box>
@@ -362,7 +362,7 @@ export const PostCard = ({
 						_hover={{ transform: "scale(1.05)" }}
 						transition="all 0.2s"
 						flex={1}>
-						{currentPost.is_liked ? "Đã thích" : "Thích"}
+						{currentPost.is_liked ? "Liked" : "Like"}
 					</Button>
 					<Button
 						size="sm"
@@ -381,7 +381,7 @@ export const PostCard = ({
 						_hover={{ transform: "scale(1.05)" }}
 						transition="all 0.2s"
 						flex={1}>
-						Bình luận
+						Comment
 					</Button>
 				</HStack>
 			</Box>

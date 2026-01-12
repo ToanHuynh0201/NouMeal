@@ -55,7 +55,7 @@ class AuthService {
 		try {
 			// Mock admin login
 			if (
-				email === "admin@mealgenie.com" &&
+				email === "admin@NouMeal.com" &&
 				password === "Toanhuynh0201@"
 			) {
 				const mockAdminData: AuthResponse = {
@@ -64,7 +64,7 @@ class AuthService {
 					data: {
 						user: {
 							_id: "admin-001",
-							email: "admin@mealgenie.com",
+							email: "admin@NouMeal.com",
 							name: "Administrator",
 							age: 30,
 							gender: "other" as const,

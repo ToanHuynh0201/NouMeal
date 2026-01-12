@@ -23,9 +23,9 @@ export const getSubdomainInfo = (): SubdomainInfo => {
 	// - admin.localhost -> parts = ["admin", "localhost"]
 	// - localhost -> parts = ["localhost"]
 	//
-	// For production (e.g., mealgenie.com):
-	// - admin.mealgenie.com -> parts = ["admin", "mealgenie", "com"]
-	// - mealgenie.com -> parts = ["mealgenie", "com"]
+	// For production (e.g., NouMeal.com):
+	// - admin.NouMeal.com -> parts = ["admin", "NouMeal", "com"]
+	// - NouMeal.com -> parts = ["NouMeal", "com"]
 
 	let subdomain: string | null = null;
 

@@ -84,10 +84,10 @@ const CommentItem = ({
 			(now.getTime() - date.getTime()) / (1000 * 60 * 60),
 		);
 
-		if (diffInHours < 1) return "Vừa xong";
-		if (diffInHours < 24) return `${diffInHours} giờ trước`;
-		if (diffInHours < 48) return "Hôm qua";
-		return date.toLocaleDateString("vi-VN");
+		if (diffInHours < 1) return "Just now";
+		if (diffInHours < 24) return `${diffInHours} hours ago`;
+		if (diffInHours < 48) return "Yesterday";
+		return date.toLocaleDateString("en-US");
 	};
 
 	const handleNavigateToUserPosts = (e: React.MouseEvent) => {
@@ -110,8 +110,8 @@ const CommentItem = ({
 	const handleSaveEdit = () => {
 		if (!editText.trim()) {
 			toast({
-				title: "Lỗi",
-				description: "Nội dung bình luận không được để trống",
+				title: "Error",
+				description: "Comment content cannot be empty",
 				status: "error",
 				duration: 2000,
 				isClosable: true,
@@ -166,8 +166,8 @@ const CommentItem = ({
 		} catch (error) {
 			console.error("Error fetching replies:", error);
 			toast({
-				title: "Lỗi",
-				description: "Không thể tải phản hồi",
+				title: "Error",
+				description: "Unable to load replies",
 				status: "error",
 				duration: 2000,
 				isClosable: true,
@@ -200,8 +200,8 @@ const CommentItem = ({
 	const handleSubmitReply = async () => {
 		if (!replyText.trim()) {
 			toast({
-				title: "Lỗi",
-				description: "Nội dung phản hồi không được để trống",
+				title: "Error",
+				description: "Reply content cannot be empty",
 				status: "error",
 				duration: 2000,
 				isClosable: true,
@@ -227,8 +227,8 @@ const CommentItem = ({
 			}));
 
 			toast({
-				title: "Thành công",
-				description: "Đã thêm phản hồi",
+				title: "Success",
+				description: "Reply added",
 				status: "success",
 				duration: 2000,
 				isClosable: true,
@@ -236,8 +236,8 @@ const CommentItem = ({
 		} catch (error) {
 			console.error("Error submitting reply:", error);
 			toast({
-				title: "Lỗi",
-				description: "Không thể thêm phản hồi",
+				title: "Error",
+				description: "Unable to add reply",
 				status: "error",
 				duration: 2000,
 				isClosable: true,
@@ -310,13 +310,13 @@ const CommentItem = ({
 										<MenuItem
 											icon={<FiEdit2 />}
 											onClick={handleEditClick}>
-											Chỉnh sửa
+											Edit
 										</MenuItem>
 										<MenuItem
 											icon={<FiTrash2 />}
 											onClick={handleDeleteClick}
 											color="red.500">
-											Xóa
+											Delete
 										</MenuItem>
 									</MenuList>
 								</Menu>
@@ -341,13 +341,13 @@ const CommentItem = ({
 										size="xs"
 										variant="ghost"
 										onClick={handleCancelEdit}>
-										Hủy
+										Cancel
 									</Button>
 									<Button
 										size="xs"
 										colorScheme="blue"
 										onClick={handleSaveEdit}>
-										Lưu
+										Save
 									</Button>
 								</HStack>
 							</VStack>
@@ -384,7 +384,7 @@ const CommentItem = ({
 								onClick={handleReplyClick}
 								_hover={{ color: "blue.500" }}
 								transition="all 0.2s">
-								Phản hồi
+								Reply
 							</Button>
 						)}
 						{/* Only show replies count on top-level comments */}
@@ -399,8 +399,8 @@ const CommentItem = ({
 									}
 									_hover={{ color: "blue.500" }}
 									transition="all 0.2s">
-									{showReplies ? "Ẩn" : "Xem"}{" "}
-									{localComment.replies_count} phản hồi
+									{showReplies ? "Hide" : "View"}{" "}
+									{localComment.replies_count} replies
 								</Button>
 							)}
 					</HStack>
@@ -420,7 +420,7 @@ const CommentItem = ({
 									onChange={(e) =>
 										setReplyText(e.target.value)
 									}
-									placeholder="Viết phản hồi..."
+									placeholder="Write a reply..."
 									size="sm"
 									resize="none"
 									rows={2}
@@ -430,7 +430,7 @@ const CommentItem = ({
 										size="xs"
 										variant="ghost"
 										onClick={handleCancelReply}>
-										Hủy
+										Cancel
 									</Button>
 									<Button
 										size="xs"
@@ -438,7 +438,7 @@ const CommentItem = ({
 										onClick={handleSubmitReply}
 										isLoading={isSubmittingReply}
 										isDisabled={!replyText.trim()}>
-										Gửi
+										Send
 									</Button>
 								</HStack>
 							</VStack>
@@ -481,7 +481,7 @@ const CommentItem = ({
 										variant="ghost"
 										onClick={handleLoadMoreReplies}
 										isLoading={isLoadingReplies}>
-										Xem thêm phản hồi
+										Load more replies
 									</Button>
 								</Center>
 							)}
@@ -546,8 +546,8 @@ export const CommentSection = ({
 		} catch (error) {
 			console.error("Error fetching comments:", error);
 			toast({
-				title: "Lỗi",
-				description: "Không thể tải bình luận",
+				title: "Error",
+				description: "Unable to load comments",
 				status: "error",
 				duration: 3000,
 				isClosable: true,
@@ -591,8 +591,8 @@ export const CommentSection = ({
 
 			if (response.success) {
 				toast({
-					title: "Thành công",
-					description: "Đã thêm bình luận",
+					title: "Success",
+					description: "Comment added",
 					status: "success",
 					duration: 2000,
 					isClosable: true,
@@ -610,8 +610,8 @@ export const CommentSection = ({
 		} catch (error) {
 			console.error("Error creating comment:", error);
 			toast({
-				title: "Lỗi",
-				description: "Không thể thêm bình luận",
+				title: "Error",
+				description: "Unable to add comment",
 				status: "error",
 				duration: 3000,
 				isClosable: true,
@@ -630,8 +630,8 @@ export const CommentSection = ({
 
 			if (response.success) {
 				toast({
-					title: "Thành công",
-					description: "Đã cập nhật bình luận",
+					title: "Success",
+					description: "Comment updated",
 					status: "success",
 					duration: 2000,
 					isClosable: true,
@@ -655,8 +655,8 @@ export const CommentSection = ({
 		} catch (error) {
 			console.error("Error updating comment:", error);
 			toast({
-				title: "Lỗi",
-				description: "Không thể cập nhật bình luận",
+				title: "Error",
+				description: "Unable to update comment",
 				status: "error",
 				duration: 3000,
 				isClosable: true,
@@ -670,8 +670,8 @@ export const CommentSection = ({
 
 			if (response.success) {
 				toast({
-					title: "Thành công",
-					description: "Đã xóa bình luận",
+					title: "Success",
+					description: "Comment deleted",
 					status: "success",
 					duration: 2000,
 					isClosable: true,
@@ -692,8 +692,8 @@ export const CommentSection = ({
 		} catch (error) {
 			console.error("Error deleting comment:", error);
 			toast({
-				title: "Lỗi",
-				description: "Không thể xóa bình luận",
+				title: "Error",
+				description: "Unable to delete comment",
 				status: "error",
 				duration: 3000,
 				isClosable: true,
@@ -724,8 +724,8 @@ export const CommentSection = ({
 		} catch (error) {
 			console.error("Error liking/unliking comment:", error);
 			toast({
-				title: "Lỗi",
-				description: "Không thể thực hiện thao tác",
+				title: "Error",
+				description: "Unable to perform action",
 				status: "error",
 				duration: 2000,
 				isClosable: true,
@@ -795,7 +795,7 @@ export const CommentSection = ({
 							flex={1}
 							spacing={2}>
 							<Textarea
-								placeholder="Viết bình luận..."
+								placeholder="Write a comment..."
 								size="sm"
 								value={newComment}
 								onChange={(e) => setNewComment(e.target.value)}
@@ -812,7 +812,7 @@ export const CommentSection = ({
 									onClick={handleSubmit}
 									isDisabled={!newComment.trim()}
 									isLoading={isSubmitting}>
-									Bình luận
+									Comment
 								</Button>
 							</Flex>
 						</VStack>
@@ -849,7 +849,7 @@ export const CommentSection = ({
 										variant="ghost"
 										onClick={handleLoadMore}
 										isLoading={isLoading}>
-										Xem thêm bình luận
+										Load more comments
 									</Button>
 								</Center>
 							)}
@@ -859,7 +859,7 @@ export const CommentSection = ({
 							<Text
 								fontSize="sm"
 								color="gray.500">
-								Chưa có bình luận nào
+								No comments yet
 							</Text>
 						</Center>
 					)}

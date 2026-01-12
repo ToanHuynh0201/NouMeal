@@ -68,7 +68,7 @@ export const PostList = () => {
 				setPagination(data.pagination);
 			}
 		} catch (err) {
-			setError("Không thể tải bài viết. Vui lòng thử lại sau.");
+			setError("Unable to load posts. Please try again later.");
 			console.error("Error loading posts:", err);
 		} finally {
 			setIsLoading(false);
@@ -129,7 +129,7 @@ export const PostList = () => {
 				alignItems="center"
 				py={20}>
 				<LoadingSpinner
-					message="Đang tải bài viết..."
+					message="Loading posts..."
 					minHeight="200px"
 					variant="default"
 				/>
@@ -150,7 +150,7 @@ export const PostList = () => {
 				<Button
 					onClick={loadPosts}
 					colorScheme="blue">
-					Thử lại
+					Retry
 				</Button>
 			</Box>
 		);
@@ -179,7 +179,7 @@ export const PostList = () => {
 								/>
 							</InputLeftElement>
 							<Input
-								placeholder="Tìm kiếm bài viết..."
+								placeholder="Search posts..."
 								value={searchInput}
 								onChange={(e) => setSearchInput(e.target.value)}
 								onKeyPress={(e) => {
@@ -192,7 +192,7 @@ export const PostList = () => {
 						<Button
 							colorScheme="blue"
 							onClick={handleSearch}>
-							Tìm
+							Search
 						</Button>
 					</Flex>
 
@@ -203,9 +203,11 @@ export const PostList = () => {
 						flexWrap="wrap">
 						<InputGroup maxW="300px">
 							<Input
-								placeholder="Thêm hashtag (vd: vietnamese)"
+								placeholder="Add hashtag (e.g. vietnamese)"
 								value={hashtagInput}
-								onChange={(e) => setHashtagInput(e.target.value)}
+								onChange={(e) =>
+									setHashtagInput(e.target.value)
+								}
 								onKeyPress={(e) => {
 									if (e.key === "Enter") {
 										handleAddHashtag();
@@ -217,7 +219,7 @@ export const PostList = () => {
 							size="sm"
 							colorScheme="purple"
 							onClick={handleAddHashtag}>
-							Thêm
+							Add
 						</Button>
 						{hashtags.map((tag) => (
 							<Tag
@@ -226,7 +228,9 @@ export const PostList = () => {
 								colorScheme="purple"
 								borderRadius="full">
 								<TagLabel>#{tag}</TagLabel>
-								<TagCloseButton onClick={() => handleRemoveHashtag(tag)} />
+								<TagCloseButton
+									onClick={() => handleRemoveHashtag(tag)}
+								/>
 							</Tag>
 						))}
 					</Flex>
@@ -237,21 +241,21 @@ export const PostList = () => {
 							fontSize="sm"
 							color="gray.600"
 							minW="fit-content">
-							Sắp xếp:
+							Sort by:
 						</Text>
 						<Select
 							size="sm"
 							value={sortBy}
 							onChange={(e) => handleSortChange(e.target.value)}
 							maxW="200px">
-							<option value="createdAt">Ngày tạo</option>
-							<option value="updatedAt">Cập nhật</option>
+							<option value="createdAt">Date Created</option>
+							<option value="updatedAt">Last Updated</option>
 						</Select>
 						<Button
 							size="sm"
 							variant="outline"
 							onClick={handleSortOrderToggle}>
-							{sortOrder === "desc" ? "↓ Mới nhất" : "↑ Cũ nhất"}
+							{sortOrder === "desc" ? "↓ Newest" : "↑ Oldest"}
 						</Button>
 					</HStack>
 				</VStack>
@@ -265,7 +269,7 @@ export const PostList = () => {
 					<Text
 						color="gray.500"
 						fontSize="lg">
-						Không tìm thấy bài viết nào.
+						No posts found.
 					</Text>
 				</Box>
 			) : (
@@ -291,23 +295,30 @@ export const PostList = () => {
 								spacing={2}>
 								<Button
 									size="sm"
-									onClick={() => handlePageChange(pagination.page - 1)}
+									onClick={() =>
+										handlePageChange(pagination.page - 1)
+									}
 									isDisabled={pagination.page === 1}>
-									Trước
+									Previous
 								</Button>
-								{Array.from({ length: pagination.pages }, (_, i) => i + 1)
+								{Array.from(
+									{ length: pagination.pages },
+									(_, i) => i + 1,
+								)
 									.filter((page) => {
 										// Show first, last, current, and adjacent pages
 										return (
 											page === 1 ||
 											page === pagination.pages ||
-											Math.abs(page - pagination.page) <= 1
+											Math.abs(page - pagination.page) <=
+												1
 										);
 									})
 									.map((page, index, array) => {
 										// Add ellipsis
 										const prevPage = array[index - 1];
-										const showEllipsis = prevPage && page - prevPage > 1;
+										const showEllipsis =
+											prevPage && page - prevPage > 1;
 
 										return (
 											<HStack
@@ -323,12 +334,18 @@ export const PostList = () => {
 												<Button
 													size="sm"
 													colorScheme={
-														page === pagination.page ? "blue" : "gray"
+														page === pagination.page
+															? "blue"
+															: "gray"
 													}
 													variant={
-														page === pagination.page ? "solid" : "ghost"
+														page === pagination.page
+															? "solid"
+															: "ghost"
 													}
-													onClick={() => handlePageChange(page)}>
+													onClick={() =>
+														handlePageChange(page)
+													}>
 													{page}
 												</Button>
 											</HStack>
@@ -336,9 +353,13 @@ export const PostList = () => {
 									})}
 								<Button
 									size="sm"
-									onClick={() => handlePageChange(pagination.page + 1)}
-									isDisabled={pagination.page === pagination.pages}>
-									Sau
+									onClick={() =>
+										handlePageChange(pagination.page + 1)
+									}
+									isDisabled={
+										pagination.page === pagination.pages
+									}>
+									Next
 								</Button>
 							</HStack>
 							<Text
@@ -346,8 +367,8 @@ export const PostList = () => {
 								fontSize="sm"
 								color="gray.600"
 								mt={2}>
-								Trang {pagination.page} / {pagination.pages} ({pagination.total}{" "}
-								bài viết)
+								Page {pagination.page} / {pagination.pages} (
+								{pagination.total} posts)
 							</Text>
 						</Box>
 					)}

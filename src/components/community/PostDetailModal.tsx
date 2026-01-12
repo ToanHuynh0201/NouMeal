@@ -136,15 +136,15 @@ const PostDetailModal = ({ isOpen, onClose, postId }: PostDetailModalProps) => {
 
 	const handleFoodClick = async (food: FoodInPost) => {
 		try {
-			// Gọi API để lấy đầy đủ thông tin food
+			// Call API to get full food information
 			const response = await foodService.getFoodById(food._id);
 			const foodData = response.data.data || response.data;
 
-			// Convert sang Recipe format
+			// Convert to Recipe format
 			const recipe = convertFoodApiToRecipe(foodData);
 			setSelectedFood(recipe);
 
-			// Đánh dấu rằng cần mở lại PostDetailModal sau khi đóng RecipeDetailModal
+			// Mark that we need to reopen PostDetailModal after closing RecipeDetailModal
 			setShouldReopenPostModal(true);
 			onRecipeOpen();
 		} catch (error) {
@@ -167,10 +167,10 @@ const PostDetailModal = ({ isOpen, onClose, postId }: PostDetailModalProps) => {
 			(now.getTime() - date.getTime()) / (1000 * 60 * 60),
 		);
 
-		if (diffInHours < 1) return "Vừa xong";
-		if (diffInHours < 24) return `${diffInHours} giờ trước`;
-		if (diffInHours < 48) return "Hôm qua";
-		return date.toLocaleDateString("vi-VN");
+		if (diffInHours < 1) return "Just now";
+		if (diffInHours < 24) return `${diffInHours} hours ago`;
+		if (diffInHours < 48) return "Yesterday";
+		return date.toLocaleDateString("en-US");
 	};
 
 	return (
@@ -182,360 +182,386 @@ const PostDetailModal = ({ isOpen, onClose, postId }: PostDetailModalProps) => {
 				scrollBehavior="inside">
 				<ModalOverlay backdropFilter="blur(4px)" />
 				<ModalContent>
-				<ModalHeader>Chi tiết bài viết</ModalHeader>
-				<ModalCloseButton />
+					<ModalHeader>Post Details</ModalHeader>
+					<ModalCloseButton />
 
-				<ModalBody pb={6}>
-					{isLoading ? (
-						<Center py={10}>
-							<Spinner
-								size="xl"
-								color="purple.500"
-							/>
-						</Center>
-					) : postDetail ? (
-						<VStack
-							spacing={6}
-							align="stretch">
-							{/* Author Info */}
-							<HStack spacing={3}>
-								<Avatar
-									size="md"
-									// name={postDetail.author.name}
-									src={postDetail.author.avatar}
+					<ModalBody pb={6}>
+						{isLoading ? (
+							<Center py={10}>
+								<Spinner
+									size="xl"
+									color="purple.500"
 								/>
-								<VStack
-									align="start"
-									spacing={0}>
-									<Text
-										fontWeight="bold"
-										fontSize="md">
-										{postDetail.author.name}
-									</Text>
-									<Text
+							</Center>
+						) : postDetail ? (
+							<VStack
+								spacing={6}
+								align="stretch">
+								{/* Author Info */}
+								<HStack spacing={3}>
+									<Avatar
+										size="md"
+										// name={postDetail.author.name}
+										src={postDetail.author.avatar}
+									/>
+									<VStack
+										align="start"
+										spacing={0}>
+										<Text
+											fontWeight="bold"
+											fontSize="md">
+											{postDetail.author.name}
+										</Text>
+										<Text
+											fontSize="sm"
+											color="gray.600">
+											{postDetail.author.email}
+										</Text>
+										<Text
+											fontSize="xs"
+											color="gray.500">
+											{formatDate(postDetail.createdAt)}
+											{postDetail.is_edited &&
+												" • Edited"}
+										</Text>
+									</VStack>
+									<Badge
+										ml="auto"
+										colorScheme={
+											postDetail.visibility === "public"
+												? "green"
+												: postDetail.visibility ===
+												  "friends"
+												? "blue"
+												: "gray"
+										}
 										fontSize="sm"
-										color="gray.600">
-										{postDetail.author.email}
-									</Text>
-									<Text
-										fontSize="xs"
-										color="gray.500">
-										{formatDate(postDetail.createdAt)}
-										{postDetail.is_edited &&
-											" • Đã chỉnh sửa"}
-									</Text>
-								</VStack>
-								<Badge
-									ml="auto"
-									colorScheme={
-										postDetail.visibility === "public"
-											? "green"
+										px={3}
+										py={1}
+										borderRadius="full">
+										{postDetail.visibility === "public"
+											? "Public"
 											: postDetail.visibility ===
 											  "friends"
-											? "blue"
-											: "gray"
-									}
-									fontSize="sm"
-									px={3}
-									py={1}
-									borderRadius="full">
-									{postDetail.visibility === "public"
-										? "Công khai"
-										: postDetail.visibility === "friends"
-										? "Bạn bè"
-										: "Riêng tư"}
-								</Badge>
-							</HStack>
+											? "Friends"
+											: "Private"}
+									</Badge>
+								</HStack>
 
-							<Divider />
+								<Divider />
 
-							{/* Post Text Content */}
-							<Box>
-								<Text
-									fontSize="md"
-									whiteSpace="pre-wrap">
-									{postDetail.text}
-								</Text>
-							</Box>
-
-							{/* Hashtags */}
-							{postDetail.hashtags?.length > 0 && (
-								<Wrap spacing={2}>
-									{postDetail.hashtags?.map((tag, index) => (
-										<WrapItem key={index}>
-											<Tag
-												size="md"
-												colorScheme="purple"
-												borderRadius="full">
-												<TagLabel>#{tag}</TagLabel>
-											</Tag>
-										</WrapItem>
-									))}
-								</Wrap>
-							)}
-
-							<Divider />
-
-							{/* Foods Section */}
-							{postDetail.foods?.length > 0 && (
+								{/* Post Text Content */}
 								<Box>
 									<Text
-										fontSize="lg"
-										fontWeight="bold"
-										mb={4}
-										color="purple.700">
-										Món ăn ({postDetail.foods?.length})
+										fontSize="md"
+										whiteSpace="pre-wrap">
+										{postDetail.text}
 									</Text>
-									<SimpleGrid
-										columns={{ base: 1, md: 2 }}
-										spacing={4}>
-										{postDetail.foods?.map((food) => (
-											<Box
-												key={food._id}
-												borderWidth="1px"
-												borderRadius="lg"
-												overflow="hidden"
-												bg="white"
-												shadow="sm"
-												_hover={{ shadow: "md" }}
-												transition="all 0.2s"
-												cursor="pointer"
-												onClick={() =>
-													handleFoodClick(food)
-												}>
-												<Image
-													src={food.imageUrl}
-													alt={food.name}
-													h="200px"
-													w="100%"
-													objectFit="cover"
-												/>
-												<VStack
-													p={4}
-													spacing={3}
-													align="stretch">
-													<VStack
-														align="start"
-														spacing={1}>
-														<Text
-															fontWeight="bold"
-															fontSize="lg"
-															noOfLines={1}>
-															{food.name}
-														</Text>
-														<Text
-															fontSize="sm"
-															color="gray.600"
-															noOfLines={2}>
-															{food.description}
-														</Text>
-													</VStack>
-
-													<HStack
-														spacing={2}
-														flexWrap="wrap">
-														<Badge colorScheme="purple">
-															{food.category}
-														</Badge>
-														<Badge colorScheme="orange">
-															{
-																food
-																	.nutritionalInfo
-																	.calories
-															}{" "}
-															kcal
-														</Badge>
-													</HStack>
-
-													{/* Nutritional Info */}
-													<Box
-														bg="gray.50"
-														p={3}
-														borderRadius="md">
-														<Text
-															fontSize="xs"
-															fontWeight="semibold"
-															color="gray.600"
-															mb={2}>
-															Thông tin dinh
-															dưỡng:
-														</Text>
-														<SimpleGrid
-															columns={2}
-															spacing={2}>
-															<HStack justify="space-between">
-																<Text
-																	fontSize="xs"
-																	color="gray.600">
-																	Protein:
-																</Text>
-																<Text
-																	fontSize="xs"
-																	fontWeight="medium">
-																	{
-																		food
-																			.nutritionalInfo
-																			.protein
-																	}
-																	g
-																</Text>
-															</HStack>
-															<HStack justify="space-between">
-																<Text
-																	fontSize="xs"
-																	color="gray.600">
-																	Carbs:
-																</Text>
-																<Text
-																	fontSize="xs"
-																	fontWeight="medium">
-																	{
-																		food
-																			.nutritionalInfo
-																			.carbohydrates
-																	}
-																	g
-																</Text>
-															</HStack>
-															<HStack justify="space-between">
-																<Text
-																	fontSize="xs"
-																	color="gray.600">
-																	Fat:
-																</Text>
-																<Text
-																	fontSize="xs"
-																	fontWeight="medium">
-																	{
-																		food
-																			.nutritionalInfo
-																			.fat
-																	}
-																	g
-																</Text>
-															</HStack>
-															<HStack justify="space-between">
-																<Text
-																	fontSize="xs"
-																	color="gray.600">
-																	Fiber:
-																</Text>
-																<Text
-																	fontSize="xs"
-																	fontWeight="medium">
-																	{
-																		food
-																			.nutritionalInfo
-																			.fiber
-																	}
-																	g
-																</Text>
-															</HStack>
-														</SimpleGrid>
-													</Box>
-												</VStack>
-											</Box>
-										))}
-									</SimpleGrid>
 								</Box>
-							)}
 
-							<Divider />
+								{/* Hashtags */}
+								{postDetail.hashtags?.length > 0 && (
+									<Wrap spacing={2}>
+										{postDetail.hashtags?.map(
+											(tag, index) => (
+												<WrapItem key={index}>
+													<Tag
+														size="md"
+														colorScheme="purple"
+														borderRadius="full">
+														<TagLabel>
+															#{tag}
+														</TagLabel>
+													</Tag>
+												</WrapItem>
+											),
+										)}
+									</Wrap>
+								)}
 
-							{/* Engagement Stats */}
-							<HStack
-								justify="space-around"
-								py={2}>
-								<VStack spacing={0}>
-									<Text
-										fontSize="2xl"
-										fontWeight="bold"
-										color="purple.600">
-										{postDetail.engagement?.likes_count}
-									</Text>
-									<Text
-										fontSize="sm"
-										color="gray.600">
-										Lượt thích
-									</Text>
-								</VStack>
-								<VStack spacing={0}>
-									<Text
-										fontSize="2xl"
-										fontWeight="bold"
-										color="blue.600">
-										{postDetail.engagement?.comments_count}
-									</Text>
-									<Text
-										fontSize="sm"
-										color="gray.600">
-										Bình luận
-									</Text>
-								</VStack>
-								<VStack spacing={0}>
-									<Text
-										fontSize="2xl"
-										fontWeight="bold"
-										color="green.600">
-										{postDetail.engagement?.shares_count}
-									</Text>
-									<Text
-										fontSize="sm"
-										color="gray.600">
-										Chia sẻ
-									</Text>
-								</VStack>
-							</HStack>
+								<Divider />
 
-							<Divider />
+								{/* Foods Section */}
+								{postDetail.foods?.length > 0 && (
+									<Box>
+										<Text
+											fontSize="lg"
+											fontWeight="bold"
+											mb={4}
+											color="purple.700">
+											Dishes ({postDetail.foods?.length})
+										</Text>
+										<SimpleGrid
+											columns={{ base: 1, md: 2 }}
+											spacing={4}>
+											{postDetail.foods?.map((food) => (
+												<Box
+													key={food._id}
+													borderWidth="1px"
+													borderRadius="lg"
+													overflow="hidden"
+													bg="white"
+													shadow="sm"
+													_hover={{ shadow: "md" }}
+													transition="all 0.2s"
+													cursor="pointer"
+													onClick={() =>
+														handleFoodClick(food)
+													}>
+													<Image
+														src={food.imageUrl}
+														alt={food.name}
+														h="200px"
+														w="100%"
+														objectFit="cover"
+													/>
+													<VStack
+														p={4}
+														spacing={3}
+														align="stretch">
+														<VStack
+															align="start"
+															spacing={1}>
+															<Text
+																fontWeight="bold"
+																fontSize="lg"
+																noOfLines={1}>
+																{food.name}
+															</Text>
+															<Text
+																fontSize="sm"
+																color="gray.600"
+																noOfLines={2}>
+																{
+																	food.description
+																}
+															</Text>
+														</VStack>
 
-							{/* Like Button */}
-							<Box py={2}>
-								<Button
-									size="md"
-									width="full"
-									variant="ghost"
-									colorScheme={postDetail.is_liked ? "blue" : "gray"}
-									leftIcon={
-										<Icon
-											as={FiThumbsUp}
-											boxSize={5}
-											color={postDetail.is_liked ? "blue.500" : undefined}
-										/>
+														<HStack
+															spacing={2}
+															flexWrap="wrap">
+															<Badge colorScheme="purple">
+																{food.category}
+															</Badge>
+															<Badge colorScheme="orange">
+																{
+																	food
+																		.nutritionalInfo
+																		.calories
+																}{" "}
+																kcal
+															</Badge>
+														</HStack>
+
+														{/* Nutritional Info */}
+														<Box
+															bg="gray.50"
+															p={3}
+															borderRadius="md">
+															<Text
+																fontSize="xs"
+																fontWeight="semibold"
+																color="gray.600"
+																mb={2}>
+																Nutritional
+																Info:
+															</Text>
+															<SimpleGrid
+																columns={2}
+																spacing={2}>
+																<HStack justify="space-between">
+																	<Text
+																		fontSize="xs"
+																		color="gray.600">
+																		Protein:
+																	</Text>
+																	<Text
+																		fontSize="xs"
+																		fontWeight="medium">
+																		{
+																			food
+																				.nutritionalInfo
+																				.protein
+																		}
+																		g
+																	</Text>
+																</HStack>
+																<HStack justify="space-between">
+																	<Text
+																		fontSize="xs"
+																		color="gray.600">
+																		Carbs:
+																	</Text>
+																	<Text
+																		fontSize="xs"
+																		fontWeight="medium">
+																		{
+																			food
+																				.nutritionalInfo
+																				.carbohydrates
+																		}
+																		g
+																	</Text>
+																</HStack>
+																<HStack justify="space-between">
+																	<Text
+																		fontSize="xs"
+																		color="gray.600">
+																		Fat:
+																	</Text>
+																	<Text
+																		fontSize="xs"
+																		fontWeight="medium">
+																		{
+																			food
+																				.nutritionalInfo
+																				.fat
+																		}
+																		g
+																	</Text>
+																</HStack>
+																<HStack justify="space-between">
+																	<Text
+																		fontSize="xs"
+																		color="gray.600">
+																		Fiber:
+																	</Text>
+																	<Text
+																		fontSize="xs"
+																		fontWeight="medium">
+																		{
+																			food
+																				.nutritionalInfo
+																				.fiber
+																		}
+																		g
+																	</Text>
+																</HStack>
+															</SimpleGrid>
+														</Box>
+													</VStack>
+												</Box>
+											))}
+										</SimpleGrid>
+									</Box>
+								)}
+
+								<Divider />
+
+								{/* Engagement Stats */}
+								<HStack
+									justify="space-around"
+									py={2}>
+									<VStack spacing={0}>
+										<Text
+											fontSize="2xl"
+											fontWeight="bold"
+											color="purple.600">
+											{postDetail.engagement?.likes_count}
+										</Text>
+										<Text
+											fontSize="sm"
+											color="gray.600">
+											Likes
+										</Text>
+									</VStack>
+									<VStack spacing={0}>
+										<Text
+											fontSize="2xl"
+											fontWeight="bold"
+											color="blue.600">
+											{
+												postDetail.engagement
+													?.comments_count
+											}
+										</Text>
+										<Text
+											fontSize="sm"
+											color="gray.600">
+											Comments
+										</Text>
+									</VStack>
+									<VStack spacing={0}>
+										<Text
+											fontSize="2xl"
+											fontWeight="bold"
+											color="green.600">
+											{
+												postDetail.engagement
+													?.shares_count
+											}
+										</Text>
+										<Text
+											fontSize="sm"
+											color="gray.600">
+											Shares
+										</Text>
+									</VStack>
+								</HStack>
+
+								<Divider />
+
+								{/* Like Button */}
+								<Box py={2}>
+									<Button
+										size="md"
+										width="full"
+										variant="ghost"
+										colorScheme={
+											postDetail.is_liked
+												? "blue"
+												: "gray"
+										}
+										leftIcon={
+											<Icon
+												as={FiThumbsUp}
+												boxSize={5}
+												color={
+													postDetail.is_liked
+														? "blue.500"
+														: undefined
+												}
+											/>
+										}
+										onClick={handleLike}
+										isLoading={isLikeLoading}
+										_hover={{ transform: "scale(1.02)" }}
+										transition="all 0.2s">
+										{postDetail.is_liked ? "Liked" : "Like"}
+									</Button>
+								</Box>
+
+								{/* Comment Section */}
+								<CommentSection
+									postId={postId || ""}
+									initialCount={
+										postDetail.engagement?.comments_count ||
+										0
 									}
-									onClick={handleLike}
-									isLoading={isLikeLoading}
-									_hover={{ transform: "scale(1.02)" }}
-									transition="all 0.2s">
-									{postDetail.is_liked ? "Đã thích" : "Thích"}
-								</Button>
-							</Box>
+									onCommentAdded={handleCommentAdded}
+								/>
+							</VStack>
+						) : (
+							<Center py={10}>
+								<Text color="gray.500">
+									Unable to load post
+								</Text>
+							</Center>
+						)}
+					</ModalBody>
+				</ModalContent>
+			</Modal>
 
-							{/* Comment Section */}
-							<CommentSection
-								postId={postId || ""}
-								initialCount={postDetail.engagement?.comments_count || 0}
-								onCommentAdded={handleCommentAdded}
-							/>
-						</VStack>
-					) : (
-						<Center py={10}>
-							<Text color="gray.500">Không thể tải bài viết</Text>
-						</Center>
-					)}
-				</ModalBody>
-			</ModalContent>
-		</Modal>
-
-		{/* Recipe Detail Modal */}
-		{selectedFood && (
-			<RecipeDetailModal
-				isOpen={isRecipeOpen}
-				onClose={handleRecipeClose}
-				recipe={selectedFood}
-				showSaveButton={true}
-			/>
-		)}
+			{/* Recipe Detail Modal */}
+			{selectedFood && (
+				<RecipeDetailModal
+					isOpen={isRecipeOpen}
+					onClose={handleRecipeClose}
+					recipe={selectedFood}
+					showSaveButton={true}
+				/>
+			)}
 		</>
 	);
 };

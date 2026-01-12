@@ -204,7 +204,7 @@ function LandingPage() {
 								as="span"
 								bgGradient="linear(to-r, yellow.300, orange.300)"
 								bgClip="text">
-								Let MealGenie
+								Let NouMeal
 							</Text>{" "}
 							Decide!
 						</Heading>
@@ -317,7 +317,7 @@ function LandingPage() {
 							fontSize="lg"
 							color="gray.600"
 							maxW="600px">
-							MealGenie combines cutting-edge AI technology with
+							NouMeal combines cutting-edge AI technology with
 							nutrition science to help you achieve your health
 							goals effortlessly.
 						</Text>
@@ -412,7 +412,7 @@ function LandingPage() {
 								px={3}
 								py={1}
 								borderRadius="full">
-								Why Choose MealGenie
+								Why Choose NouMeal
 							</Badge>
 							<Heading
 								size="2xl"
@@ -428,7 +428,7 @@ function LandingPage() {
 								fontSize="lg"
 								color="gray.600"
 								maxW="700px">
-								MealGenie is designed to make healthy eating
+								NouMeal is designed to make healthy eating
 								simple, personalized, and accessible for
 								everyone. Here's why you'll love it.
 							</Text>
@@ -534,7 +534,7 @@ function LandingPage() {
 						<Heading
 							size="2xl"
 							fontWeight="bold">
-							How MealGenie Works
+							How NouMeal Works
 						</Heading>
 						<Text
 							fontSize="lg"
@@ -652,7 +652,7 @@ function LandingPage() {
 						<Text
 							fontSize="xl"
 							opacity={0.9}>
-							Let MealGenie help you make smarter food choices and
+							Let NouMeal help you make smarter food choices and
 							achieve your health goals with personalized
 							AI-powered recommendations.
 						</Text>

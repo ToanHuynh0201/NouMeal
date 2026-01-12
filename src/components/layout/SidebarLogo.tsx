@@ -40,7 +40,7 @@ export const SidebarLogo = ({ isCollapsed }: SidebarLogoProps) => {
 			}}>
 			{isCollapsed ? (
 				<Tooltip
-					label="MealGenie"
+					label="NouMeal"
 					placement="right"
 					hasArrow>
 					<Box
@@ -65,7 +65,7 @@ export const SidebarLogo = ({ isCollapsed }: SidebarLogoProps) => {
 							}}>
 							<img
 								src="/vite.svg"
-								alt="MealGenie Logo"
+								alt="NouMeal Logo"
 								style={{
 									width: "28px",
 									height: "28px",
@@ -92,7 +92,7 @@ export const SidebarLogo = ({ isCollapsed }: SidebarLogoProps) => {
 						}}>
 						<img
 							src="/vite.svg"
-							alt="MealGenie Logo"
+							alt="NouMeal Logo"
 							style={{
 								width: "36px",
 								height: "36px",
@@ -111,7 +111,7 @@ export const SidebarLogo = ({ isCollapsed }: SidebarLogoProps) => {
 							bgClip="text"
 							lineHeight={1.2}
 							letterSpacing="tight">
-							MealGenie
+							NouMeal
 						</Text>
 						<Text
 							fontSize="xs"
