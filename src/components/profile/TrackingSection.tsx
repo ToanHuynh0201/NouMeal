@@ -57,23 +57,49 @@ const TrackingSection = () => {
 
 	// Memoize params to prevent infinite loop
 	const dailyParams = useMemo(() => {
+		const today = new Date();
 		const sevenDaysAgo = new Date();
 		sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
-		return {
-			startDate: sevenDaysAgo.toISOString().split("T")[0],
-			endDate: new Date().toISOString().split("T")[0],
+
+		// Format dates using local timezone (YYYY-MM-DD)
+		const formatLocalDate = (date: Date) => {
+			const year = date.getFullYear();
+			const month = String(date.getMonth() + 1).padStart(2, '0');
+			const day = String(date.getDate()).padStart(2, '0');
+			return `${year}-${month}-${day}`;
+		};
+
+		const params = {
+			startDate: formatLocalDate(sevenDaysAgo),
+			endDate: formatLocalDate(today),
 			groupBy: "day" as const,
 		};
+
+		console.log('Daily params:', params);
+		return params;
 	}, []);
 
 	const weeklyParams = useMemo(() => {
+		const today = new Date();
 		const fourWeeksAgo = new Date();
 		fourWeeksAgo.setDate(fourWeeksAgo.getDate() - 28);
-		return {
-			startDate: fourWeeksAgo.toISOString().split("T")[0],
-			endDate: new Date().toISOString().split("T")[0],
+
+		// Format dates using local timezone (YYYY-MM-DD)
+		const formatLocalDate = (date: Date) => {
+			const year = date.getFullYear();
+			const month = String(date.getMonth() + 1).padStart(2, '0');
+			const day = String(date.getDate()).padStart(2, '0');
+			return `${year}-${month}-${day}`;
+		};
+
+		const params = {
+			startDate: formatLocalDate(fourWeeksAgo),
+			endDate: formatLocalDate(today),
 			groupBy: "week" as const,
 		};
+
+		console.log('Weekly params:', params);
+		return params;
 	}, []);
 
 	// Fetch last 7 days data for daily tracking
