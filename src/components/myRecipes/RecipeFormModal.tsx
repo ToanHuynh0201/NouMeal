@@ -28,8 +28,8 @@ import {
 	TagLabel,
 	TagCloseButton,
 } from "@chakra-ui/react";
-import { useState, useEffect } from "react";
-import { FiPlus, FiX } from "react-icons/fi";
+import { useState, useEffect, useRef } from "react";
+import { FiPlus, FiX, FiUpload, FiImage } from "react-icons/fi";
 import type { Recipe } from "@/types/recipe";
 import type { RecipeFormData } from "@/types/myRecipe";
 import { ALLERGEN_VALUES, DIETARY_PREFERENCE_TAGS } from "@/constants";
@@ -79,6 +79,8 @@ const RecipeFormModal = ({
 	};
 
 	const [formData, setFormData] = useState<RecipeFormData>(initialFormData);
+	const [imagePreview, setImagePreview] = useState<string>("");
+	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	// Load editing recipe data
 	useEffect(() => {
@@ -107,18 +109,20 @@ const RecipeFormModal = ({
 						const parts = ing.split(" - ");
 						return {
 							name: capitalizeFirstLetter(parts[0].trim()),
-							amount: parts[1]?.trim() || ""
+							amount: parts[1]?.trim() || "",
 						};
 					}
 
 					// Kiểm tra format "amount name"
 					// Match: số (có thể có dấu / hoặc .) + đơn vị đo lường (tùy chọn, có thể dính liền hoặc cách nhau)
 					// Ví dụ: "2", "1/2", "300g", "300 g", "4 cups", "1 tbsp", "500ml"
-					const match = ing.match(/^([\d./]+(?:(?:\s+|(?=[a-z]))(?:cups?|tbsp|tsp|mg|g|kg|ml|l|oz|lb|piece|pieces|cloves?|wedges?))?)\s+(.+)$/i);
+					const match = ing.match(
+						/^([\d./]+(?:(?:\s+|(?=[a-z]))(?:cups?|tbsp|tsp|mg|g|kg|ml|l|oz|lb|piece|pieces|cloves?|wedges?))?)\s+(.+)$/i,
+					);
 					if (match) {
 						return {
 							name: capitalizeFirstLetter(match[2].trim()),
-							amount: match[1].trim()
+							amount: match[1].trim(),
 						};
 					}
 
@@ -130,10 +134,69 @@ const RecipeFormModal = ({
 				allergens: (editingRecipe as any).allergens || [],
 				nutrition: editingRecipe.nutrition,
 			});
+			setImagePreview(editingRecipe.image || "");
 		} else if (isOpen && !editingRecipe) {
 			setFormData(initialFormData);
+			setImagePreview("");
 		}
 	}, [editingRecipe, isOpen]);
+
+	// Handle image file upload and convert to base64
+	const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+		const file = event.target.files?.[0];
+		if (!file) return;
+
+		// Validate file type
+		if (!file.type.startsWith("image/")) {
+			toast({
+				title: "Invalid file type",
+				description:
+					"Please select an image file (JPEG, PNG, GIF, etc.)",
+				status: "error",
+				duration: 3000,
+				isClosable: true,
+			});
+			return;
+		}
+
+		// Validate file size (max 5MB)
+		const maxSize = 5 * 1024 * 1024;
+		if (file.size > maxSize) {
+			toast({
+				title: "File too large",
+				description: "Please select an image smaller than 5MB",
+				status: "error",
+				duration: 3000,
+				isClosable: true,
+			});
+			return;
+		}
+
+		const reader = new FileReader();
+		reader.onloadend = () => {
+			const base64String = reader.result as string;
+			setFormData((prev) => ({ ...prev, image: base64String }));
+			setImagePreview(base64String);
+		};
+		reader.onerror = () => {
+			toast({
+				title: "Error reading file",
+				description: "Failed to read the image file",
+				status: "error",
+				duration: 3000,
+				isClosable: true,
+			});
+		};
+		reader.readAsDataURL(file);
+	};
+
+	const handleRemoveImage = () => {
+		setFormData((prev) => ({ ...prev, image: "" }));
+		setImagePreview("");
+		if (fileInputRef.current) {
+			fileInputRef.current.value = "";
+		}
+	};
 
 	const handleInputChange = (
 		field: keyof RecipeFormData,
@@ -213,7 +276,7 @@ const RecipeFormModal = ({
 		});
 	};
 
-	const handleSubmit = () => {
+	const handleSubmit = async () => {
 		// Validation
 		if (!formData.title.trim()) {
 			toast({
@@ -272,12 +335,21 @@ const RecipeFormModal = ({
 			return;
 		}
 
-		onSave(cleanedData);
+		try {
+			await onSave(cleanedData);
+			console.log("RecipeFormModal - onSave completed");
+		} catch (error) {
+			console.error("RecipeFormModal - onSave error:", error);
+		}
 		handleClose();
 	};
 
 	const handleClose = () => {
 		setFormData(initialFormData);
+		setImagePreview("");
+		if (fileInputRef.current) {
+			fileInputRef.current.value = "";
+		}
 		onClose();
 	};
 
@@ -485,17 +557,87 @@ const RecipeFormModal = ({
 								</Grid>
 
 								<FormControl>
-									<FormLabel>Image URL</FormLabel>
+									<FormLabel>Recipe Image</FormLabel>
 									<Input
-										value={formData.image}
-										onChange={(e) =>
-											handleInputChange(
-												"image",
-												e.target.value,
-											)
-										}
-										placeholder="Enter image URL"
+										type="file"
+										accept="image/*"
+										ref={fileInputRef}
+										onChange={handleImageUpload}
+										display="none"
 									/>
+									{imagePreview ? (
+										<Box position="relative">
+											<Box
+												borderRadius="lg"
+												overflow="hidden"
+												border="2px solid"
+												borderColor={borderColor}>
+												<img
+													src={imagePreview}
+													alt="Recipe preview"
+													style={{
+														width: "100%",
+														maxHeight: "200px",
+														objectFit: "cover",
+													}}
+												/>
+											</Box>
+											<HStack
+												mt={2}
+												spacing={2}>
+												<Button
+													size="sm"
+													leftIcon={
+														<Icon as={FiUpload} />
+													}
+													variant="outline"
+													onClick={() =>
+														fileInputRef.current?.click()
+													}>
+													Change Image
+												</Button>
+												<IconButton
+													aria-label="Remove image"
+													icon={<Icon as={FiX} />}
+													size="sm"
+													colorScheme="red"
+													variant="outline"
+													onClick={handleRemoveImage}
+												/>
+											</HStack>
+										</Box>
+									) : (
+										<Box
+											border="2px dashed"
+											borderColor={borderColor}
+											borderRadius="lg"
+											p={8}
+											textAlign="center"
+											cursor="pointer"
+											_hover={{
+												borderColor: "brand.500",
+												bg: "gray.50",
+											}}
+											onClick={() =>
+												fileInputRef.current?.click()
+											}>
+											<VStack spacing={2}>
+												<Icon
+													as={FiImage}
+													boxSize={8}
+													color="gray.400"
+												/>
+												<Text color="gray.500">
+													Click to upload an image
+												</Text>
+												<Text
+													fontSize="sm"
+													color="gray.400">
+													JPEG, PNG, GIF (max 5MB)
+												</Text>
+											</VStack>
+										</Box>
+									)}
 								</FormControl>
 							</VStack>
 						</Box>
@@ -769,18 +911,31 @@ const RecipeFormModal = ({
 								<Select
 									placeholder="Select a dietary tag to add"
 									onChange={(e) => {
-										const selectedTag = e.target.value as DietaryPreferenceTag;
-										if (selectedTag && !formData.tags.includes(selectedTag)) {
+										const selectedTag = e.target
+											.value as DietaryPreferenceTag;
+										if (
+											selectedTag &&
+											!formData.tags.includes(selectedTag)
+										) {
 											setFormData((prev) => ({
 												...prev,
-												tags: [...prev.tags, selectedTag],
+												tags: [
+													...prev.tags,
+													selectedTag,
+												],
 											}));
 										}
 										e.target.value = ""; // Reset select
 									}}>
 									{DIETARY_PREFERENCE_TAGS.map((tag) => (
-										<option key={tag} value={tag}>
-											{tag.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+										<option
+											key={tag}
+											value={tag}>
+											{tag
+												.replace(/_/g, " ")
+												.replace(/\b\w/g, (l) =>
+													l.toUpperCase(),
+												)}
 										</option>
 									))}
 								</Select>
@@ -794,13 +949,19 @@ const RecipeFormModal = ({
 											variant="solid"
 											colorScheme="purple">
 											<TagLabel>
-												{tag.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase())}
+												{tag
+													.replace(/_/g, " ")
+													.replace(/\b\w/g, (l) =>
+														l.toUpperCase(),
+													)}
 											</TagLabel>
 											<TagCloseButton
 												onClick={() => {
 													setFormData((prev) => ({
 														...prev,
-														tags: prev.tags.filter((t) => t !== tag),
+														tags: prev.tags.filter(
+															(t) => t !== tag,
+														),
 													}));
 												}}
 											/>

@@ -79,7 +79,7 @@ export const useMyRecipes = () => {
 					step: index + 1,
 					description: desc,
 				})),
-				imageUrl: recipeData.image,
+				image: recipeData.image,
 				category: recipeData.foodCategory,
 				meal: recipeData.category,
 				ingredients: recipeData.ingredients,
@@ -159,6 +159,7 @@ export const useMyRecipes = () => {
 					carbohydrates: parseFloat(recipeData.nutrition.carbs) || 0,
 					fat: parseFloat(recipeData.nutrition.fat) || 0,
 				},
+				ingredients: recipeData.ingredients,
 			};
 		},
 		[],
@@ -175,12 +176,15 @@ export const useMyRecipes = () => {
 		}> => {
 			try {
 				const checkRequest = convertRecipeToCheckRequest(recipeData);
+				console.log(checkRequest);
+
 				const response = await foodService.checkFoodAppropriate(
 					checkRequest,
 				);
 
 				if (response.success) {
-					const { isAppropriate, isAllergyFree } = response.data;
+					const { isAppropriate, isAllergyFree } =
+						response.data.isAppropriate;
 					return {
 						isAppropriate,
 						isAllergyFree,
@@ -195,9 +199,9 @@ export const useMyRecipes = () => {
 			} catch (error) {
 				console.error("Error checking food appropriateness:", error);
 				return {
-					isAppropriate: true,
-					isAllergyFree: true,
-					canAdd: true,
+					isAppropriate: false,
+					isAllergyFree: false,
+					canAdd: false,
 				};
 			}
 		},
@@ -210,6 +214,7 @@ export const useMyRecipes = () => {
 			try {
 				const foodRequest = convertRecipeToFoodRequest(recipeData);
 				const response = await foodService.createUserFood(foodRequest);
+				console.log(response);
 
 				if (response.success) {
 					const newRecipe = convertFoodToRecipe(response.data);
@@ -252,6 +257,7 @@ export const useMyRecipes = () => {
 	const addRecipe = useCallback(
 		async (recipeData: RecipeFormData) => {
 			const checkResult = await checkFoodAppropriate(recipeData);
+
 			return { ...checkResult, recipeData };
 		},
 		[checkFoodAppropriate],

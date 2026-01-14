@@ -168,11 +168,13 @@ const MyRecipesPage = () => {
 
 	const handleSaveRecipe = async (recipeData: RecipeFormData) => {
 		if (editingRecipe) {
-			// Update existing recipe - no need to check appropriateness
+			console.log("EDITING");
+
 			updateRecipe(editingRecipe.id, recipeData);
 		} else {
 			// Add new recipe - check if appropriate
 			const result = await addRecipe(recipeData);
+			console.log(result);
 
 			if (!result.isAllergyFree) {
 				// Contains allergens - block completely

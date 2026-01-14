@@ -74,7 +74,7 @@ export interface CreateFoodRequest {
 	name: string;
 	description: string;
 	instructions: FoodInstruction[];
-	imageUrl: string;
+	image: string;
 	category:
 		| "fruits"
 		| "vegetables"
@@ -125,6 +125,7 @@ export interface CheckFoodAppropriateRequest {
 		carbohydrates: number;
 		fat: number;
 	};
+	ingredients: Array<{ name: string; amount: string }>;
 }
 
 export interface CheckFoodAppropriateResponse {
