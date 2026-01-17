@@ -44,16 +44,12 @@ export const useTimeseries = (
 			setError(null);
 
 			const queryParams = params || paramsRef.current;
-			console.log('🔍 Timeseries API Request params:', queryParams);
 
 			const result = await userService.getTimeseries(queryParams);
-			console.log('📊 Timeseries API Response:', result);
 
 			if (result.success && result.data) {
-				console.log('✅ Data received:', result.data.length, 'items');
 				setData(result.data);
 			} else {
-				console.error('❌ API Error:', result.error);
 				setError(result.error || "Failed to fetch timeseries data");
 				setData([]);
 			}

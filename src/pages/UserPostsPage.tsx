@@ -15,18 +15,24 @@ import {
 	useToast,
 	SimpleGrid,
 	HStack,
+	Stat,
+	StatLabel,
+	StatNumber,
 } from "@chakra-ui/react";
-import { FiArrowLeft, FiUser } from "react-icons/fi";
+import { FiArrowLeft, FiUser, FiUserPlus, FiUserCheck } from "react-icons/fi";
 import MainLayout from "@/components/layout/MainLayout";
 import { animationPresets } from "@/styles/animation";
 import { communityService } from "@/services/communityService";
+import { userService } from "@/services/userService";
 import type { Post } from "@/types/community";
 import PostDetailModal from "@/components/community/PostDetailModal";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function UserPostsPage() {
 	const { userId } = useParams<{ userId: string }>();
 	const navigate = useNavigate();
 	const toast = useToast();
+	const { user: currentUser } = useAuth();
 
 	const [posts, setPosts] = useState<Post[]>([]);
 	const [loading, setLoading] = useState(true);
@@ -34,13 +40,35 @@ export default function UserPostsPage() {
 	const [totalPages, setTotalPages] = useState(1);
 	const [selectedPost, setSelectedPost] = useState<Post | null>(null);
 	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [isFollowing, setIsFollowing] = useState(false);
+	const [followLoading, setFollowLoading] = useState(false);
+	const [followerCount, setFollowerCount] = useState(0);
+	const [followingCount, setFollowingCount] = useState(0);
 
 	const authorInfo = posts.length > 0 ? posts[0].author : null;
+	const isOwnProfile = currentUser?._id === userId;
 
-	useEffect(() => {
-		loadUserPosts();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [userId, page]);
+	const loadUserProfile = async () => {
+		if (!userId) {
+			return;
+		}
+
+		try {
+			const response = await userService.getUserProfile(userId);
+
+			// Handle both direct data and nested data structures
+			const userData = response.data || response;
+
+			if (userData) {
+				setFollowerCount(userData.NumberOfFollowers || 0);
+				setFollowingCount(userData.followingUsers?.length || 0);
+			}
+		} catch (error) {
+			console.error("Error loading user profile:", error);
+			// Don't show error toast for profile stats failure
+			// Keep current counts if API fails
+		}
+	};
 
 	const loadUserPosts = async () => {
 		if (!userId) {
@@ -55,8 +83,20 @@ export default function UserPostsPage() {
 					limit: 12,
 				});
 
+			console.log("User posts loaded:", userPosts);
+			console.log(
+				"First post is_from_follower:",
+				userPosts[0]?.is_from_follower,
+			);
+
 			setPosts(userPosts);
 			setTotalPages(pagination.pages);
+
+			// Determine if current user is following this user
+			// Based on the log, is_from_follower indicates if the post author is being followed
+			if (userPosts.length > 0) {
+				setIsFollowing(userPosts[0].is_from_follower || false);
+			}
 		} catch (error) {
 			console.error("Error loading user posts:", error);
 			toast({
@@ -68,6 +108,75 @@ export default function UserPostsPage() {
 			});
 		} finally {
 			setLoading(false);
+		}
+	};
+
+	useEffect(() => {
+		console.log(currentUser);
+
+		loadUserPosts();
+		loadUserProfile();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [userId, page]);
+
+	const handleFollowToggle = async () => {
+		if (!userId || !currentUser) {
+			return;
+		}
+
+		const previousFollowing = isFollowing;
+		const previousCount = followerCount;
+
+		setFollowLoading(true);
+		try {
+			if (isFollowing) {
+				// Unfollow
+				await userService.unfollowUser(userId);
+
+				// Update state after successful API call
+				setIsFollowing(false);
+				setFollowerCount((prev) => Math.max(0, prev - 1));
+
+				toast({
+					title: "Đã bỏ theo dõi",
+					description: "Bạn đã bỏ theo dõi người dùng này",
+					status: "success",
+					duration: 2000,
+					isClosable: true,
+				});
+			} else {
+				// Follow
+				await userService.followUser(userId);
+
+				// Update state after successful API call
+				setIsFollowing(true);
+				setFollowerCount((prev) => prev + 1);
+
+				toast({
+					title: "Đã theo dõi",
+					description: "Bạn đã theo dõi người dùng này",
+					status: "success",
+					duration: 2000,
+					isClosable: true,
+				});
+			}
+		} catch (error: any) {
+			console.error("Error toggling follow:", error);
+
+			// Revert any optimistic updates on error
+			setIsFollowing(previousFollowing);
+			setFollowerCount(previousCount);
+
+			toast({
+				title: "Lỗi",
+				description:
+					error?.message || "Không thể thực hiện thao tác này",
+				status: "error",
+				duration: 3000,
+				isClosable: true,
+			});
+		} finally {
+			setFollowLoading(false);
 		}
 	};
 
@@ -116,36 +225,83 @@ export default function UserPostsPage() {
 						borderWidth="1px"
 						borderColor="gray.200">
 						<Flex
-							align="center"
+							direction={{ base: "column", md: "row" }}
+							align={{ base: "start", md: "center" }}
+							justify="space-between"
 							gap={6}>
-							<Avatar
-								size="2xl"
-								name={authorInfo?.name || "User"}
-								src={authorInfo?.avatar}
-								bg="blue.500"
-							/>
-							<VStack
-								align="start"
-								spacing={2}>
-								<Heading
-									as="h1"
-									size="xl"
-									color="gray.900">
-									{authorInfo?.name || "Người dùng"}
-								</Heading>
-								<HStack spacing={4}>
-									<Text
-										color="gray.600"
-										fontSize="lg">
-										<Text
-											as="span"
-											fontWeight="bold">
-											{posts.length}
-										</Text>{" "}
-										bài viết
-									</Text>
-								</HStack>
-							</VStack>
+							<Flex
+								align="center"
+								gap={6}
+								flex={1}>
+								<Avatar
+									size="2xl"
+									name={authorInfo?.name || "User"}
+									src={authorInfo?.avatar}
+									bg="blue.500"
+								/>
+								<VStack
+									align="start"
+									spacing={3}>
+									<Heading
+										as="h1"
+										size="xl"
+										color="gray.900">
+										{authorInfo?.name || "Người dùng"}
+									</Heading>
+									<HStack
+										spacing={6}
+										divider={
+											<Text color="gray.300">•</Text>
+										}>
+										<Stat size="sm">
+											<StatLabel color="gray.600">
+												Bài viết
+											</StatLabel>
+											<StatNumber fontSize="lg">
+												{posts.length}
+											</StatNumber>
+										</Stat>
+										<Stat size="sm">
+											<StatLabel color="gray.600">
+												Followers
+											</StatLabel>
+											<StatNumber fontSize="lg">
+												{followerCount}
+											</StatNumber>
+										</Stat>
+										<Stat size="sm">
+											<StatLabel color="gray.600">
+												Following
+											</StatLabel>
+											<StatNumber fontSize="lg">
+												{followingCount}
+											</StatNumber>
+										</Stat>
+									</HStack>
+								</VStack>
+							</Flex>
+
+							{/* Follow/Unfollow Button - Only show if not own profile */}
+							{!isOwnProfile && currentUser && (
+								<Button
+									leftIcon={
+										<Icon
+											as={
+												isFollowing
+													? FiUserCheck
+													: FiUserPlus
+											}
+										/>
+									}
+									colorScheme={isFollowing ? "gray" : "blue"}
+									variant={isFollowing ? "outline" : "solid"}
+									onClick={handleFollowToggle}
+									isLoading={followLoading}
+									size="lg"
+									minW="140px">
+									{isFollowing ? "Đang theo dõi" : "Theo dõi"}
+								</Button>
+							)}
 						</Flex>
 					</Box>
 

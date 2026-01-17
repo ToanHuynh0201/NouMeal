@@ -64,8 +64,8 @@ const TrackingSection = () => {
 		// Format dates using local timezone (YYYY-MM-DD)
 		const formatLocalDate = (date: Date) => {
 			const year = date.getFullYear();
-			const month = String(date.getMonth() + 1).padStart(2, '0');
-			const day = String(date.getDate()).padStart(2, '0');
+			const month = String(date.getMonth() + 1).padStart(2, "0");
+			const day = String(date.getDate()).padStart(2, "0");
 			return `${year}-${month}-${day}`;
 		};
 
@@ -74,8 +74,6 @@ const TrackingSection = () => {
 			endDate: formatLocalDate(today),
 			groupBy: "day" as const,
 		};
-
-		console.log('Daily params:', params);
 		return params;
 	}, []);
 
@@ -87,8 +85,8 @@ const TrackingSection = () => {
 		// Format dates using local timezone (YYYY-MM-DD)
 		const formatLocalDate = (date: Date) => {
 			const year = date.getFullYear();
-			const month = String(date.getMonth() + 1).padStart(2, '0');
-			const day = String(date.getDate()).padStart(2, '0');
+			const month = String(date.getMonth() + 1).padStart(2, "0");
+			const day = String(date.getDate()).padStart(2, "0");
 			return `${year}-${month}-${day}`;
 		};
 
@@ -97,8 +95,6 @@ const TrackingSection = () => {
 			endDate: formatLocalDate(today),
 			groupBy: "week" as const,
 		};
-
-		console.log('Weekly params:', params);
 		return params;
 	}, []);
 

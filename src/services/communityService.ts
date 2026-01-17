@@ -34,6 +34,9 @@ export const communityService = {
 				sortBy: params?.sortBy || "createdAt",
 				sortOrder: params?.sortOrder || "desc",
 			});
+			
+			const data = await api.get(`/posts/feed?${queryParams.toString()}`);
+			console.log(data);
 
 			// Add hashtags if provided
 			if (params?.hashtags && params.hashtags.length > 0) {
@@ -135,7 +138,7 @@ export const communityService = {
 			// Build query params
 			const queryParams = new URLSearchParams({
 				page: String(params?.page || 1),
-				limit: String(params?.limit || 1),
+				limit: String(params?.limit || 10),
 				sortBy: params?.sortBy || "createdAt",
 				sortOrder: params?.sortOrder || "desc",
 			});

@@ -33,6 +33,33 @@ class UserService {
 
 		return api.get("/reports/user/timeseries", { params });
 	});
+
+	/**
+	 * Get user profile by ID
+	 * @param {string} userId - User ID to fetch profile for
+	 * @returns {Promise<Object>} Standardized response with user profile data
+	 */
+	getUserProfile = withErrorHandling(async (userId: string) => {
+		return api.get(`/users/${userId}`);
+	});
+
+	/**
+	 * Follow a user
+	 * @param {string} targetUserId - ID of user to follow
+	 * @returns {Promise<Object>} Standardized response
+	 */
+	followUser = withErrorHandling(async (targetUserId: string) => {
+		return api.post(`/users/follow/${targetUserId}`, {});
+	});
+
+	/**
+	 * Unfollow a user
+	 * @param {string} targetUserId - ID of user to unfollow
+	 * @returns {Promise<Object>} Standardized response
+	 */
+	unfollowUser = withErrorHandling(async (targetUserId: string) => {
+		return api.delete(`/users/unfollow/${targetUserId}`, {});
+	});
 }
 
 export const userService = new UserService();

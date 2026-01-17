@@ -49,6 +49,7 @@ export interface Post {
 	hashtags: string[];
 	is_edited: boolean;
 	is_liked?: boolean; // Track if current user has liked this post
+	is_from_follower?: boolean; // Track if current user is following the post author
 	createdAt: string;
 	updatedAt: string;
 	post_type?: string;

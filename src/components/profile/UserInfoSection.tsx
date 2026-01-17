@@ -359,6 +359,39 @@ const UserInfoSection = () => {
 								color="gray.600">
 								{displayData.email}
 							</Text>
+
+							{/* Followers and Following Stats */}
+							<HStack
+								spacing={6}
+								mt={2}>
+								<HStack spacing={2}>
+									<Text
+										fontSize="md"
+										fontWeight="bold"
+										color="gray.700">
+										{user.NumberOfFollowers || 0}
+									</Text>
+									<Text
+										fontSize="md"
+										color="gray.600">
+										Followers
+									</Text>
+								</HStack>
+								<HStack spacing={2}>
+									<Text
+										fontSize="md"
+										fontWeight="bold"
+										color="gray.700">
+										{user.followingUsers?.length || 0}
+									</Text>
+									<Text
+										fontSize="md"
+										color="gray.600">
+										Following
+									</Text>
+								</HStack>
+							</HStack>
+
 							<HStack
 								spacing={3}
 								mt={2}
