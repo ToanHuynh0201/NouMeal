@@ -53,41 +53,6 @@ class AuthService {
 	 */
 	async login(email: string, password: string): Promise<AuthResponse> {
 		try {
-			// Mock admin login
-			if (
-				email === "admin@NouMeal.com" &&
-				password === "Toanhuynh0201@"
-			) {
-				const mockAdminData: AuthResponse = {
-					success: true,
-					message: "Login successful",
-					data: {
-						user: {
-							_id: "admin-001",
-							email: "admin@NouMeal.com",
-							name: "Administrator",
-							age: 30,
-							gender: "other" as const,
-							height: 170,
-							weight: 70,
-							activity: "moderately_active" as const,
-							goal: "maintain_weight" as const,
-							isActive: true,
-							isEmailVerified: true,
-							role: "ADMIN",
-							createdAt: new Date().toISOString(),
-							updatedAt: new Date().toISOString(),
-						},
-						accessToken: "mock-admin-token-123456",
-						refreshToken: "mock-admin-refresh-token-123456",
-					},
-				};
-
-				const { user, accessToken, refreshToken } = mockAdminData.data!;
-				this._storeAuthData(user, accessToken, refreshToken);
-				return mockAdminData;
-			}
-
 			const loginData: UserLoginRequest = {
 				email,
 				password,
