@@ -20,12 +20,13 @@ import {
 	AlertDialogOverlay,
 	useDisclosure,
 } from "@chakra-ui/react";
-import { FiSearch, FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import { FiSearch, FiChevronLeft, FiChevronRight, FiPlus } from "react-icons/fi";
 import { useRef } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import { FoodsTable } from "@/components/admin/foods/FoodsTable";
 import { FoodDetailModal } from "@/components/admin/foods/FoodDetailModal";
 import { FoodEditModal } from "@/components/admin/foods/FoodEditModal";
+import { FoodCreateModal } from "@/components/admin/foods/FoodCreateModal";
 import { foodService } from "@/services/foodService";
 import type { Food } from "@/types/recipe";
 import type { RecipeFormData } from "@/types/myRecipe";
@@ -38,17 +39,18 @@ interface PaginationInfo {
 }
 
 const FoodsManagementPage = () => {
+	const [allFoods, setAllFoods] = useState<Food[]>([]);
 	const [foods, setFoods] = useState<Food[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [selectedFood, setSelectedFood] = useState<Food | null>(null);
 	const [modalOpen, setModalOpen] = useState(false);
 	const [editingFood, setEditingFood] = useState<Food | null>(null);
 	const [editModalOpen, setEditModalOpen] = useState(false);
+	const [createModalOpen, setCreateModalOpen] = useState(false);
 	const [search, setSearch] = useState("");
 	const [searchDebounced, setSearchDebounced] = useState("");
 	const [filterCategory, setFilterCategory] = useState<string>("all");
 	const [filterMeal, setFilterMeal] = useState<string>("all");
-	const [filterStatus, setFilterStatus] = useState<string>("all");
 	const [currentPage, setCurrentPage] = useState(1);
 	const [pagination, setPagination] = useState<PaginationInfo>({
 		currentPage: 1,
@@ -74,65 +76,22 @@ const FoodsManagementPage = () => {
 		return () => clearTimeout(timer);
 	}, [search]);
 
-	const fetchFoods = async (page: number = 1) => {
+	// Fetch all foods from API (no filters on backend)
+	const fetchAllFoods = async () => {
 		try {
 			setLoading(true);
 
-			// Build filters object
-			const filters: {
-				category?: string;
-				meal?: string;
-				isActive?: string;
-				search?: string;
-			} = {};
-
-			if (filterCategory !== "all") {
-				filters.category = filterCategory;
-			}
-
-			if (filterMeal !== "all") {
-				filters.meal = filterMeal;
-			}
-
-			if (filterStatus !== "all") {
-				filters.isActive = filterStatus === "active" ? "true" : "false";
-			}
-
-			if (searchDebounced.trim()) {
-				filters.search = searchDebounced.trim();
-			}
-
-			const response = await foodService.getAdminFoods(page, 10, filters);
+			// Fetch all foods with a large limit to get everything
+			const response = await foodService.getAdminFoods(1, 1000);
 			console.log(response);
 
 			if (response && response.success) {
 				const foodsData = response.data;
-				const meta = response.meta;
 
-				// Set foods array
+				// Set all foods array
 				if (Array.isArray(foodsData)) {
-					setFoods(foodsData);
+					setAllFoods(foodsData);
 				}
-
-				// Set pagination from meta if available
-				if (meta) {
-					setPagination({
-						currentPage: meta.currentPage,
-						totalPages: meta.totalPages,
-						totalFoods: meta.totalItems,
-						limit: meta.itemsPerPage,
-					});
-				} else {
-					// Fallback if no meta
-					setPagination({
-						currentPage: page,
-						totalPages: 1,
-						totalFoods: foodsData.length,
-						limit: 10,
-					});
-				}
-
-				setCurrentPage(page);
 			}
 		} catch (error) {
 			console.error("Error fetching foods:", error);
@@ -148,9 +107,56 @@ const FoodsManagementPage = () => {
 		}
 	};
 
+	// Client-side filtering
 	useEffect(() => {
-		fetchFoods(1);
-	}, [searchDebounced, filterCategory, filterMeal, filterStatus]);
+		let filtered = [...allFoods];
+
+		// Filter by category
+		if (filterCategory !== "all") {
+			filtered = filtered.filter(
+				(food) => food.category === filterCategory,
+			);
+		}
+
+		// Filter by meal
+		if (filterMeal !== "all") {
+			filtered = filtered.filter((food) => food.meal === filterMeal);
+		}
+
+		// Filter by search
+		if (searchDebounced.trim()) {
+			const searchLower = searchDebounced.toLowerCase();
+			filtered = filtered.filter((food) =>
+				food.name.toLowerCase().includes(searchLower),
+			);
+		}
+
+		// Calculate pagination
+		const itemsPerPage = 10;
+		const totalPages = Math.ceil(filtered.length / itemsPerPage);
+		const startIndex = (currentPage - 1) * itemsPerPage;
+		const endIndex = startIndex + itemsPerPage;
+		const paginatedFoods = filtered.slice(startIndex, endIndex);
+
+		// Update state
+		setFoods(paginatedFoods);
+		setPagination({
+			currentPage: currentPage,
+			totalPages: totalPages || 1,
+			totalFoods: filtered.length,
+			limit: itemsPerPage,
+		});
+
+		// Reset to page 1 if current page exceeds total pages
+		if (currentPage > totalPages && totalPages > 0) {
+			setCurrentPage(1);
+		}
+	}, [allFoods, searchDebounced, filterCategory, filterMeal, currentPage]);
+
+	// Fetch all foods on mount
+	useEffect(() => {
+		fetchAllFoods();
+	}, []);
 
 	const handleView = (food: Food) => {
 		setSelectedFood(food);
@@ -164,6 +170,7 @@ const FoodsManagementPage = () => {
 
 	const handleSaveEdit = async (foodId: string, recipeData: RecipeFormData) => {
 		try {
+			console.log("handleSaveEdit called with:", { foodId, recipeData });
 			setLoading(true);
 
 			// Convert RecipeFormData back to CreateFoodRequest format
@@ -192,11 +199,13 @@ const FoodsManagementPage = () => {
 				tags: recipeData.tags || [],
 			};
 
+			console.log("Sending foodData to API:", foodData);
 			const response = await foodService.updateAdminFood(foodId, foodData);
+			console.log("API Response:", response);
 
 			if (response && response.success) {
-				// Update the food in the list
-				setFoods((prev) =>
+				// Update the food in allFoods
+				setAllFoods((prev) =>
 					prev.map((f) =>
 						f._id === foodId ? response.data : f,
 					),
@@ -206,10 +215,6 @@ const FoodsManagementPage = () => {
 				if (selectedFood?._id === foodId) {
 					setSelectedFood(response.data);
 				}
-
-				// Close edit modal
-				setEditModalOpen(false);
-				setEditingFood(null);
 
 				toast({
 					title: "Success",
@@ -242,8 +247,8 @@ const FoodsManagementPage = () => {
 			);
 
 			if (response && response.success) {
-				// Update the food in the list with new status
-				setFoods((prev) =>
+				// Update the food in allFoods with new status
+				setAllFoods((prev) =>
 					prev.map((f) =>
 						f._id === food._id
 							? { ...f, isActive: !food.isActive }
@@ -295,8 +300,8 @@ const FoodsManagementPage = () => {
 			);
 
 			if (response && response.success) {
-				// Remove the food from the list
-				setFoods((prev) =>
+				// Remove the food from allFoods
+				setAllFoods((prev) =>
 					prev.filter((f) => f._id !== foodToDelete._id),
 				);
 
@@ -332,7 +337,68 @@ const FoodsManagementPage = () => {
 
 	const handlePageChange = (newPage: number) => {
 		if (newPage >= 1 && newPage <= pagination.totalPages) {
-			fetchFoods(newPage);
+			setCurrentPage(newPage);
+		}
+	};
+
+	const handleCreateFood = async (recipeData: RecipeFormData) => {
+		try {
+			setLoading(true);
+
+			// Convert RecipeFormData to CreateFoodRequest format
+			const foodData = {
+				name: recipeData.title,
+				description: recipeData.description,
+				imageUrl: recipeData.image,
+				category: recipeData.foodCategory,
+				meal: recipeData.category,
+				ingredients: recipeData.ingredients,
+				instructions: recipeData.instructions.map((desc, index) => ({
+					step: index + 1,
+					description: desc,
+				})),
+				nutritionalInfo: {
+					calories: recipeData.nutrition.calories,
+					protein: parseFloat(recipeData.nutrition.protein) || 0,
+					carbohydrates: parseFloat(recipeData.nutrition.carbs) || 0,
+					fat: parseFloat(recipeData.nutrition.fat) || 0,
+					fiber: parseFloat(recipeData.nutrition.fiber) || 0,
+					sugar: parseFloat(recipeData.nutrition.sugar) || 0,
+					sodium: parseFloat(recipeData.nutrition.sodium) || 0,
+					cholesterol: parseFloat(recipeData.nutrition.cholesterol) || 0,
+				},
+				allergens: recipeData.allergens || [],
+				tags: recipeData.tags || [],
+			};
+
+			const response = await foodService.createAdminFood(foodData);
+
+			if (response && response.success) {
+				// Refresh all foods list
+				await fetchAllFoods();
+
+				// Close create modal
+				setCreateModalOpen(false);
+
+				toast({
+					title: "Success",
+					description: "Food created successfully",
+					status: "success",
+					duration: 3000,
+					isClosable: true,
+				});
+			}
+		} catch (error) {
+			console.error("Error creating food:", error);
+			toast({
+				title: "Error",
+				description: "Failed to create food",
+				status: "error",
+				duration: 3000,
+				isClosable: true,
+			});
+		} finally {
+			setLoading(false);
 		}
 	};
 
@@ -342,12 +408,22 @@ const FoodsManagementPage = () => {
 				p={8}
 				minH="100vh"
 				bg="gray.50">
-				<Heading
-					size="lg"
-					mb={6}
-					color="gray.700">
-					Foods Management
-				</Heading>
+				<Flex
+					justify="space-between"
+					align="center"
+					mb={6}>
+					<Heading
+						size="lg"
+						color="gray.700">
+						Foods Management
+					</Heading>
+					<Button
+						leftIcon={<FiPlus />}
+						colorScheme="blue"
+						onClick={() => setCreateModalOpen(true)}>
+						Add Food
+					</Button>
+				</Flex>
 				<Flex
 					mb={6}
 					gap={4}
@@ -390,16 +466,6 @@ const FoodsManagementPage = () => {
 						<option value="lunch">Lunch</option>
 						<option value="dinner">Dinner</option>
 						<option value="snack">Snack</option>
-					</Select>
-					<Select
-						maxW="200px"
-						value={filterStatus}
-						onChange={(e) => setFilterStatus(e.target.value)}
-						bg="white"
-						borderRadius="lg">
-						<option value="all">All Status</option>
-						<option value="active">Active</option>
-						<option value="inactive">Inactive</option>
 					</Select>
 				</Flex>
 				{loading ? (
@@ -580,6 +646,13 @@ const FoodsManagementPage = () => {
 						setEditingFood(null);
 					}}
 					onSave={handleSaveEdit}
+				/>
+
+				{/* Food Create Modal */}
+				<FoodCreateModal
+					isOpen={createModalOpen}
+					onClose={() => setCreateModalOpen(false)}
+					onSave={handleCreateFood}
 				/>
 			</Box>
 		</MainLayout>

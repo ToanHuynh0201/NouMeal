@@ -43,7 +43,6 @@ export const ROUTES = {
 	ADMIN_USERS: "/admin/users",
 	ADMIN_FOOD: "/admin/food",
 	ADMIN_FOODS_MANAGEMENT: "/admin/foods-management",
-	ADMIN_COMMUNITY: "/admin/community",
 };
 
 // Form Validation

@@ -20,7 +20,6 @@ import { FiCamera, FiBook, FiUsers } from "react-icons/fi";
 import { BsStars } from "react-icons/bs";
 import { MdRestaurantMenu, MdDashboard, MdFastfood } from "react-icons/md";
 import { CgProfile } from "react-icons/cg";
-import { RiCommunityLine } from "react-icons/ri";
 
 function Sidebar() {
 	const location = useLocation();
@@ -100,11 +99,6 @@ function Sidebar() {
 			label: "Foods Management",
 			path: ROUTES.ADMIN_FOODS_MANAGEMENT,
 			icon: FiBook,
-		},
-		{
-			label: "Community",
-			path: ROUTES.ADMIN_COMMUNITY,
-			icon: RiCommunityLine,
 		},
 	];
 

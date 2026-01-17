@@ -70,11 +70,12 @@ export interface Food {
 }
 
 export interface CreateFoodRequest {
-	id: string;
+	id?: string;
 	name: string;
 	description: string;
 	instructions: FoodInstruction[];
-	image: string;
+	image?: string;
+	imageUrl?: string;
 	category:
 		| "fruits"
 		| "vegetables"
