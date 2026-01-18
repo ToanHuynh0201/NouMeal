@@ -16,7 +16,7 @@ import { useRole } from "@/hooks/useRole";
 import { SidebarLogo } from "./SidebarLogo";
 import { SidebarItem } from "./SidebarItem";
 import { SidebarUserProfile } from "./SidebarUserProfile";
-import { FiCamera, FiBook, FiUsers } from "react-icons/fi";
+import { FiCamera, FiBook, FiUsers, FiCheckCircle } from "react-icons/fi";
 import { BsStars } from "react-icons/bs";
 import { MdRestaurantMenu, MdDashboard, MdFastfood } from "react-icons/md";
 import { CgProfile } from "react-icons/cg";
@@ -99,6 +99,11 @@ function Sidebar() {
 			label: "Foods Management",
 			path: ROUTES.ADMIN_FOODS_MANAGEMENT,
 			icon: FiBook,
+		},
+		{
+			label: "Food Approval",
+			path: ROUTES.ADMIN_FOOD_APPROVAL,
+			icon: FiCheckCircle,
 		},
 	];
 

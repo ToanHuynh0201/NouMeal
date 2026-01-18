@@ -5,46 +5,52 @@ import {
 	Tr,
 	Th,
 	Td,
-	Box,
+	Badge,
 	IconButton,
 	HStack,
-	Badge,
 	Image,
 	Text,
+	Box,
 	Tooltip,
 } from "@chakra-ui/react";
-import { FiEye, FiTrash2, FiEdit2 } from "react-icons/fi";
+import { FiEye, FiCheck, FiX } from "react-icons/fi";
 import type { Food } from "@/types/recipe";
 
-interface FoodsTableProps {
+interface FoodApprovalTableProps {
 	foods: Food[];
 	onView: (food: Food) => void;
-	onEdit: (food: Food) => void;
-	onDelete: (food: Food) => void;
+	onApprove: (foodId: string) => void;
+	onReject: (foodId: string) => void;
 }
 
-const categoryColors: { [key: string]: string } = {
-	protein: "red",
-	carbohydrate: "orange",
-	vegetable: "green",
-	fruit: "pink",
-	dairy: "blue",
-	fat: "yellow",
-};
-
-const mealColors: { [key: string]: string } = {
-	breakfast: "purple",
-	lunch: "blue",
-	dinner: "orange",
-	snack: "green",
-};
-
-export const FoodsTable = ({
+export const FoodApprovalTable = ({
 	foods,
 	onView,
-	onEdit,
-	onDelete,
-}: FoodsTableProps) => {
+	onApprove,
+	onReject,
+}: FoodApprovalTableProps) => {
+	const getCategoryColor = (category: string) => {
+		const colors: Record<string, string> = {
+			protein: "red",
+			carbohydrate: "orange",
+			vegetable: "green",
+			fruit: "pink",
+			dairy: "blue",
+			fat: "yellow",
+		};
+		return colors[category] || "gray";
+	};
+
+	const getMealColor = (meal: string) => {
+		const colors: Record<string, string> = {
+			breakfast: "purple",
+			lunch: "blue",
+			dinner: "orange",
+			snack: "green",
+		};
+		return colors[meal] || "gray";
+	};
+
 	return (
 		<Box
 			bg="white"
@@ -78,7 +84,6 @@ export const FoodsTable = ({
 									boxSize="50px"
 									objectFit="cover"
 									borderRadius="md"
-									fallbackSrc="https://via.placeholder.com/50"
 								/>
 							</Td>
 							<Td>
@@ -98,7 +103,7 @@ export const FoodsTable = ({
 							</Td>
 							<Td>
 								<Badge
-									colorScheme={categoryColors[food.category] || "gray"}
+									colorScheme={getCategoryColor(food.category)}
 									textTransform="uppercase"
 									px={3}
 									py={1}
@@ -108,7 +113,7 @@ export const FoodsTable = ({
 							</Td>
 							<Td>
 								<Badge
-									colorScheme={mealColors[food.meal] || "gray"}
+									colorScheme={getMealColor(food.meal)}
 									textTransform="uppercase"
 									px={3}
 									py={1}
@@ -140,29 +145,29 @@ export const FoodsTable = ({
 											aria-label="View food"
 											icon={<FiEye />}
 											size="sm"
-											colorScheme="blue"
+											colorScheme="purple"
 											variant="ghost"
 											onClick={() => onView(food)}
 										/>
 									</Tooltip>
-									<Tooltip label="Edit Food">
+									<Tooltip label="Approve for Recommendations">
 										<IconButton
-											aria-label="Edit food"
-											icon={<FiEdit2 />}
+											aria-label="Approve food"
+											icon={<FiCheck />}
 											size="sm"
-											colorScheme="orange"
+											colorScheme="green"
 											variant="ghost"
-											onClick={() => onEdit(food)}
+											onClick={() => onApprove(food._id)}
 										/>
 									</Tooltip>
-									<Tooltip label="Delete Food">
+									<Tooltip label="Reject and Deactivate">
 										<IconButton
-											aria-label="Delete food"
-											icon={<FiTrash2 />}
+											aria-label="Reject food"
+											icon={<FiX />}
 											size="sm"
 											colorScheme="red"
 											variant="ghost"
-											onClick={() => onDelete(food)}
+											onClick={() => onReject(food._id)}
 										/>
 									</Tooltip>
 								</HStack>
@@ -171,6 +176,18 @@ export const FoodsTable = ({
 					))}
 				</Tbody>
 			</Table>
+
+			{foods.length === 0 && (
+				<Box
+					p={10}
+					textAlign="center">
+					<Text
+						fontSize="lg"
+						color="gray.500">
+						No foods found
+					</Text>
+				</Box>
+			)}
 		</Box>
 	);
 };

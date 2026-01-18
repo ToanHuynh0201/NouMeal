@@ -109,6 +109,52 @@ const MenuSuggestionPage = () => {
 		setIsLoading(false);
 	};
 
+	// Reset today's meals
+	const handleResetTodayMeals = async () => {
+		try {
+			setIsLoading(true);
+			const result = await foodService.resetTodayMeals();
+
+			if (result.success) {
+				setTodayMealsData(result.data);
+
+				// Reset meal change tracking
+				const mealChangeService = new MealChangeService();
+				mealChangeService.resetDailyChanges();
+				setChangedMeals([]);
+
+				// Refresh progress
+				await refetchProgress();
+
+				toast({
+					title: "Menu reset successfully",
+					description: "Your today's meals have been refreshed with new suggestions",
+					status: "success",
+					duration: 3000,
+					isClosable: true,
+				});
+			} else {
+				toast({
+					title: "Failed to reset menu",
+					description: result.error || "Please try again",
+					status: "error",
+					duration: 3000,
+					isClosable: true,
+				});
+			}
+		} catch (error) {
+			toast({
+				title: "Error",
+				description: "An error occurred while resetting menu",
+				status: "error",
+				duration: 3000,
+				isClosable: true,
+			});
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
 	// Fetch weekly menu
 	const fetchWeeklyMenu = async () => {
 		setIsLoadingWeekly(true);
@@ -420,6 +466,24 @@ const MenuSuggestionPage = () => {
 									<VStack
 										spacing={6}
 										align="stretch">
+										{/* Reset Menu Button */}
+										<HStack justify="flex-end">
+											<Button
+												leftIcon={<Icon as={FiRefreshCw} />}
+												colorScheme="purple"
+												variant="outline"
+												size="md"
+												onClick={handleResetTodayMeals}
+												isLoading={isLoading}
+												_hover={{
+													bg: "purple.50",
+													transform: "translateY(-2px)",
+													shadow: "md",
+												}}
+												transition="all 0.2s">
+												Reset Today's Menu
+											</Button>
+										</HStack>
 										{/* Today's Progress Card */}
 										{!isLoadingProgress && progressData && (
 											<Box

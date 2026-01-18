@@ -26,6 +26,14 @@ class FoodService {
 	});
 
 	/**
+	 * Reset today's meals to get a new random set of meals
+	 * @returns {Promise} Standardized response with success flag and new meals data
+	 */
+	resetTodayMeals = withErrorHandling(async () => {
+		return await api.post("/foods/reset-today-meals", {});
+	});
+
+	/**
 	 * Get weekly menu for the current user
 	 * @returns {Promise} Standardized response with success flag and data
 	 */
@@ -205,6 +213,34 @@ class FoodService {
 	updateFoodStatus = withErrorHandling(
 		async (foodId: string, isActive: boolean) => {
 			return await api.patch(`/foods/${foodId}/status`, { isActive });
+		},
+	);
+
+	/**
+	 * Get public foods (Admin only) with pagination
+	 * @param {number} page - Page number (default: 1)
+	 * @param {number} limit - Items per page (default: 10)
+	 * @returns {Promise} Standardized response with success flag and data
+	 */
+	getPublicFoods = withErrorHandling(
+		async (page: number = 1, limit: number = 10) => {
+			return await api.get("/foods/admin/public", {
+				params: { page, limit },
+			});
+		},
+	);
+
+	/**
+	 * Update food recommendable status - Admin only
+	 * @param {string} foodId - Food ID
+	 * @param {boolean} isRecommendable - New recommendable status
+	 * @returns {Promise} Standardized response with updated food info
+	 */
+	updateFoodRecommendableStatus = withErrorHandling(
+		async (foodId: string, isRecommendable: boolean) => {
+			return await api.patch(`/foods/admin/${foodId}/recommendable`, {
+				isRecommendable,
+			});
 		},
 	);
 }
