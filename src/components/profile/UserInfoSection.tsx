@@ -77,7 +77,7 @@ const UserInfoSection = () => {
 				activity: user.activity,
 				preferences: user.preferences || [],
 				allergies: user.allergies || [],
-		  };
+			};
 
 	// Helper to set editedData from user object
 	const setEditedDataFromUser = (userObj: typeof user) => {
@@ -100,6 +100,8 @@ const UserInfoSection = () => {
 		if (user) {
 			setEditedDataFromUser(user);
 		}
+
+		console.log(user);
 	}, [user]);
 
 	// Scroll detection for floating buttons
@@ -440,8 +442,8 @@ const UserInfoSection = () => {
 								{displayData.gender === "male"
 									? "Male"
 									: displayData.gender === "female"
-									? "Female"
-									: "Other"}
+										? "Female"
+										: "Other"}
 							</StatHelpText>
 						</Stat>
 

@@ -168,14 +168,10 @@ const MyRecipesPage = () => {
 
 	const handleSaveRecipe = async (recipeData: RecipeFormData) => {
 		if (editingRecipe) {
-			console.log("EDITING");
-
 			updateRecipe(editingRecipe.id, recipeData);
 		} else {
 			// Add new recipe - check if appropriate
 			const result = await addRecipe(recipeData);
-			console.log(result);
-
 			if (!result.isAllergyFree) {
 				// Contains allergens - block completely
 				toast({
@@ -494,11 +490,11 @@ const MyRecipesPage = () => {
 														{sortBy === "createdAt"
 															? "Newest"
 															: sortBy === "title"
-															? "A-Z"
-															: sortBy ===
-															  "calories"
-															? "Calories"
-															: "Time"}{" "}
+																? "A-Z"
+																: sortBy ===
+																	  "calories"
+																	? "Calories"
+																	: "Time"}{" "}
 														{sortOrder === "asc"
 															? "↑"
 															: "↓"}

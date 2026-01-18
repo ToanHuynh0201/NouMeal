@@ -75,7 +75,6 @@ export interface CreateFoodRequest {
 	description: string;
 	instructions: FoodInstruction[];
 	image?: string;
-	imageUrl?: string;
 	category:
 		| "fruits"
 		| "vegetables"

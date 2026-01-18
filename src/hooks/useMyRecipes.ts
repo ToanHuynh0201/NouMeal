@@ -176,15 +176,14 @@ export const useMyRecipes = () => {
 		}> => {
 			try {
 				const checkRequest = convertRecipeToCheckRequest(recipeData);
-				console.log(checkRequest);
 
-				const response = await foodService.checkFoodAppropriate(
-					checkRequest,
-				);
+				const response =
+					await foodService.checkFoodAppropriate(checkRequest);
+				console.log(response);
 
 				if (response.success) {
 					const { isAppropriate, isAllergyFree } =
-						response.data.isAppropriate;
+						response.data.result;
 					return {
 						isAppropriate,
 						isAllergyFree,
@@ -272,6 +271,10 @@ export const useMyRecipes = () => {
 					recipeId,
 					foodRequest,
 				);
+
+				console.log(foodRequest);
+
+				console.log(response);
 
 				if (response.success) {
 					toast({
@@ -451,7 +454,7 @@ export const useMyRecipes = () => {
 							(sum, r) => sum + r.nutrition.calories,
 							0,
 						) / total,
-				  )
+					)
 				: 0;
 
 		const stats = {

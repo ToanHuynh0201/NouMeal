@@ -32,7 +32,7 @@ export default function UserPostsPage() {
 	const { userId } = useParams<{ userId: string }>();
 	const navigate = useNavigate();
 	const toast = useToast();
-	const { user: currentUser } = useAuth();
+	const { user: currentUser, updateUser } = useAuth();
 
 	const [posts, setPosts] = useState<Post[]>([]);
 	const [loading, setLoading] = useState(true);
@@ -100,8 +100,8 @@ export default function UserPostsPage() {
 		} catch (error) {
 			console.error("Error loading user posts:", error);
 			toast({
-				title: "Lỗi",
-				description: "Không thể tải bài viết của người dùng",
+				title: "Error",
+				description: "Failed to load user posts",
 				status: "error",
 				duration: 3000,
 				isClosable: true,
@@ -130,20 +130,41 @@ export default function UserPostsPage() {
 		setFollowLoading(true);
 		try {
 			if (isFollowing) {
+				console.log(userId);
+
 				// Unfollow
-				await userService.unfollowUser(userId);
+				const data = await userService.unfollowUser(userId);
 
-				// Update state after successful API call
-				setIsFollowing(false);
-				setFollowerCount((prev) => Math.max(0, prev - 1));
+				if (data.success) {
+					// Update state after successful API call
+					setIsFollowing(false);
+					setFollowerCount((prev) => Math.max(0, prev - 1));
 
-				toast({
-					title: "Đã bỏ theo dõi",
-					description: "Bạn đã bỏ theo dõi người dùng này",
-					status: "success",
-					duration: 2000,
-					isClosable: true,
-				});
+					// Update current user profile
+					const profileResponse = await userService.getUserProfile(
+						currentUser._id,
+					);
+					if (profileResponse?.data) {
+						updateUser(profileResponse.data);
+					}
+
+					toast({
+						title: "Unfollowed",
+						description: "You have unfollowed this user",
+						status: "success",
+						duration: 2000,
+						isClosable: true,
+					});
+				} else {
+					toast({
+						title: "Error",
+						description:
+							data?.error || "Unable to perform this action",
+						status: "error",
+						duration: 3000,
+						isClosable: true,
+					});
+				}
 			} else {
 				// Follow
 				await userService.followUser(userId);
@@ -152,9 +173,17 @@ export default function UserPostsPage() {
 				setIsFollowing(true);
 				setFollowerCount((prev) => prev + 1);
 
+				// Update current user profile
+				const profileResponse = await userService.getUserProfile(
+					currentUser._id,
+				);
+				if (profileResponse?.data) {
+					updateUser(profileResponse.data);
+				}
+
 				toast({
-					title: "Đã theo dõi",
-					description: "Bạn đã theo dõi người dùng này",
+					title: "Followed",
+					description: "You are now following this user",
 					status: "success",
 					duration: 2000,
 					isClosable: true,
@@ -168,9 +197,9 @@ export default function UserPostsPage() {
 			setFollowerCount(previousCount);
 
 			toast({
-				title: "Lỗi",
+				title: "Error",
 				description:
-					error?.message || "Không thể thực hiện thao tác này",
+					error?.message || "Unable to perform this action",
 				status: "error",
 				duration: 3000,
 				isClosable: true,
@@ -213,7 +242,7 @@ export default function UserPostsPage() {
 						onClick={() => navigate(-1)}
 						alignSelf="flex-start"
 						size="md">
-						Quay lại
+						Back
 					</Button>
 
 					{/* User Header */}
@@ -246,7 +275,7 @@ export default function UserPostsPage() {
 										as="h1"
 										size="xl"
 										color="gray.900">
-										{authorInfo?.name || "Người dùng"}
+										{authorInfo?.name || "User"}
 									</Heading>
 									<HStack
 										spacing={6}
@@ -255,7 +284,7 @@ export default function UserPostsPage() {
 										}>
 										<Stat size="sm">
 											<StatLabel color="gray.600">
-												Bài viết
+												Posts
 											</StatLabel>
 											<StatNumber fontSize="lg">
 												{posts.length}
@@ -299,7 +328,7 @@ export default function UserPostsPage() {
 									isLoading={followLoading}
 									size="lg"
 									minW="140px">
-									{isFollowing ? "Đang theo dõi" : "Theo dõi"}
+									{isFollowing ? "Following" : "Follow"}
 								</Button>
 							)}
 						</Flex>
@@ -325,7 +354,7 @@ export default function UserPostsPage() {
 								<Text
 									fontSize="lg"
 									color="gray.500">
-									Người dùng chưa có bài viết nào
+									This user has no posts yet
 								</Text>
 							</VStack>
 						</Center>
@@ -436,7 +465,7 @@ export default function UserPostsPage() {
 										isDisabled={page === 1}
 										colorScheme="blue"
 										variant="outline">
-										Trang trước
+										Previous
 									</Button>
 									<HStack spacing={2}>
 										{Array.from(
@@ -470,7 +499,7 @@ export default function UserPostsPage() {
 										isDisabled={page === totalPages}
 										colorScheme="blue"
 										variant="outline">
-										Trang sau
+										Next
 									</Button>
 								</Flex>
 							)}

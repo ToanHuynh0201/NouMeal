@@ -60,7 +60,9 @@ export const FoodsTable = ({
 						<Th textTransform="uppercase">Meal</Th>
 						<Th textTransform="uppercase">Calories</Th>
 						<Th textTransform="uppercase">Status</Th>
-						<Th textTransform="uppercase" textAlign="center">
+						<Th
+							textTransform="uppercase"
+							textAlign="center">
 							Actions
 						</Th>
 					</Tr>
@@ -98,7 +100,9 @@ export const FoodsTable = ({
 							</Td>
 							<Td>
 								<Badge
-									colorScheme={categoryColors[food.category] || "gray"}
+									colorScheme={
+										categoryColors[food.category] || "gray"
+									}
 									textTransform="uppercase"
 									px={3}
 									py={1}
@@ -108,7 +112,9 @@ export const FoodsTable = ({
 							</Td>
 							<Td>
 								<Badge
-									colorScheme={mealColors[food.meal] || "gray"}
+									colorScheme={
+										mealColors[food.meal] || "gray"
+									}
 									textTransform="uppercase"
 									px={3}
 									py={1}
@@ -123,7 +129,9 @@ export const FoodsTable = ({
 							</Td>
 							<Td>
 								<Badge
-									colorScheme={food.isActive ? "green" : "red"}
+									colorScheme={
+										food.isActive ? "green" : "red"
+									}
 									textTransform="uppercase"
 									px={3}
 									py={1}

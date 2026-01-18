@@ -28,9 +28,6 @@ class UserService {
 	 * @returns {Promise<Object>} Standardized response with timeseries data
 	 */
 	getTimeseries = withErrorHandling(async (params: TimeseriesParams = {}) => {
-		const data = await api.get("/reports/user/timeseries", { params });
-		console.log(data);
-
 		return api.get("/reports/user/timeseries", { params });
 	});
 
@@ -58,7 +55,7 @@ class UserService {
 	 * @returns {Promise<Object>} Standardized response
 	 */
 	unfollowUser = withErrorHandling(async (targetUserId: string) => {
-		return api.delete(`/users/unfollow/${targetUserId}`, {});
+		return api.delete(`/users/unfollow/${targetUserId}`);
 	});
 }
 

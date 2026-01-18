@@ -20,7 +20,12 @@ import {
 	AlertDialogOverlay,
 	useDisclosure,
 } from "@chakra-ui/react";
-import { FiSearch, FiChevronLeft, FiChevronRight, FiPlus } from "react-icons/fi";
+import {
+	FiSearch,
+	FiChevronLeft,
+	FiChevronRight,
+	FiPlus,
+} from "react-icons/fi";
 import { useRef } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import { FoodsTable } from "@/components/admin/foods/FoodsTable";
@@ -168,7 +173,10 @@ const FoodsManagementPage = () => {
 		setEditModalOpen(true);
 	};
 
-	const handleSaveEdit = async (foodId: string, recipeData: RecipeFormData) => {
+	const handleSaveEdit = async (
+		foodId: string,
+		recipeData: RecipeFormData,
+	) => {
 		try {
 			console.log("handleSaveEdit called with:", { foodId, recipeData });
 			setLoading(true);
@@ -177,7 +185,7 @@ const FoodsManagementPage = () => {
 			const foodData = {
 				name: recipeData.title,
 				description: recipeData.description,
-				imageUrl: recipeData.image,
+				image: recipeData.image,
 				category: recipeData.foodCategory,
 				meal: recipeData.category,
 				ingredients: recipeData.ingredients,
@@ -193,22 +201,24 @@ const FoodsManagementPage = () => {
 					fiber: parseFloat(recipeData.nutrition.fiber) || 0,
 					sugar: parseFloat(recipeData.nutrition.sugar) || 0,
 					sodium: parseFloat(recipeData.nutrition.sodium) || 0,
-					cholesterol: parseFloat(recipeData.nutrition.cholesterol) || 0,
+					cholesterol:
+						parseFloat(recipeData.nutrition.cholesterol) || 0,
 				},
 				allergens: recipeData.allergens || [],
 				tags: recipeData.tags || [],
 			};
 
 			console.log("Sending foodData to API:", foodData);
-			const response = await foodService.updateAdminFood(foodId, foodData);
+			const response = await foodService.updateAdminFood(
+				foodId,
+				foodData,
+			);
 			console.log("API Response:", response);
 
 			if (response && response.success) {
 				// Update the food in allFoods
 				setAllFoods((prev) =>
-					prev.map((f) =>
-						f._id === foodId ? response.data : f,
-					),
+					prev.map((f) => (f._id === foodId ? response.data : f)),
 				);
 
 				// Update selected food if it's the same one
@@ -349,7 +359,7 @@ const FoodsManagementPage = () => {
 			const foodData = {
 				name: recipeData.title,
 				description: recipeData.description,
-				imageUrl: recipeData.image,
+				image: recipeData.image,
 				category: recipeData.foodCategory,
 				meal: recipeData.category,
 				ingredients: recipeData.ingredients,
@@ -365,7 +375,8 @@ const FoodsManagementPage = () => {
 					fiber: parseFloat(recipeData.nutrition.fiber) || 0,
 					sugar: parseFloat(recipeData.nutrition.sugar) || 0,
 					sodium: parseFloat(recipeData.nutrition.sodium) || 0,
-					cholesterol: parseFloat(recipeData.nutrition.cholesterol) || 0,
+					cholesterol:
+						parseFloat(recipeData.nutrition.cholesterol) || 0,
 				},
 				allergens: recipeData.allergens || [],
 				tags: recipeData.tags || [],
