@@ -45,10 +45,10 @@ const StepProgressBar = ({ currentStep, steps }: StepProgressBarProps) => {
 				/>
 
 				{/* Steps */}
-				{steps.map((step, index) => {
+				{steps.map((step) => {
 					const isCompleted = currentStep > step.number;
 					const isCurrent = currentStep === step.number;
-					const isUpcoming = currentStep < step.number;
+					// const isUpcoming = currentStep < step.number;
 
 					return (
 						<VStack
@@ -63,8 +63,8 @@ const StepProgressBar = ({ currentStep, steps }: StepProgressBarProps) => {
 									isCompleted
 										? "blue.500"
 										: isCurrent
-										? "blue.500"
-										: "gray.200"
+											? "blue.500"
+											: "gray.200"
 								}
 								color="white"
 								border={{ base: "4px solid", md: "5px solid" }}

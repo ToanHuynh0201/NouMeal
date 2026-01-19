@@ -77,12 +77,6 @@ const RecipeFormModal = ({
 		return value.replace(/[^0-9.]/g, "");
 	};
 
-	// Helper function to add unit to numeric value: "15" -> "15g"
-	const addGramUnit = (value: string): string => {
-		const numValue = value.replace(/[^0-9.]/g, "");
-		return numValue ? `${numValue}g` : "0g";
-	};
-
 	const [formData, setFormData] = useState<RecipeFormData>(initialFormData);
 	const [imagePreview, setImagePreview] = useState<string>("");
 	const [isLoading, setIsLoading] = useState(false);

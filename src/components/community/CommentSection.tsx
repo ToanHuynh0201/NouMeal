@@ -647,7 +647,7 @@ export const CommentSection = ({
 										...comment.content,
 										text: newText,
 									},
-							  }
+								}
 							: comment,
 					),
 				);
@@ -716,7 +716,7 @@ export const CommentSection = ({
 									...comment,
 									likes_count: response.data.likes_count,
 									has_liked: response.data.has_liked,
-							  }
+								}
 							: comment,
 					),
 				);

@@ -149,6 +149,7 @@ export const DIETARY_PREFERENCE_TAGS = [
 	"low_sodium",
 	"diabetic_friendly",
 	"heart_healthy",
+	"mediterranean",
 ] as const;
 
 // Export profile constants

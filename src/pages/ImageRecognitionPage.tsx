@@ -31,7 +31,6 @@ import {
 } from "react-icons/fi";
 import MainLayout from "@/components/layout/MainLayout";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
-import { mockImageRecognitionResults } from "@/data/mockData";
 import type { ImageRecognitionResult, RecognizedFood } from "@/types/ai";
 import { aiService } from "@/services";
 import { useAuth } from "@/hooks/useAuth";
@@ -110,11 +109,6 @@ const ImageRecognitionPage = () => {
 						protein: `${apiData.nutrition_analysis.protein.value}${apiData.nutrition_analysis.protein.unit}`,
 						carbs: `${apiData.nutrition_analysis.carbs.value}${apiData.nutrition_analysis.carbs.unit}`,
 						fat: `${apiData.nutrition_analysis.fat.value}${apiData.nutrition_analysis.fat.unit}`,
-						satFat: "0g", // Not provided by API, default value
-						fiber: `${apiData.nutrition_analysis.fiber.value}${apiData.nutrition_analysis.fiber.unit}`,
-						sugar: `${apiData.nutrition_analysis.sugar.value}${apiData.nutrition_analysis.sugar.unit}`,
-						sodium: `${apiData.nutrition_analysis.sodium.value}${apiData.nutrition_analysis.sodium.unit}`,
-						cholesterol: `${apiData.nutrition_analysis.cholesterol.value}${apiData.nutrition_analysis.cholesterol.unit}`,
 					},
 					suggestions: apiData.recommendations,
 					timestamp: new Date().toISOString(),
@@ -158,48 +152,48 @@ const ImageRecognitionPage = () => {
 		fileInputRef.current?.click();
 	};
 
-	const convertImageUrlToBase64 = async (
-		imageUrl: string,
-	): Promise<string> => {
-		try {
-			const response = await fetch(imageUrl);
-			const blob = await response.blob();
+	// const convertImageUrlToBase64 = async (
+	// 	imageUrl: string,
+	// ): Promise<string> => {
+	// 	try {
+	// 		const response = await fetch(imageUrl);
+	// 		const blob = await response.blob();
 
-			return new Promise((resolve, reject) => {
-				const reader = new FileReader();
-				reader.onloadend = () => resolve(reader.result as string);
-				reader.onerror = reject;
-				reader.readAsDataURL(blob);
-			});
-		} catch (error) {
-			console.error("Error converting image to base64:", error);
-			throw error;
-		}
-	};
+	// 		return new Promise((resolve, reject) => {
+	// 			const reader = new FileReader();
+	// 			reader.onloadend = () => resolve(reader.result as string);
+	// 			reader.onerror = reject;
+	// 			reader.readAsDataURL(blob);
+	// 		});
+	// 	} catch (error) {
+	// 		console.error("Error converting image to base64:", error);
+	// 		throw error;
+	// 	}
+	// };
 
-	const handleExampleImageClick = async (imageUrl: string) => {
-		try {
-			toast({
-				title: "Loading image...",
-				description: "Converting image to base64",
-				status: "info",
-				duration: 1000,
-				isClosable: true,
-			});
+	// const handleExampleImageClick = async (imageUrl: string) => {
+	// 	try {
+	// 		toast({
+	// 			title: "Loading image...",
+	// 			description: "Converting image to base64",
+	// 			status: "info",
+	// 			duration: 1000,
+	// 			isClosable: true,
+	// 		});
 
-			const base64Image = await convertImageUrlToBase64(imageUrl);
-			setSelectedImage(base64Image);
-			setResult(null);
-		} catch (error) {
-			toast({
-				title: "Error loading image",
-				description: "Failed to convert image. Please try again.",
-				status: "error",
-				duration: 3000,
-				isClosable: true,
-			});
-		}
-	};
+	// 		const base64Image = await convertImageUrlToBase64(imageUrl);
+	// 		setSelectedImage(base64Image);
+	// 		setResult(null);
+	// 	} catch (error) {
+	// 		toast({
+	// 			title: "Error loading image",
+	// 			description: "Failed to convert image. Please try again.",
+	// 			status: "error",
+	// 			duration: 3000,
+	// 			isClosable: true,
+	// 		});
+	// 	}
+	// };
 
 	return (
 		<MainLayout
@@ -301,50 +295,6 @@ const ImageRecognitionPage = () => {
 											fontWeight="semibold">
 											Or try with example images:
 										</Text>
-										<SimpleGrid
-											columns={{ base: 2, md: 3 }}
-											spacing={4}>
-											{mockImageRecognitionResults.map(
-												(mockResult, idx) => (
-													<Card
-														key={idx}
-														cursor="pointer"
-														onClick={() =>
-															handleExampleImageClick(
-																mockResult.imageUrl,
-															)
-														}
-														transition="all 0.2s"
-														_hover={{
-															transform:
-																"scale(1.05)",
-															boxShadow: "lg",
-														}}>
-														<Image
-															src={
-																mockResult.imageUrl
-															}
-															alt={`Example ${
-																idx + 1
-															}`}
-															h="120px"
-															w="100%"
-															objectFit="cover"
-															borderRadius="md"
-														/>
-														<CardBody p={2}>
-															<Text
-																fontSize="xs"
-																color="gray.600"
-																textAlign="center">
-																Example{" "}
-																{idx + 1}
-															</Text>
-														</CardBody>
-													</Card>
-												),
-											)}
-										</SimpleGrid>
 									</Box>
 								</VStack>
 							</CardBody>
@@ -482,9 +432,9 @@ const ImageRecognitionPage = () => {
 																	90
 																		? "green"
 																		: food.confidence >
-																		  80
-																		? "blue"
-																		: "orange"
+																			  80
+																			? "blue"
+																			: "orange"
 																}>
 																{
 																	food.confidence
@@ -583,91 +533,6 @@ const ImageRecognitionPage = () => {
 												</StatNumber>
 											</Stat>
 										</StatGroup>
-
-										<SimpleGrid
-											columns={{ base: 2, md: 4 }}
-											spacing={4}>
-											<Box
-												p={4}
-												bg="gray.50"
-												borderRadius="lg"
-												textAlign="center">
-												<Text
-													fontSize="xs"
-													color="gray.600">
-													Fiber
-												</Text>
-												<Text
-													fontSize="lg"
-													fontWeight="bold"
-													color="green.600">
-													{
-														result.overallNutrition
-															.fiber
-													}
-												</Text>
-											</Box>
-											<Box
-												p={4}
-												bg="gray.50"
-												borderRadius="lg"
-												textAlign="center">
-												<Text
-													fontSize="xs"
-													color="gray.600">
-													Sugar
-												</Text>
-												<Text
-													fontSize="lg"
-													fontWeight="bold"
-													color="pink.600">
-													{
-														result.overallNutrition
-															.sugar
-													}
-												</Text>
-											</Box>
-											<Box
-												p={4}
-												bg="gray.50"
-												borderRadius="lg"
-												textAlign="center">
-												<Text
-													fontSize="xs"
-													color="gray.600">
-													Sodium
-												</Text>
-												<Text
-													fontSize="lg"
-													fontWeight="bold"
-													color="red.600">
-													{
-														result.overallNutrition
-															.sodium
-													}
-												</Text>
-											</Box>
-											<Box
-												p={4}
-												bg="gray.50"
-												borderRadius="lg"
-												textAlign="center">
-												<Text
-													fontSize="xs"
-													color="gray.600">
-													Cholesterol
-												</Text>
-												<Text
-													fontSize="lg"
-													fontWeight="bold"
-													color="orange.600">
-													{
-														result.overallNutrition
-															.cholesterol
-													}
-												</Text>
-											</Box>
-										</SimpleGrid>
 									</VStack>
 								</CardBody>
 							</Card>

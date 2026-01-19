@@ -60,10 +60,7 @@ export const normalizeAITags = (aiTags: string[]): DietaryPreferenceTag[] => {
 				normalizedTags.add("pescatarian");
 			} else if (tagLower === "ketogenic") {
 				normalizedTags.add("keto");
-			} else if (
-				tagLower === "paleolithic" ||
-				tagLower === "primal"
-			) {
+			} else if (tagLower === "paleolithic" || tagLower === "primal") {
 				normalizedTags.add("paleo");
 			} else if (
 				tagLower === "lowcarb" ||
@@ -142,8 +139,6 @@ export const convertFoodToRecipe = (food: Food): Recipe => {
 		id: food._id,
 		title: food.name,
 		description: food.description || "No description available",
-		cookingTime: "Varies", // API doesn't provide cooking time
-		servingSize: "1 serving", // API doesn't provide serving size
 		image: food.imageUrl || getDefaultImageForCategory(food.category),
 		foodCategory: food.category, // Food category from API
 		category: food.meal || getCategoryFromMealType(food.category),
@@ -152,12 +147,7 @@ export const convertFoodToRecipe = (food: Food): Recipe => {
 			calories: nutritionalInfo.calories,
 			protein: `${nutritionalInfo.protein}g`,
 			fat: `${nutritionalInfo.fat}g`,
-			satFat: "0g", // API doesn't provide saturated fat
 			carbs: `${nutritionalInfo.carbohydrates}g`,
-			cholesterol: `${nutritionalInfo.cholesterol || 0}mg`,
-			fiber: `${nutritionalInfo.fiber || 0}g`,
-			sugar: `${nutritionalInfo.sugar || 0}g`,
-			sodium: `${nutritionalInfo.sodium || 0}mg`,
 		},
 		ingredients:
 			food.ingredients?.map((ing) => `${ing.amount} ${ing.name}`) || [],
@@ -372,8 +362,6 @@ const createDefaultRecipe = (
 		id: `default-${mealType}`,
 		title: `No ${mealType} recommendation available`,
 		description: "Please check back later for personalized recommendations",
-		cookingTime: "N/A",
-		servingSize: "N/A",
 		image: getDefaultImageForCategory(mealType),
 		foodCategory: "grains", // Default food category
 		category: mealType,
@@ -382,12 +370,7 @@ const createDefaultRecipe = (
 			calories: 0,
 			protein: "0g",
 			fat: "0g",
-			satFat: "0g",
 			carbs: "0g",
-			cholesterol: "0mg",
-			fiber: "0g",
-			sugar: "0g",
-			sodium: "0mg",
 		},
 		ingredients: [],
 		instructions: [],

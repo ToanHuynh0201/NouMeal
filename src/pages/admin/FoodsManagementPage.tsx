@@ -204,11 +204,6 @@ const FoodsManagementPage = () => {
 					protein: parseFloat(recipeData.nutrition.protein) || 0,
 					carbohydrates: parseFloat(recipeData.nutrition.carbs) || 0,
 					fat: parseFloat(recipeData.nutrition.fat) || 0,
-					fiber: parseFloat(recipeData.nutrition.fiber) || 0,
-					sugar: parseFloat(recipeData.nutrition.sugar) || 0,
-					sodium: parseFloat(recipeData.nutrition.sodium) || 0,
-					cholesterol:
-						parseFloat(recipeData.nutrition.cholesterol) || 0,
 				},
 				allergens: recipeData.allergens || [],
 				tags: recipeData.tags || [],
@@ -383,11 +378,6 @@ const FoodsManagementPage = () => {
 					protein: parseFloat(recipeData.nutrition.protein) || 0,
 					carbohydrates: parseFloat(recipeData.nutrition.carbs) || 0,
 					fat: parseFloat(recipeData.nutrition.fat) || 0,
-					fiber: parseFloat(recipeData.nutrition.fiber) || 0,
-					sugar: parseFloat(recipeData.nutrition.sugar) || 0,
-					sodium: parseFloat(recipeData.nutrition.sodium) || 0,
-					cholesterol:
-						parseFloat(recipeData.nutrition.cholesterol) || 0,
 				},
 				allergens: recipeData.allergens || [],
 				tags: recipeData.tags || [],

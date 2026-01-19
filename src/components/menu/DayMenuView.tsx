@@ -22,7 +22,7 @@ import {
 	ModalCloseButton,
 	useDisclosure,
 } from "@chakra-ui/react";
-import { FiClock, FiUsers, FiCheck, FiAlertCircle, FiRefreshCw } from "react-icons/fi";
+import { FiCheck, FiAlertCircle, FiRefreshCw } from "react-icons/fi";
 import { useState } from "react";
 import useScrollAnimation from "@/hooks/useScrollAnimation";
 import type { Recipe, DailyMenu } from "@/types/recipe";
@@ -37,14 +37,29 @@ interface DayMenuViewProps {
 	remainingMeals?: string[];
 }
 
-const DayMenuView = ({ dailyMenu, onRecipeClick, onLogFood, onChangeMeal, disabledMealChanges = [], remainingMeals = [] }: DayMenuViewProps) => {
+const DayMenuView = ({
+	dailyMenu,
+	onRecipeClick,
+	onLogFood,
+	onChangeMeal,
+	disabledMealChanges = [],
+	remainingMeals = [],
+}: DayMenuViewProps) => {
 	const contentSection = useScrollAnimation({ threshold: 0.1 });
 	const toast = useToast();
 	const [loggingFoods, setLoggingFoods] = useState<Set<string>>(new Set());
 	const { isOpen, onOpen, onClose } = useDisclosure();
-	const [selectedMeal, setSelectedMeal] = useState<{ foodId: string; name: string; mealType: string } | null>(null);
+	const [selectedMeal, setSelectedMeal] = useState<{
+		foodId: string;
+		name: string;
+		mealType: string;
+	} | null>(null);
 
-	const openConfirmModal = (foodId: string, name: string, mealType: string) => {
+	const openConfirmModal = (
+		foodId: string,
+		name: string,
+		mealType: string,
+	) => {
 		setSelectedMeal({ foodId, name, mealType });
 		onOpen();
 	};
@@ -54,7 +69,7 @@ const DayMenuView = ({ dailyMenu, onRecipeClick, onLogFood, onChangeMeal, disabl
 
 		const { foodId } = selectedMeal;
 		onClose();
-		setLoggingFoods(prev => new Set(prev).add(foodId));
+		setLoggingFoods((prev) => new Set(prev).add(foodId));
 
 		try {
 			await onLogFood(foodId);
@@ -74,7 +89,7 @@ const DayMenuView = ({ dailyMenu, onRecipeClick, onLogFood, onChangeMeal, disabl
 				isClosable: true,
 			});
 		} finally {
-			setLoggingFoods(prev => {
+			setLoggingFoods((prev) => {
 				const next = new Set(prev);
 				next.delete(foodId);
 				return next;
@@ -188,7 +203,11 @@ const DayMenuView = ({ dailyMenu, onRecipeClick, onLogFood, onChangeMeal, disabl
 							{recipe.category}
 						</Badge>
 					</Box>
-					<CardBody p={4} display="flex" flexDirection="column" flex={1}>
+					<CardBody
+						p={4}
+						display="flex"
+						flexDirection="column"
+						flex={1}>
 						<VStack
 							align="start"
 							spacing={2.5}
@@ -206,25 +225,6 @@ const DayMenuView = ({ dailyMenu, onRecipeClick, onLogFood, onChangeMeal, disabl
 								lineHeight="1.4">
 								{recipe.description}
 							</Text>
-							<HStack
-								spacing={3}
-								fontSize="xs"
-								color="gray.600">
-								<HStack spacing={1}>
-									<Icon
-										as={FiClock}
-										boxSize={3.5}
-									/>
-									<Text>{recipe.cookingTime}</Text>
-								</HStack>
-								<HStack spacing={1}>
-									<Icon
-										as={FiUsers}
-										boxSize={3.5}
-									/>
-									<Text>{recipe.servingSize}</Text>
-								</HStack>
-							</HStack>
 							<Divider />
 							<HStack
 								justify="space-between"
@@ -276,21 +276,36 @@ const DayMenuView = ({ dailyMenu, onRecipeClick, onLogFood, onChangeMeal, disabl
 							{(onLogFood || onChangeMeal) && (
 								<>
 									<Divider />
-									<VStack spacing={2} w="full">
+									<VStack
+										spacing={2}
+										w="full">
 										{onLogFood && (
 											<Button
 												size="sm"
-												colorScheme={categoryColor[recipe.category]}
+												colorScheme={
+													categoryColor[
+														recipe.category
+													]
+												}
 												leftIcon={<Icon as={FiCheck} />}
 												w="full"
-												isLoading={loggingFoods.has(recipe.id)}
-												isDisabled={!isMealRemaining(mealType)}
+												isLoading={loggingFoods.has(
+													recipe.id,
+												)}
+												isDisabled={
+													!isMealRemaining(mealType)
+												}
 												onClick={(e) => {
 													e.stopPropagation();
-													openConfirmModal(recipe.id, recipe.title, mealType);
+													openConfirmModal(
+														recipe.id,
+														recipe.title,
+														mealType,
+													);
 												}}
 												_hover={{
-													transform: "translateY(-2px)",
+													transform:
+														"translateY(-2px)",
 													shadow: "md",
 												}}
 												transition="all 0.2s">
@@ -302,23 +317,36 @@ const DayMenuView = ({ dailyMenu, onRecipeClick, onLogFood, onChangeMeal, disabl
 												size="sm"
 												colorScheme="orange"
 												variant="outline"
-												leftIcon={<Icon as={FiRefreshCw} />}
+												leftIcon={
+													<Icon as={FiRefreshCw} />
+												}
 												w="full"
-												isDisabled={disabledMealChanges.includes(mealType) || !isMealRemaining(mealType)}
+												isDisabled={
+													disabledMealChanges.includes(
+														mealType,
+													) ||
+													!isMealRemaining(mealType)
+												}
 												onClick={(e) => {
 													e.stopPropagation();
-													onChangeMeal(mealType, recipe.id);
+													onChangeMeal(
+														mealType,
+														recipe.id,
+													);
 												}}
 												_hover={{
-													transform: "translateY(-2px)",
+													transform:
+														"translateY(-2px)",
 													shadow: "md",
 												}}
 												transition="all 0.2s">
 												{!isMealRemaining(mealType)
 													? "Already Logged"
-													: disabledMealChanges.includes(mealType)
-													? "Changed Today"
-													: "Change Meal"}
+													: disabledMealChanges.includes(
+																mealType,
+														  )
+														? "Changed Today"
+														: "Change Meal"}
 											</Button>
 										)}
 									</VStack>
@@ -459,7 +487,11 @@ const DayMenuView = ({ dailyMenu, onRecipeClick, onLogFood, onChangeMeal, disabl
 											{snack.category}
 										</Badge>
 									</Box>
-									<CardBody p={4} display="flex" flexDirection="column" flex={1}>
+									<CardBody
+										p={4}
+										display="flex"
+										flexDirection="column"
+										flex={1}>
 										<VStack
 											align="start"
 											spacing={2.5}
@@ -477,29 +509,6 @@ const DayMenuView = ({ dailyMenu, onRecipeClick, onLogFood, onChangeMeal, disabl
 												lineHeight="1.4">
 												{snack.description}
 											</Text>
-											<HStack
-												spacing={3}
-												fontSize="xs"
-												color="gray.600">
-												<HStack spacing={1}>
-													<Icon
-														as={FiClock}
-														boxSize={3.5}
-													/>
-													<Text>
-														{snack.cookingTime}
-													</Text>
-												</HStack>
-												<HStack spacing={1}>
-													<Icon
-														as={FiUsers}
-														boxSize={3.5}
-													/>
-													<Text>
-														{snack.servingSize}
-													</Text>
-												</HStack>
-											</HStack>
 											<Divider />
 											<HStack
 												justify="space-between"
@@ -569,21 +578,42 @@ const DayMenuView = ({ dailyMenu, onRecipeClick, onLogFood, onChangeMeal, disabl
 											{(onLogFood || onChangeMeal) && (
 												<>
 													<Divider />
-													<VStack spacing={2} w="full">
+													<VStack
+														spacing={2}
+														w="full">
 														{onLogFood && (
 															<Button
 																size="sm"
 																colorScheme="blue"
-																leftIcon={<Icon as={FiCheck} />}
+																leftIcon={
+																	<Icon
+																		as={
+																			FiCheck
+																		}
+																	/>
+																}
 																w="full"
-																isLoading={loggingFoods.has(snack.id)}
-																isDisabled={!isMealRemaining("snack")}
-																onClick={(e) => {
+																isLoading={loggingFoods.has(
+																	snack.id,
+																)}
+																isDisabled={
+																	!isMealRemaining(
+																		"snack",
+																	)
+																}
+																onClick={(
+																	e,
+																) => {
 																	e.stopPropagation();
-																	openConfirmModal(snack.id, snack.title, "snack");
+																	openConfirmModal(
+																		snack.id,
+																		snack.title,
+																		"snack",
+																	);
 																}}
 																_hover={{
-																	transform: "translateY(-2px)",
+																	transform:
+																		"translateY(-2px)",
 																	shadow: "md",
 																}}
 																transition="all 0.2s">
@@ -595,23 +625,46 @@ const DayMenuView = ({ dailyMenu, onRecipeClick, onLogFood, onChangeMeal, disabl
 																size="sm"
 																colorScheme="orange"
 																variant="outline"
-																leftIcon={<Icon as={FiRefreshCw} />}
+																leftIcon={
+																	<Icon
+																		as={
+																			FiRefreshCw
+																		}
+																	/>
+																}
 																w="full"
-																isDisabled={disabledMealChanges.includes("snack") || !isMealRemaining("snack")}
-																onClick={(e) => {
+																isDisabled={
+																	disabledMealChanges.includes(
+																		"snack",
+																	) ||
+																	!isMealRemaining(
+																		"snack",
+																	)
+																}
+																onClick={(
+																	e,
+																) => {
 																	e.stopPropagation();
-																	onChangeMeal("snack", snack.id);
+																	onChangeMeal(
+																		"snack",
+																		snack.id,
+																	);
 																}}
 																_hover={{
-																	transform: "translateY(-2px)",
+																	transform:
+																		"translateY(-2px)",
 																	shadow: "md",
 																}}
 																transition="all 0.2s">
-																{!isMealRemaining("snack")
+																{!isMealRemaining(
+																	"snack",
+																)
 																	? "Already Logged"
-																	: disabledMealChanges.includes("snack")
-																	? "Changed Today"
-																	: "Change Snack"}
+																	: disabledMealChanges.includes(
+																				"snack",
+																		  )
+																		? "Changed Today"
+																		: "Change Snack"}
 															</Button>
 														)}
 													</VStack>
@@ -627,20 +680,40 @@ const DayMenuView = ({ dailyMenu, onRecipeClick, onLogFood, onChangeMeal, disabl
 			</VStack>
 
 			{/* Confirmation Modal */}
-			<Modal isOpen={isOpen} onClose={onClose} isCentered>
-				<ModalOverlay bg="blackAlpha.600" backdropFilter="blur(4px)" />
-				<ModalContent borderRadius="2xl" mx={4}>
-					<ModalHeader borderBottom="1px solid" borderColor="gray.100" pb={4}>
+			<Modal
+				isOpen={isOpen}
+				onClose={onClose}
+				isCentered>
+				<ModalOverlay
+					bg="blackAlpha.600"
+					backdropFilter="blur(4px)"
+				/>
+				<ModalContent
+					borderRadius="2xl"
+					mx={4}>
+					<ModalHeader
+						borderBottom="1px solid"
+						borderColor="gray.100"
+						pb={4}>
 						<HStack spacing={2}>
-							<Icon as={FiAlertCircle} color="purple.500" boxSize={6} />
+							<Icon
+								as={FiAlertCircle}
+								color="purple.500"
+								boxSize={6}
+							/>
 							<Text>Confirm Meal Log</Text>
 						</HStack>
 					</ModalHeader>
 					<ModalCloseButton />
 					<ModalBody py={6}>
-						<VStack spacing={4} align="start">
-							<Text fontSize="md" color="gray.700">
-								Are you sure you want to log this meal to your diary?
+						<VStack
+							spacing={4}
+							align="start">
+							<Text
+								fontSize="md"
+								color="gray.700">
+								Are you sure you want to log this meal to your
+								diary?
 							</Text>
 							{selectedMeal && (
 								<Box
@@ -650,28 +723,50 @@ const DayMenuView = ({ dailyMenu, onRecipeClick, onLogFood, onChangeMeal, disabl
 									borderRadius="xl"
 									border="1px solid"
 									borderColor="purple.200">
-									<VStack align="start" spacing={2}>
+									<VStack
+										align="start"
+										spacing={2}>
 										<HStack spacing={2}>
-											<Text fontSize="sm" fontWeight="semibold" color="purple.700" textTransform="uppercase">
+											<Text
+												fontSize="sm"
+												fontWeight="semibold"
+												color="purple.700"
+												textTransform="uppercase">
 												Meal Type:
 											</Text>
-											<Badge colorScheme="purple" fontSize="sm" px={2} py={1}>
+											<Badge
+												colorScheme="purple"
+												fontSize="sm"
+												px={2}
+												py={1}>
 												{selectedMeal.mealType}
 											</Badge>
 										</HStack>
-										<Text fontSize="md" fontWeight="bold" color="gray.800">
+										<Text
+											fontSize="md"
+											fontWeight="bold"
+											color="gray.800">
 											{selectedMeal.name}
 										</Text>
 									</VStack>
 								</Box>
 							)}
-							<Text fontSize="sm" color="gray.600">
-								This action will update your daily nutrition progress.
+							<Text
+								fontSize="sm"
+								color="gray.600">
+								This action will update your daily nutrition
+								progress.
 							</Text>
 						</VStack>
 					</ModalBody>
-					<ModalFooter borderTop="1px solid" borderColor="gray.100" pt={4}>
-						<HStack spacing={3} w="full" justify="flex-end">
+					<ModalFooter
+						borderTop="1px solid"
+						borderColor="gray.100"
+						pt={4}>
+						<HStack
+							spacing={3}
+							w="full"
+							justify="flex-end">
 							<Button
 								variant="ghost"
 								onClick={onClose}
@@ -684,7 +779,8 @@ const DayMenuView = ({ dailyMenu, onRecipeClick, onLogFood, onChangeMeal, disabl
 								onClick={handleConfirmLog}
 								leftIcon={<Icon as={FiCheck} />}
 								_hover={{
-									bgGradient: "linear(135deg, purple.600, pink.600)",
+									bgGradient:
+										"linear(135deg, purple.600, pink.600)",
 									transform: "translateY(-2px)",
 									shadow: "md",
 								}}

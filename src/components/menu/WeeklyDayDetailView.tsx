@@ -6,12 +6,10 @@ import {
 	Card,
 	CardBody,
 	Image,
-	Icon,
 	SimpleGrid,
 	Heading,
 	Badge,
 } from "@chakra-ui/react";
-import { FiClock } from "react-icons/fi";
 import useScrollAnimation from "@/hooks/useScrollAnimation";
 import type { Recipe, DailyMenu } from "@/types/recipe";
 
@@ -126,7 +124,15 @@ const WeeklyDayDetailView = ({
 						position="absolute"
 						bottom={3}
 						left={3}
-						colorScheme={mealType === "breakfast" ? "orange" : mealType === "lunch" ? "green" : mealType === "dinner" ? "purple" : "blue"}
+						colorScheme={
+							mealType === "breakfast"
+								? "orange"
+								: mealType === "lunch"
+									? "green"
+									: mealType === "dinner"
+										? "purple"
+										: "blue"
+						}
 						fontSize="xs"
 						px={2}
 						py={1}
@@ -169,10 +175,16 @@ const WeeklyDayDetailView = ({
 								px={2}
 								py={1}
 								borderRadius="md">
-								<Text fontWeight="bold" color="purple.600">
+								<Text
+									fontWeight="bold"
+									color="purple.600">
 									{recipe.nutrition.calories}
 								</Text>
-								<Text fontSize="xs" color="gray.600">cal</Text>
+								<Text
+									fontSize="xs"
+									color="gray.600">
+									cal
+								</Text>
 							</HStack>
 							<HStack
 								spacing={1}
@@ -180,10 +192,16 @@ const WeeklyDayDetailView = ({
 								px={2}
 								py={1}
 								borderRadius="md">
-								<Text fontWeight="bold" color="green.600">
+								<Text
+									fontWeight="bold"
+									color="green.600">
 									{recipe.nutrition.protein}
 								</Text>
-								<Text fontSize="xs" color="gray.600">protein</Text>
+								<Text
+									fontSize="xs"
+									color="gray.600">
+									protein
+								</Text>
 							</HStack>
 						</HStack>
 
@@ -195,13 +213,6 @@ const WeeklyDayDetailView = ({
 							pt={2}
 							borderTop="1px solid"
 							borderColor="gray.100">
-							<HStack spacing={1}>
-								<Icon
-									as={FiClock}
-									boxSize={3.5}
-								/>
-								<Text>{recipe.cookingTime}</Text>
-							</HStack>
 							<Text>•</Text>
 							<Text
 								textTransform="capitalize"
@@ -255,12 +266,15 @@ const WeeklyDayDetailView = ({
 						<Text
 							fontSize="md"
 							color="whiteAlpha.900">
-							{new Date(dailyMenu.date).toLocaleDateString("en-US", {
-								weekday: "long",
-								month: "long",
-								day: "numeric",
-								year: "numeric",
-							})}
+							{new Date(dailyMenu.date).toLocaleDateString(
+								"en-US",
+								{
+									weekday: "long",
+									month: "long",
+									day: "numeric",
+									year: "numeric",
+								},
+							)}
 						</Text>
 					</VStack>
 

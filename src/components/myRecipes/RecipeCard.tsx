@@ -18,8 +18,6 @@ import {
 	Checkbox,
 } from "@chakra-ui/react";
 import {
-	FiClock,
-	FiUsers,
 	FiMoreVertical,
 	FiEdit2,
 	FiTrash2,
@@ -261,42 +259,6 @@ const RecipeCard = ({
 						minH="40px">
 						{recipe.description}
 					</Text>
-
-					{/* Meta Info */}
-					<HStack
-						spacing={4}
-						pt={2}>
-						<HStack
-							spacing={2}
-							flex={1}>
-							<Icon
-								as={FiClock}
-								color="gray.500"
-								boxSize={4}
-							/>
-							<Text
-								fontSize="xs"
-								color="gray.600"
-								fontWeight="medium">
-								{recipe.cookingTime}
-							</Text>
-						</HStack>
-						<HStack
-							spacing={2}
-							flex={1}>
-							<Icon
-								as={FiUsers}
-								color="gray.500"
-								boxSize={4}
-							/>
-							<Text
-								fontSize="xs"
-								color="gray.600"
-								fontWeight="medium">
-								{recipe.servingSize}
-							</Text>
-						</HStack>
-					</HStack>
 
 					{/* Tags and Difficulty */}
 					<HStack

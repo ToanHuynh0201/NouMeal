@@ -28,12 +28,10 @@ const convertFoodToRecipe = (food: Food) => {
 			fat: `${food.nutritionalInfo.fat}g`,
 			satFat: "0g", // Default if not available
 			carbs: `${food.nutritionalInfo.carbohydrates}g`,
-			cholesterol: `${food.nutritionalInfo.cholesterol}mg`,
-			fiber: `${food.nutritionalInfo.fiber}g`,
-			sugar: `${food.nutritionalInfo.sugar}g`,
-			sodium: `${food.nutritionalInfo.sodium}mg`,
 		},
-		ingredients: food.ingredients.map((ing) => `${ing.name} - ${ing.amount}`),
+		ingredients: food.ingredients.map(
+			(ing) => `${ing.name} - ${ing.amount}`,
+		),
 		instructions: food.instructions.map((inst) => inst.description),
 		tags: food.tags || [],
 		allergens: food.allergens || [],

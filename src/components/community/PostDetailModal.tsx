@@ -107,8 +107,6 @@ const PostDetailModal = ({ isOpen, onClose, postId }: PostDetailModalProps) => {
 			id: foodData._id,
 			title: foodData.name,
 			description: foodData.description,
-			cookingTime: "30 mins", // Default value
-			servingSize: "1 serving", // Default value
 			image: foodData.imageUrl,
 			category: foodData.meal || "lunch",
 			difficulty: "medium", // Default value
@@ -116,12 +114,7 @@ const PostDetailModal = ({ isOpen, onClose, postId }: PostDetailModalProps) => {
 				calories: foodData.nutritionalInfo?.calories || 0,
 				protein: `${foodData.nutritionalInfo?.protein || 0}g`,
 				fat: `${foodData.nutritionalInfo?.fat || 0}g`,
-				satFat: "0g",
 				carbs: `${foodData.nutritionalInfo?.carbohydrates || 0}g`,
-				cholesterol: `${foodData.nutritionalInfo?.cholesterol || 0}mg`,
-				fiber: `${foodData.nutritionalInfo?.fiber || 0}g`,
-				sugar: `${foodData.nutritionalInfo?.sugar || 0}g`,
-				sodium: `${foodData.nutritionalInfo?.sodium || 0}mg`,
 			},
 			ingredients:
 				foodData.ingredients?.map(
@@ -231,9 +224,9 @@ const PostDetailModal = ({ isOpen, onClose, postId }: PostDetailModalProps) => {
 											postDetail.visibility === "public"
 												? "green"
 												: postDetail.visibility ===
-												  "friends"
-												? "blue"
-												: "gray"
+													  "friends"
+													? "blue"
+													: "gray"
 										}
 										fontSize="sm"
 										px={3}
@@ -242,9 +235,9 @@ const PostDetailModal = ({ isOpen, onClose, postId }: PostDetailModalProps) => {
 										{postDetail.visibility === "public"
 											? "Public"
 											: postDetail.visibility ===
-											  "friends"
-											? "Friends"
-											: "Private"}
+												  "friends"
+												? "Friends"
+												: "Private"}
 									</Badge>
 								</HStack>
 
