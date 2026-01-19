@@ -99,7 +99,6 @@ const MyRecipesPage = () => {
 	const [editingRecipe, setEditingRecipe] = useState<Recipe | null>(null);
 	const [deletingRecipe, setDeletingRecipe] = useState<Recipe | null>(null);
 	const [viewingRecipe, setViewingRecipe] = useState<Recipe | null>(null);
-	const [sharingRecipe, setSharingRecipe] = useState<Recipe | null>(null);
 	const [pendingRecipe, setPendingRecipe] = useState<RecipeFormData | null>(
 		null,
 	);
@@ -133,7 +132,6 @@ const MyRecipesPage = () => {
 	};
 
 	const handleShareRecipe = (recipe: Recipe) => {
-		setSharingRecipe(recipe);
 		setSelectedRecipes([recipe]);
 		onShareOpen();
 	};
@@ -161,7 +159,6 @@ const MyRecipesPage = () => {
 
 	const handleShareSelected = () => {
 		if (selectedRecipes.length > 0) {
-			setSharingRecipe(null);
 			onShareOpen();
 		}
 	};

@@ -167,7 +167,8 @@ export type DietaryPreferenceTag =
 	| "organic"
 	| "low_sodium"
 	| "diabetic_friendly"
-	| "heart_healthy";
+	| "heart_healthy"
+	| "mediterranean";
 
 export interface FoodInstruction {
 	step: number;
@@ -277,7 +278,7 @@ export interface LogFoodResponse {
 }
 
 // Food Log with populated food field
-export interface PopulatedFoodLog extends Omit<FoodLog, 'food'> {
+export interface PopulatedFoodLog extends Omit<FoodLog, "food"> {
 	food: Food;
 }
 

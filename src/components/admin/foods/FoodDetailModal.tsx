@@ -27,8 +27,8 @@ interface FoodDetailModalProps {
 	food: Food | null;
 	isOpen: boolean;
 	onClose: () => void;
-	onToggleStatus: (food: Food) => void;
-	onDelete: (food: Food) => void;
+	onToggleStatus?: (food: Food) => void;
+	onDelete?: (food: Food) => void;
 }
 
 const categoryColors: { [key: string]: string } = {
@@ -47,12 +47,24 @@ const mealColors: { [key: string]: string } = {
 	snack: "green",
 };
 
-const InfoField = ({ label, value }: { label: string; value: React.ReactNode }) => (
+const InfoField = ({
+	label,
+	value,
+}: {
+	label: string;
+	value: React.ReactNode;
+}) => (
 	<Box>
-		<Text fontWeight="bold" color="gray.600" fontSize="sm" mb={1}>
+		<Text
+			fontWeight="bold"
+			color="gray.600"
+			fontSize="sm"
+			mb={1}>
 			{label}
 		</Text>
-		<Text fontSize="md" color="gray.800">
+		<Text
+			fontSize="md"
+			color="gray.800">
 			{value}
 		</Text>
 	</Box>
@@ -69,17 +81,30 @@ export const FoodDetailModal = ({
 	if (!food) return null;
 
 	return (
-		<Modal isOpen={isOpen} onClose={onClose} size={isMobile ? "full" : "4xl"}>
+		<Modal
+			isOpen={isOpen}
+			onClose={onClose}
+			size={isMobile ? "full" : "4xl"}>
 			<ModalOverlay />
-			<ModalContent maxW="1000px" borderRadius="2xl">
-				<ModalHeader fontSize="2xl" fontWeight="bold" color="gray.700" pb={2}>
+			<ModalContent
+				maxW="1000px"
+				borderRadius="2xl">
+				<ModalHeader
+					fontSize="2xl"
+					fontWeight="bold"
+					color="gray.700"
+					pb={2}>
 					Food Details
 				</ModalHeader>
 				<ModalCloseButton />
-				<ModalBody px={{ base: 4, md: 8 }} py={4}>
+				<ModalBody
+					px={{ base: 4, md: 8 }}
+					py={4}>
 					{/* Food Image & Basic Info */}
 					<Box mb={6}>
-						<Grid templateColumns={{ base: "1fr", md: "200px 1fr" }} gap={6}>
+						<Grid
+							templateColumns={{ base: "1fr", md: "200px 1fr" }}
+							gap={6}>
 							<Image
 								src={food.imageUrl}
 								alt={food.name}
@@ -90,15 +115,28 @@ export const FoodDetailModal = ({
 								fallbackSrc="https://via.placeholder.com/200"
 							/>
 							<Box>
-								<Text fontSize="2xl" fontWeight="bold" color="gray.800" mb={2}>
+								<Text
+									fontSize="2xl"
+									fontWeight="bold"
+									color="gray.800"
+									mb={2}>
 									{food.name}
 								</Text>
-								<Text fontSize="md" color="gray.600" mb={3}>
+								<Text
+									fontSize="md"
+									color="gray.600"
+									mb={3}>
 									{food.description}
 								</Text>
-								<Stack direction="row" spacing={2} mb={2}>
+								<Stack
+									direction="row"
+									spacing={2}
+									mb={2}>
 									<Badge
-										colorScheme={categoryColors[food.category] || "gray"}
+										colorScheme={
+											categoryColors[food.category] ||
+											"gray"
+										}
 										fontSize="sm"
 										px={3}
 										py={1}
@@ -106,7 +144,9 @@ export const FoodDetailModal = ({
 										{food.category.toUpperCase()}
 									</Badge>
 									<Badge
-										colorScheme={mealColors[food.meal] || "gray"}
+										colorScheme={
+											mealColors[food.meal] || "gray"
+										}
 										fontSize="sm"
 										px={3}
 										py={1}
@@ -114,7 +154,9 @@ export const FoodDetailModal = ({
 										{food.meal.toUpperCase()}
 									</Badge>
 									<Badge
-										colorScheme={food.isActive ? "green" : "red"}
+										colorScheme={
+											food.isActive ? "green" : "red"
+										}
 										fontSize="sm"
 										px={3}
 										py={1}
@@ -123,11 +165,19 @@ export const FoodDetailModal = ({
 									</Badge>
 								</Stack>
 								{food.tags && food.tags.length > 0 && (
-									<Wrap spacing={2} mt={2}>
+									<Wrap
+										spacing={2}
+										mt={2}>
 										{food.tags.map((tag, index) => (
 											<WrapItem key={index}>
-												<Badge colorScheme="cyan" fontSize="xs" px={2} py={1}>
-													{tag.replace(/_/g, " ").toUpperCase()}
+												<Badge
+													colorScheme="cyan"
+													fontSize="xs"
+													px={2}
+													py={1}>
+													{tag
+														.replace(/_/g, " ")
+														.toUpperCase()}
 												</Badge>
 											</WrapItem>
 										))}
@@ -141,18 +191,35 @@ export const FoodDetailModal = ({
 
 					{/* Nutritional Information */}
 					<Box mb={6}>
-						<Text fontSize="lg" fontWeight="bold" color="gray.700" mb={4}>
+						<Text
+							fontSize="lg"
+							fontWeight="bold"
+							color="gray.700"
+							mb={4}>
 							Nutritional Information
 						</Text>
-						<Grid templateColumns={{ base: "repeat(2, 1fr)", md: "repeat(4, 1fr)" }} gap={4}>
-							<InfoField label="Calories" value={`${food.nutritionalInfo.calories} kcal`} />
-							<InfoField label="Protein" value={`${food.nutritionalInfo.protein}g`} />
-							<InfoField label="Carbohydrates" value={`${food.nutritionalInfo.carbohydrates}g`} />
-							<InfoField label="Fat" value={`${food.nutritionalInfo.fat}g`} />
-							<InfoField label="Fiber" value={`${food.nutritionalInfo.fiber}g`} />
-							<InfoField label="Sugar" value={`${food.nutritionalInfo.sugar}g`} />
-							<InfoField label="Sodium" value={`${food.nutritionalInfo.sodium}mg`} />
-							<InfoField label="Cholesterol" value={`${food.nutritionalInfo.cholesterol}mg`} />
+						<Grid
+							templateColumns={{
+								base: "repeat(2, 1fr)",
+								md: "repeat(4, 1fr)",
+							}}
+							gap={4}>
+							<InfoField
+								label="Calories"
+								value={`${food.nutritionalInfo.calories} kcal`}
+							/>
+							<InfoField
+								label="Protein"
+								value={`${food.nutritionalInfo.protein}g`}
+							/>
+							<InfoField
+								label="Carbohydrates"
+								value={`${food.nutritionalInfo.carbohydrates}g`}
+							/>
+							<InfoField
+								label="Fat"
+								value={`${food.nutritionalInfo.fat}g`}
+							/>
 						</Grid>
 					</Box>
 
@@ -160,15 +227,32 @@ export const FoodDetailModal = ({
 
 					{/* Ingredients */}
 					<Box mb={6}>
-						<Text fontSize="lg" fontWeight="bold" color="gray.700" mb={4}>
+						<Text
+							fontSize="lg"
+							fontWeight="bold"
+							color="gray.700"
+							mb={4}>
 							Ingredients
 						</Text>
-						<UnorderedList spacing={2} pl={4}>
+						<UnorderedList
+							spacing={2}
+							pl={4}>
 							{food.ingredients.map((ingredient, index) => (
-								<ListItem key={index} fontSize="md" color="gray.700">
-									<Text as="span" fontWeight="semibold">{ingredient.name}</Text>
+								<ListItem
+									key={index}
+									fontSize="md"
+									color="gray.700">
+									<Text
+										as="span"
+										fontWeight="semibold">
+										{ingredient.name}
+									</Text>
 									{" - "}
-									<Text as="span" color="gray.600">{ingredient.amount}</Text>
+									<Text
+										as="span"
+										color="gray.600">
+										{ingredient.amount}
+									</Text>
 								</ListItem>
 							))}
 						</UnorderedList>
@@ -178,12 +262,21 @@ export const FoodDetailModal = ({
 
 					{/* Instructions */}
 					<Box mb={6}>
-						<Text fontSize="lg" fontWeight="bold" color="gray.700" mb={4}>
+						<Text
+							fontSize="lg"
+							fontWeight="bold"
+							color="gray.700"
+							mb={4}>
 							Cooking Instructions
 						</Text>
-						<OrderedList spacing={3} pl={4}>
+						<OrderedList
+							spacing={3}
+							pl={4}>
 							{food.instructions.map((instruction) => (
-								<ListItem key={instruction.step} fontSize="md" color="gray.700">
+								<ListItem
+									key={instruction.step}
+									fontSize="md"
+									color="gray.700">
 									{instruction.description}
 								</ListItem>
 							))}
@@ -194,21 +287,31 @@ export const FoodDetailModal = ({
 
 					{/* Allergens */}
 					<Box mb={6}>
-						<Text fontSize="lg" fontWeight="bold" color="gray.700" mb={4}>
+						<Text
+							fontSize="lg"
+							fontWeight="bold"
+							color="gray.700"
+							mb={4}>
 							Allergens
 						</Text>
 						{food.allergens && food.allergens.length > 0 ? (
 							<Wrap spacing={2}>
 								{food.allergens.map((allergen, index) => (
 									<WrapItem key={index}>
-										<Badge colorScheme="red" fontSize="sm" px={3} py={1}>
+										<Badge
+											colorScheme="red"
+											fontSize="sm"
+											px={3}
+											py={1}>
 											{allergen.toUpperCase()}
 										</Badge>
 									</WrapItem>
 								))}
 							</Wrap>
 						) : (
-							<Text fontSize="sm" color="gray.500">
+							<Text
+								fontSize="sm"
+								color="gray.500">
 								No allergens specified
 							</Text>
 						)}
@@ -218,52 +321,71 @@ export const FoodDetailModal = ({
 
 					{/* Metadata */}
 					<Box>
-						<Text fontSize="lg" fontWeight="bold" color="gray.700" mb={4}>
+						<Text
+							fontSize="lg"
+							fontWeight="bold"
+							color="gray.700"
+							mb={4}>
 							Metadata
 						</Text>
-						<Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={4}>
+						<Grid
+							templateColumns={{
+								base: "1fr",
+								md: "repeat(2, 1fr)",
+							}}
+							gap={4}>
 							<InfoField
 								label="Created At"
-								value={new Date(food.createdAt).toLocaleString("en-US", {
-									dateStyle: "medium",
-									timeStyle: "short",
-								})}
+								value={new Date(food.createdAt).toLocaleString(
+									"en-US",
+									{
+										dateStyle: "medium",
+										timeStyle: "short",
+									},
+								)}
 							/>
 							<InfoField
 								label="Updated At"
-								value={new Date(food.updatedAt).toLocaleString("en-US", {
-									dateStyle: "medium",
-									timeStyle: "short",
-								})}
+								value={new Date(food.updatedAt).toLocaleString(
+									"en-US",
+									{
+										dateStyle: "medium",
+										timeStyle: "short",
+									},
+								)}
 							/>
 						</Grid>
 					</Box>
 				</ModalBody>
 				<ModalFooter>
-					<Button
-						colorScheme="red"
-						variant="outline"
-						mr="auto"
-						onClick={() => onDelete(food)}
-						fontWeight="bold"
-						fontSize="md"
-						px={6}
-						py={2}
-						borderRadius="lg">
-						Delete Food
-					</Button>
-					<Button
-						colorScheme={food.isActive ? "red" : "green"}
-						variant={food.isActive ? "outline" : "solid"}
-						mr={3}
-						onClick={() => onToggleStatus(food)}
-						fontWeight="bold"
-						fontSize="md"
-						px={6}
-						py={2}
-						borderRadius="lg">
-						{food.isActive ? "Deactivate" : "Activate"}
-					</Button>
+					{onDelete && (
+						<Button
+							colorScheme="red"
+							variant="outline"
+							mr="auto"
+							onClick={() => onDelete(food)}
+							fontWeight="bold"
+							fontSize="md"
+							px={6}
+							py={2}
+							borderRadius="lg">
+							Delete Food
+						</Button>
+					)}
+					{onToggleStatus && (
+						<Button
+							colorScheme={food.isActive ? "red" : "green"}
+							variant={food.isActive ? "outline" : "solid"}
+							mr={3}
+							onClick={() => onToggleStatus(food)}
+							fontWeight="bold"
+							fontSize="md"
+							px={6}
+							py={2}
+							borderRadius="lg">
+							{food.isActive ? "Deactivate" : "Activate"}
+						</Button>
+					)}
 					<Button
 						onClick={onClose}
 						fontWeight="bold"
