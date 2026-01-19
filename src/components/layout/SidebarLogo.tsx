@@ -7,6 +7,7 @@ import {
 	useColorModeValue,
 	VStack,
 } from "@chakra-ui/react";
+import logoImage from "@/assets/1.png";
 
 interface SidebarLogoProps {
 	isCollapsed: boolean;
@@ -64,7 +65,7 @@ export const SidebarLogo = ({ isCollapsed }: SidebarLogoProps) => {
 								transform: "scale(0.95)",
 							}}>
 							<img
-								src="/vite.svg"
+								src={logoImage}
 								alt="NouMeal Logo"
 								style={{
 									width: "28px",
@@ -91,7 +92,7 @@ export const SidebarLogo = ({ isCollapsed }: SidebarLogoProps) => {
 							bgGradient: "linear(135deg, purple.500, pink.500)",
 						}}>
 						<img
-							src="/vite.svg"
+							src={logoImage}
 							alt="NouMeal Logo"
 							style={{
 								width: "36px",

@@ -30,9 +30,17 @@ import {
 	IconButton,
 	Tooltip,
 	SlideFade,
+	Modal,
+	ModalOverlay,
+	ModalContent,
+	ModalHeader,
+	ModalBody,
+	ModalCloseButton,
+	useDisclosure,
 } from "@chakra-ui/react";
 import { EditIcon, CheckIcon, CloseIcon } from "@chakra-ui/icons";
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { userService } from "@/services/userService";
 import {
@@ -41,15 +49,22 @@ import {
 	ALLERGIES,
 	ACTIVITY_LEVELS,
 } from "@/constants/profile";
+import { ROUTES } from "@/constants";
 import { calculateBMI, calculateBMR } from "@/mocks/profileData";
 import { animationPresets } from "@/styles/animation";
 
 const UserInfoSection = () => {
 	const { user, updateUser } = useAuth();
 	const toast = useToast();
+	const navigate = useNavigate();
 	const [isEditing, setIsEditing] = useState(false);
 	const [showFloatingButtons, setShowFloatingButtons] = useState(false);
 	const buttonHeaderRef = useRef<HTMLDivElement>(null);
+	const {
+		isOpen: isFollowingModalOpen,
+		onOpen: onFollowingModalOpen,
+		onClose: onFollowingModalClose,
+	} = useDisclosure();
 	const [editedData, setEditedData] = useState({
 		name: "",
 		email: "",
@@ -62,6 +77,8 @@ const UserInfoSection = () => {
 		preferences: [] as string[],
 		allergies: [] as string[],
 	});
+
+	console.log(user);
 
 	// Get display data based on edit mode
 	const displayData = isEditing
@@ -276,6 +293,68 @@ const UserInfoSection = () => {
 		return goalMap[goal] || goal;
 	};
 
+	// Handle user click in following modal
+	const handleUserClick = (userId: string) => {
+		const userPostsPath = ROUTES.USER_POSTS.replace(":userId", userId);
+		navigate(userPostsPath);
+		onFollowingModalClose();
+	};
+
+	// Handle unfollow user
+	const handleUnfollowUser = async (
+		e: React.MouseEvent,
+		userId: string,
+		userName: string,
+	) => {
+		e.stopPropagation(); // Prevent navigation when clicking unfollow button
+
+		try {
+			const result = await userService.unfollowUser(userId);
+
+			if (result.success) {
+				toast({
+					title: "Unfollowed Successfully",
+					description: `You have unfollowed ${userName}`,
+					status: "success",
+					duration: 3000,
+					isClosable: true,
+					position: "top",
+				});
+
+				// Update user's followingUsers array in AuthContext
+				const updatedFollowingUsers =
+					user.followingUsers?.filter(
+						(followingUser: any) => followingUser.id !== userId,
+					) || [];
+
+				updateUser({
+					...user,
+					followingUsers: updatedFollowingUsers,
+				});
+			} else {
+				toast({
+					title: "Unfollow Failed",
+					description:
+						result.error || "Failed to unfollow user. Please try again.",
+					status: "error",
+					duration: 3000,
+					isClosable: true,
+					position: "top",
+				});
+			}
+		} catch (error: any) {
+			toast({
+				title: "Unfollow Failed",
+				description:
+					error?.message || "An error occurred while unfollowing user.",
+				status: "error",
+				duration: 3000,
+				isClosable: true,
+				position: "top",
+			});
+		}
+	};
+
 	return (
 		<VStack
 			spacing={8}
@@ -379,7 +458,15 @@ const UserInfoSection = () => {
 										Followers
 									</Text>
 								</HStack>
-								<HStack spacing={2}>
+								<HStack
+									spacing={2}
+									cursor="pointer"
+									onClick={onFollowingModalOpen}
+									_hover={{
+										color: "brand.600",
+										textDecoration: "underline",
+									}}
+									transition="all 0.2s">
 									<Text
 										fontSize="md"
 										fontWeight="bold"
@@ -1174,6 +1261,114 @@ const UserInfoSection = () => {
 					</Box>
 				</Box>
 			</Fade>
+
+			{/* Following Modal */}
+			<Modal
+				isOpen={isFollowingModalOpen}
+				onClose={onFollowingModalClose}
+				size="md"
+				scrollBehavior="inside">
+				<ModalOverlay
+					bg="blackAlpha.600"
+					backdropFilter="blur(8px)"
+				/>
+				<ModalContent>
+					<ModalHeader>
+						Following ({user.followingUsers?.length || 0})
+					</ModalHeader>
+					<ModalCloseButton />
+					<ModalBody pb={6}>
+						{user.followingUsers &&
+						user.followingUsers.length > 0 ? (
+							<VStack
+								spacing={3}
+								align="stretch">
+								{user.followingUsers.map(
+									(followingUser: any) => (
+										<Card
+											key={followingUser.id}
+											variant="outline"
+											cursor="pointer"
+											onClick={() =>
+												handleUserClick(followingUser.id)
+											}
+											_hover={{
+												shadow: "md",
+												borderColor: "brand.300",
+												bg: "brand.50",
+											}}
+											transition="all 0.2s">
+											<CardBody p={4}>
+												<HStack
+													spacing={4}
+													justify="space-between">
+													<HStack
+														spacing={4}
+														flex={1}>
+														<Avatar
+															size="md"
+															name={
+																followingUser.name
+															}
+															bg="brand.500"
+															color="white"
+														/>
+														<VStack
+															align="start"
+															spacing={1}
+															flex={1}>
+															<Text
+																fontWeight="semibold"
+																fontSize="md">
+																{
+																	followingUser.name
+																}
+															</Text>
+															<Text
+																fontSize="sm"
+																color="gray.600">
+																{
+																	followingUser.email
+																}
+															</Text>
+														</VStack>
+													</HStack>
+													<Button
+														size="sm"
+														colorScheme="red"
+														variant="outline"
+														onClick={(e) =>
+															handleUnfollowUser(
+																e,
+																followingUser.id,
+																followingUser.name,
+															)
+														}
+														_hover={{
+															bg: "red.50",
+														}}>
+														Unfollow
+													</Button>
+												</HStack>
+											</CardBody>
+										</Card>
+									),
+								)}
+							</VStack>
+						) : (
+							<Box
+								textAlign="center"
+								py={8}>
+								<Text
+									color="gray.500"
+									fontSize="md">
+									You are not following anyone yet
+								</Text>
+							</Box>
+						)}
+					</ModalBody>
+				</ModalContent>
+			</Modal>
 		</VStack>
 	);
 };
