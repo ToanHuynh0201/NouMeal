@@ -495,27 +495,17 @@ const CommentItem = ({
 
 export const CommentSection = ({
 	postId,
-	initialCount = 0,
 	onCommentAdded,
-	showComments: externalShowComments,
-	onToggleComments,
+	showComments = true,
 }: CommentSectionProps) => {
 	const [newComment, setNewComment] = useState("");
-	const [internalShowComments, setInternalShowComments] = useState(false);
 	const [comments, setComments] = useState<Comment[]>([]);
 	const [isLoading, setIsLoading] = useState(false);
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [page, setPage] = useState(1);
 	const [hasMore, setHasMore] = useState(false);
-	const [totalComments, setTotalComments] = useState(initialCount);
 	const borderColor = useColorModeValue("gray.200", "gray.600");
 	const toast = useToast();
-
-	// Use external showComments if provided, otherwise use internal state
-	const showComments =
-		externalShowComments !== undefined
-			? externalShowComments
-			: internalShowComments;
 
 	// Fetch comments when expanding the section
 	const fetchComments = async (pageNum: number = 1) => {
@@ -536,7 +526,6 @@ export const CommentSection = ({
 				} else {
 					setComments((prev) => [...prev, ...response.data.comments]);
 				}
-				setTotalComments(response.data.pagination.total);
 				setHasMore(
 					response.data.pagination.page <
 						response.data.pagination.totalPages,
@@ -563,17 +552,6 @@ export const CommentSection = ({
 			fetchComments(1);
 		}
 	}, [showComments]);
-
-	const handleToggleComments = () => {
-		if (!showComments && comments.length === 0) {
-			fetchComments(1);
-		}
-		if (onToggleComments) {
-			onToggleComments(!showComments);
-		} else {
-			setInternalShowComments(!showComments);
-		}
-	};
 
 	const handleSubmit = async () => {
 		if (!newComment.trim() || !postId) return;
@@ -681,7 +659,6 @@ export const CommentSection = ({
 				setComments((prev) =>
 					prev.filter((comment) => comment._id !== commentId),
 				);
-				setTotalComments((prev) => prev - 1);
 
 				// Notify parent component to update comment count
 				if (onCommentAdded) {

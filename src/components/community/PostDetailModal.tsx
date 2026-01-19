@@ -44,7 +44,6 @@ const PostDetailModal = ({ isOpen, onClose, postId }: PostDetailModalProps) => {
 	const [isLoading, setIsLoading] = useState(false);
 	const [isLikeLoading, setIsLikeLoading] = useState(false);
 	const [selectedFood, setSelectedFood] = useState<Recipe | null>(null);
-	const [shouldReopenPostModal, setShouldReopenPostModal] = useState(false);
 	const {
 		isOpen: isRecipeOpen,
 		onOpen: onRecipeOpen,
@@ -137,8 +136,6 @@ const PostDetailModal = ({ isOpen, onClose, postId }: PostDetailModalProps) => {
 			const recipe = convertFoodApiToRecipe(foodData);
 			setSelectedFood(recipe);
 
-			// Mark that we need to reopen PostDetailModal after closing RecipeDetailModal
-			setShouldReopenPostModal(true);
 			onRecipeOpen();
 		} catch (error) {
 			console.error("Error fetching food details:", error);
@@ -146,11 +143,8 @@ const PostDetailModal = ({ isOpen, onClose, postId }: PostDetailModalProps) => {
 	};
 
 	const handleRecipeClose = () => {
-		// Đóng RecipeDetailModal
 		onRecipeClose();
 		setSelectedFood(null);
-		// Reset flag
-		setShouldReopenPostModal(false);
 	};
 
 	const formatDate = (dateString: string) => {
