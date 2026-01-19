@@ -18,7 +18,7 @@ import {
 	TagLeftIcon,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import { FiSearch, FiClock, FiUsers, FiZap } from "react-icons/fi";
+import { FiSearch, FiZap } from "react-icons/fi";
 import MainLayout from "@/components/layout/MainLayout";
 import RecipeDetailModal from "@/components/menu/RecipeDetailModal";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
@@ -28,15 +28,17 @@ import type { MealSuggestion } from "@/types/ai";
 import type { ApiMeal } from "@/types/ai";
 import { normalizeAITags } from "@/utils/food";
 
+// Default placeholder image - A simple purple gradient food placeholder
+const DEFAULT_MEAL_IMAGE =
+	"data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAwIiBoZWlnaHQ9IjYwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8ZGVmcz4KICAgIDxsaW5lYXJHcmFkaWVudCBpZD0iZ3JhZCIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMTAwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0eWxlPSJzdG9wLWNvbG9yOiM5RjdBRUE7c3RvcC1vcGFjaXR5OjEiIC8+CiAgICAgIDxzdG9wIG9mZnNldD0iMTAwJSIgc3R5bGU9InN0b3AtY29sb3I6I0ZCQjZDRTtzdG9wLW9wYWNpdHk6MSIgLz4KICAgIDwvbGluZWFyR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSI4MDAiIGhlaWdodD0iNjAwIiBmaWxsPSJ1cmwoI2dyYWQpIi8+CiAgPHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0OCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiIG9wYWNpdHk9IjAuNiI+CiAgICA8dHNwYW4geD0iNTAlIiBkeT0iLTIwIj7wn42977iPPC90c3Bhbj4KICAgIDx0c3BhbiB4PSI1MCUiIGR5PSI2MCI+TWVhbCBJbWFnZTwvdHNwYW4+CiAgPC90ZXh0Pgo8L3N2Zz4=";
+
 // Helper function to convert API meal to Recipe format
 const convertApiMealToRecipe = (meal: ApiMeal, index: number): Recipe => {
 	return {
 		id: `meal-${index}-${Date.now()}`,
 		title: meal.name,
-		description: meal.description,
-		cookingTime: meal.prep_time,
-		servingSize: `${meal.servings} servings`,
-		image: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800", // Default image
+		description: meal.description, // Default serving size
+		image: DEFAULT_MEAL_IMAGE,
 		foodCategory: "grains", // Default food category
 		category: "lunch", // Default category
 		difficulty: meal.difficulty.toLowerCase() as "easy" | "medium" | "hard",
@@ -44,12 +46,7 @@ const convertApiMealToRecipe = (meal: ApiMeal, index: number): Recipe => {
 			calories: meal.nutrition_facts.calories.value,
 			protein: `${meal.nutrition_facts.protein.value}${meal.nutrition_facts.protein.unit}`,
 			fat: `${meal.nutrition_facts.fat.value}${meal.nutrition_facts.fat.unit}`,
-			satFat: "0g", // Not provided by API
 			carbs: `${meal.nutrition_facts.carbs.value}${meal.nutrition_facts.carbs.unit}`,
-			cholesterol: `${meal.nutrition_facts.cholesterol.value}${meal.nutrition_facts.cholesterol.unit}`,
-			fiber: `${meal.nutrition_facts.fiber.value}${meal.nutrition_facts.fiber.unit}`,
-			sugar: `${meal.nutrition_facts.sugar.value}${meal.nutrition_facts.sugar.unit}`,
-			sodium: `${meal.nutrition_facts.sodium.value}${meal.nutrition_facts.sodium.unit}`,
 		},
 		ingredients: meal.ingredients,
 		instructions: meal.instructions,
@@ -282,36 +279,6 @@ const AIMealSuggestionPage = () => {
 												<Flex
 													gap={2}
 													flexWrap="wrap">
-													<Tag
-														size="md"
-														colorScheme="purple"
-														variant="subtle">
-														<TagLeftIcon
-															as={FiClock}
-														/>
-														<TagLabel>
-															{
-																suggestion
-																	.recipe
-																	.cookingTime
-															}
-														</TagLabel>
-													</Tag>
-													<Tag
-														size="md"
-														colorScheme="blue"
-														variant="subtle">
-														<TagLeftIcon
-															as={FiUsers}
-														/>
-														<TagLabel>
-															{
-																suggestion
-																	.recipe
-																	.servingSize
-															}
-														</TagLabel>
-													</Tag>
 													<Tag
 														size="md"
 														colorScheme="orange"

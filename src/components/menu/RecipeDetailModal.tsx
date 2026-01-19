@@ -28,8 +28,10 @@ import {
 	Button,
 	useDisclosure,
 	useToast,
+	Wrap,
+	WrapItem,
 } from "@chakra-ui/react";
-import { FiClock, FiUsers, FiBookmark } from "react-icons/fi";
+import { FiBookmark } from "react-icons/fi";
 import { CheckCircleIcon } from "@chakra-ui/icons";
 import { animationPresets } from "@/styles/animation";
 import type { Recipe } from "@/types/recipe";
@@ -243,26 +245,6 @@ const RecipeDetailModal = ({
 												mb={2}>
 												{recipe.description}
 											</Text>
-											<HStack spacing={4}>
-												<HStack spacing={2}>
-													<Icon
-														as={FiClock}
-														boxSize={5}
-													/>
-													<Text fontWeight="bold">
-														{recipe.cookingTime}
-													</Text>
-												</HStack>
-												<HStack spacing={2}>
-													<Icon
-														as={FiUsers}
-														boxSize={5}
-													/>
-													<Text fontWeight="bold">
-														{recipe.servingSize}
-													</Text>
-												</HStack>
-											</HStack>
 										</Box>
 									</Box>
 								</GridItem>
@@ -291,53 +273,95 @@ const RecipeDetailModal = ({
 													mb={3}>
 													{recipe.description}
 												</Text>
-												<HStack spacing={4}>
-													<HStack spacing={2}>
-														<Icon
-															as={FiClock}
-															boxSize={5}
-															color="purple.600"
-														/>
-														<Text
-															fontWeight="bold"
-															color="purple.600">
-															{recipe.cookingTime}
-														</Text>
-													</HStack>
-													<HStack spacing={2}>
-														<Icon
-															as={FiUsers}
-															boxSize={5}
-															color="purple.600"
-														/>
-														<Text
-															fontWeight="bold"
-															color="purple.600">
-															{recipe.servingSize}
-														</Text>
-													</HStack>
-												</HStack>
 											</Box>
 											<Divider />
 										</>
 									)}
 
 									{/* Tags */}
-									<HStack
-										spacing={2}
-										flexWrap="wrap">
-										{recipe.tags.map((tag, index) => (
-											<Badge
-												key={index}
-												colorScheme="purple"
-												fontSize="xs"
-												px={3}
-												py={1}
-												borderRadius="full">
-												{tag}
-											</Badge>
-										))}
-									</HStack>
+									{recipe.tags && recipe.tags.length > 0 && (
+										<Box>
+											<Heading
+												size="sm"
+												mb={3}
+												color="brand.600">
+												Dietary Tags
+											</Heading>
+											<Wrap spacing={2}>
+												{recipe.tags.map(
+													(tag, index) => (
+														<WrapItem key={index}>
+															<Badge
+																colorScheme="purple"
+																fontSize="xs"
+																px={3}
+																py={1}
+																borderRadius="full">
+																{tag
+																	.replace(
+																		/_/g,
+																		" ",
+																	)
+																	.replace(
+																		/\b\w/g,
+																		(l) =>
+																			l.toUpperCase(),
+																	)}
+															</Badge>
+														</WrapItem>
+													),
+												)}
+											</Wrap>
+										</Box>
+									)}
+
+									{/* Allergens */}
+									{recipe.allergens &&
+										recipe.allergens.length > 0 && (
+											<Box>
+												<Heading
+													size="sm"
+													mb={3}
+													color="red.600">
+													Allergens
+												</Heading>
+												<Text
+													fontSize="sm"
+													color="gray.600"
+													mb={2}>
+													This recipe contains the
+													following allergens:
+												</Text>
+												<Wrap spacing={2}>
+													{recipe.allergens.map(
+														(allergen, index) => (
+															<WrapItem
+																key={index}>
+																<Badge
+																	colorScheme="red"
+																	fontSize="xs"
+																	px={3}
+																	py={1}
+																	borderRadius="full">
+																	{allergen
+																		.replace(
+																			/_/g,
+																			" ",
+																		)
+																		.replace(
+																			/\b\w/g,
+																			(
+																				l,
+																			) =>
+																				l.toUpperCase(),
+																		)}
+																</Badge>
+															</WrapItem>
+														),
+													)}
+												</Wrap>
+											</Box>
+										)}
 
 									<Divider />
 
@@ -430,70 +454,6 @@ const RecipeDetailModal = ({
 													</VStack>
 												</SimpleGrid>
 												<Divider my={3} />
-												<SimpleGrid
-													columns={2}
-													spacing={2}>
-													<HStack justify="space-between">
-														<Text
-															fontSize="xs"
-															color="gray.600">
-															Fiber
-														</Text>
-														<Text
-															fontSize="xs"
-															fontWeight="medium">
-															{
-																recipe.nutrition
-																	.fiber
-															}
-														</Text>
-													</HStack>
-													<HStack justify="space-between">
-														<Text
-															fontSize="xs"
-															color="gray.600">
-															Sugar
-														</Text>
-														<Text
-															fontSize="xs"
-															fontWeight="medium">
-															{
-																recipe.nutrition
-																	.sugar
-															}
-														</Text>
-													</HStack>
-													<HStack justify="space-between">
-														<Text
-															fontSize="xs"
-															color="gray.600">
-															Sodium
-														</Text>
-														<Text
-															fontSize="xs"
-															fontWeight="medium">
-															{
-																recipe.nutrition
-																	.sodium
-															}
-														</Text>
-													</HStack>
-													<HStack justify="space-between">
-														<Text
-															fontSize="xs"
-															color="gray.600">
-															Cholesterol
-														</Text>
-														<Text
-															fontSize="xs"
-															fontWeight="medium">
-															{
-																recipe.nutrition
-																	.cholesterol
-															}
-														</Text>
-													</HStack>
-												</SimpleGrid>
 											</CardBody>
 										</Card>
 									</Box>

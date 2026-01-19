@@ -8,12 +8,7 @@ export interface NutritionInfo {
 	calories: number;
 	protein: string;
 	fat: string;
-	satFat: string;
 	carbs: string;
-	cholesterol: string;
-	fiber: string;
-	sugar: string;
-	sodium: string;
 }
 
 /**
@@ -35,10 +30,6 @@ export interface FoodNutritionalInfo {
 	protein: number;
 	carbohydrates: number;
 	fat: number;
-	fiber: number;
-	sugar: number;
-	sodium: number;
-	cholesterol: number;
 }
 
 export interface Food {
@@ -145,8 +136,7 @@ export interface Recipe {
 	id: string;
 	title: string;
 	description: string;
-	cookingTime: string;
-	servingSize: string;
+
 	image: string;
 	foodCategory?:
 		| "fruits"
@@ -165,6 +155,7 @@ export interface Recipe {
 	ingredients: string[];
 	instructions: string[];
 	tags: DietaryPreferenceTag[];
+	allergens?: string[];
 }
 
 export interface DailyMenu {

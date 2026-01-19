@@ -44,8 +44,7 @@ export const useMyRecipes = () => {
 			id: food._id,
 			title: food.name,
 			description: food.description,
-			cookingTime: "30 mins", // Default value, adjust if needed
-			servingSize: "1 serving", // Default value, adjust if needed
+
 			image: food.imageUrl,
 			category: food.meal,
 			difficulty: "medium", // Default value since API doesn't provide this
@@ -53,18 +52,14 @@ export const useMyRecipes = () => {
 				calories: food.nutritionalInfo.calories,
 				protein: `${food.nutritionalInfo.protein}g`,
 				fat: `${food.nutritionalInfo.fat}g`,
-				satFat: "0g", // Default value if not provided
 				carbs: `${food.nutritionalInfo.carbohydrates}g`,
-				cholesterol: `${food.nutritionalInfo.cholesterol}mg`,
-				fiber: `${food.nutritionalInfo.fiber}g`,
-				sugar: `${food.nutritionalInfo.sugar}g`,
-				sodium: `${food.nutritionalInfo.sodium}mg`,
 			},
 			ingredients: food.ingredients.map(
 				(ing) => `${ing.name} - ${ing.amount}`,
 			),
 			instructions: food.instructions.map((inst) => inst.description),
 			tags: food.tags,
+			allergens: food.allergens,
 		};
 	}, []);
 
@@ -97,11 +92,6 @@ export const useMyRecipes = () => {
 					protein: parseFloat(recipeData.nutrition.protein) || 0,
 					carbohydrates: parseFloat(recipeData.nutrition.carbs) || 0,
 					fat: parseFloat(recipeData.nutrition.fat) || 0,
-					fiber: parseFloat(recipeData.nutrition.fiber) || 0,
-					sugar: parseFloat(recipeData.nutrition.sugar) || 0,
-					sodium: parseFloat(recipeData.nutrition.sodium) || 0,
-					cholesterol:
-						parseFloat(recipeData.nutrition.cholesterol) || 0,
 				},
 				allergens: recipeData.allergens,
 				tags: recipeData.tags,
@@ -116,6 +106,7 @@ export const useMyRecipes = () => {
 			try {
 				setIsLoading(true);
 				const response = await foodService.getUserFoods(page, 10);
+
 				if (response.success) {
 					const foods = response.data;
 					const convertedRecipes = foods.map(convertFoodToRecipe);
@@ -397,12 +388,6 @@ export const useMyRecipes = () => {
 					break;
 				case "calories":
 					comparison = a.nutrition.calories - b.nutrition.calories;
-					break;
-				case "cookingTime":
-					// Extract minutes from cooking time string
-					const timeA = parseInt(a.cookingTime) || 0;
-					const timeB = parseInt(b.cookingTime) || 0;
-					comparison = timeA - timeB;
 					break;
 				case "createdAt":
 					// Extract timestamp from ID

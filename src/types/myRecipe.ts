@@ -8,8 +8,6 @@ import type { DietaryPreferenceTag } from "./index";
 export interface RecipeFormData {
 	title: string;
 	description: string;
-	cookingTime: string;
-	servingSize: string;
 	image: string;
 	foodCategory:
 		| "fruits"
@@ -32,12 +30,7 @@ export interface RecipeFormData {
 		calories: number;
 		protein: string;
 		fat: string;
-		satFat: string;
 		carbs: string;
-		cholesterol: string;
-		fiber: string;
-		sugar: string;
-		sodium: string;
 	};
 	_id?: string;
 }

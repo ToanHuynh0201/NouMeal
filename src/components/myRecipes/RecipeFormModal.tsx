@@ -55,8 +55,6 @@ const RecipeFormModal = ({
 	const initialFormData: RecipeFormData = {
 		title: "",
 		description: "",
-		cookingTime: "",
-		servingSize: "",
 		image: "",
 		foodCategory: "grains",
 		category: "breakfast",
@@ -69,13 +67,20 @@ const RecipeFormModal = ({
 			calories: 0,
 			protein: "0g",
 			fat: "0g",
-			satFat: "0g",
 			carbs: "0g",
-			cholesterol: "0mg",
-			fiber: "0g",
-			sugar: "0g",
-			sodium: "0mg",
 		},
+	};
+
+	// Helper function to extract numeric value from string like "15g" -> "15"
+	const extractNumericValue = (value: string | undefined): string => {
+		if (!value) return "";
+		return value.replace(/[^0-9.]/g, "");
+	};
+
+	// Helper function to add unit to numeric value: "15" -> "15g"
+	const addGramUnit = (value: string): string => {
+		const numValue = value.replace(/[^0-9.]/g, "");
+		return numValue ? `${numValue}g` : "0g";
 	};
 
 	const [formData, setFormData] = useState<RecipeFormData>(initialFormData);
@@ -90,8 +95,6 @@ const RecipeFormModal = ({
 				_id: editingRecipe.id,
 				title: editingRecipe.title,
 				description: editingRecipe.description,
-				cookingTime: editingRecipe.cookingTime,
-				servingSize: editingRecipe.servingSize,
 				image: editingRecipe.image,
 				foodCategory: (editingRecipe as any).foodCategory || "grains",
 				category: editingRecipe.category,
@@ -133,7 +136,12 @@ const RecipeFormModal = ({
 				instructions: editingRecipe.instructions,
 				tags: editingRecipe.tags,
 				allergens: (editingRecipe as any).allergens || [],
-				nutrition: editingRecipe.nutrition,
+				nutrition: {
+					calories: editingRecipe.nutrition.calories || 0,
+					protein: editingRecipe.nutrition.protein || "0g",
+					fat: editingRecipe.nutrition.fat || "0g",
+					carbs: editingRecipe.nutrition.carbs || "0g",
+				},
 			});
 			setImagePreview(editingRecipe.image || "");
 		} else if (isOpen && !editingRecipe) {
@@ -207,10 +215,26 @@ const RecipeFormModal = ({
 	};
 
 	const handleNutritionChange = (field: string, value: string | number) => {
-		setFormData((prev) => ({
-			...prev,
-			nutrition: { ...prev.nutrition, [field]: value },
-		}));
+		// For gram-based fields, convert input value to "Xg" format
+		if (
+			field === "protein" ||
+			field === "fat" ||
+			field === "carbs" ||
+			field === "fiber" ||
+			field === "sugar"
+		) {
+			const numValue = String(value).replace(/[^0-9.]/g, "");
+			const formattedValue = numValue ? `${numValue}g` : "0g";
+			setFormData((prev) => ({
+				...prev,
+				nutrition: { ...prev.nutrition, [field]: formattedValue },
+			}));
+		} else {
+			setFormData((prev) => ({
+				...prev,
+				nutrition: { ...prev.nutrition, [field]: value },
+			}));
+		}
 	};
 
 	const handleArrayChange = (
@@ -533,41 +557,6 @@ const RecipeFormModal = ({
 									</GridItem>
 								</Grid>
 
-								<Grid
-									templateColumns="repeat(2, 1fr)"
-									gap={4}>
-									<GridItem>
-										<FormControl isRequired>
-											<FormLabel>Cooking Time</FormLabel>
-											<Input
-												value={formData.cookingTime}
-												onChange={(e) =>
-													handleInputChange(
-														"cookingTime",
-														e.target.value,
-													)
-												}
-												placeholder="e.g., 30 minutes"
-											/>
-										</FormControl>
-									</GridItem>
-									<GridItem>
-										<FormControl isRequired>
-											<FormLabel>Serving Size</FormLabel>
-											<Input
-												value={formData.servingSize}
-												onChange={(e) =>
-													handleInputChange(
-														"servingSize",
-														e.target.value,
-													)
-												}
-												placeholder="e.g., 2 servings"
-											/>
-										</FormControl>
-									</GridItem>
-								</Grid>
-
 								<FormControl>
 									<FormLabel>Recipe Image</FormLabel>
 									<Input
@@ -664,97 +653,109 @@ const RecipeFormModal = ({
 								Nutrition Information
 							</Text>
 							<Grid
-								templateColumns="repeat(3, 1fr)"
+								templateColumns="repeat(2, 1fr)"
 								gap={4}>
 								<GridItem>
 									<FormControl>
 										<FormLabel>Calories</FormLabel>
 										<Input
-											type="number"
-											value={formData.nutrition.calories}
-											onChange={(e) =>
+											type="text"
+											inputMode="numeric"
+											pattern="[0-9]*"
+											value={
+												formData.nutrition.calories ===
+												0
+													? ""
+													: formData.nutrition
+															.calories
+											}
+											onChange={(e) => {
+												const value =
+													e.target.value.replace(
+														/[^0-9]/g,
+														"",
+													);
 												handleNutritionChange(
 													"calories",
-													parseInt(e.target.value) ||
-														0,
-												)
-											}
+													parseInt(value) || 0,
+												);
+											}}
 											placeholder="0"
 										/>
 									</FormControl>
 								</GridItem>
 								<GridItem>
 									<FormControl>
-										<FormLabel>Protein</FormLabel>
+										<FormLabel>Protein (g)</FormLabel>
 										<Input
-											value={formData.nutrition.protein}
-											onChange={(e) =>
+											type="text"
+											inputMode="decimal"
+											pattern="[0-9]*\.?[0-9]*"
+											value={extractNumericValue(
+												formData.nutrition.protein,
+											)}
+											onChange={(e) => {
+												const value =
+													e.target.value.replace(
+														/[^0-9.]/g,
+														"",
+													);
 												handleNutritionChange(
 													"protein",
-													e.target.value,
-												)
-											}
-											placeholder="e.g., 15g"
+													value,
+												);
+											}}
+											placeholder="0"
 										/>
 									</FormControl>
 								</GridItem>
 								<GridItem>
 									<FormControl>
-										<FormLabel>Carbs</FormLabel>
+										<FormLabel>Carbs (g)</FormLabel>
 										<Input
-											value={formData.nutrition.carbs}
-											onChange={(e) =>
+											type="text"
+											inputMode="decimal"
+											pattern="[0-9]*\.?[0-9]*"
+											value={extractNumericValue(
+												formData.nutrition.carbs,
+											)}
+											onChange={(e) => {
+												const value =
+													e.target.value.replace(
+														/[^0-9.]/g,
+														"",
+													);
 												handleNutritionChange(
 													"carbs",
-													e.target.value,
-												)
-											}
-											placeholder="e.g., 30g"
+													value,
+												);
+											}}
+											placeholder="0"
 										/>
 									</FormControl>
 								</GridItem>
 								<GridItem>
 									<FormControl>
-										<FormLabel>Fat</FormLabel>
+										<FormLabel>Fat (g)</FormLabel>
 										<Input
-											value={formData.nutrition.fat}
-											onChange={(e) =>
+											type="text"
+											inputMode="decimal"
+											pattern="[0-9]*\.?[0-9]*"
+											value={extractNumericValue(
+												formData.nutrition.fat,
+											)}
+											onChange={(e) => {
+												const value =
+													e.target.value.replace(
+														/[^0-9.]/g,
+														"",
+													);
 												handleNutritionChange(
 													"fat",
-													e.target.value,
-												)
-											}
-											placeholder="e.g., 10g"
-										/>
-									</FormControl>
-								</GridItem>
-								<GridItem>
-									<FormControl>
-										<FormLabel>Fiber</FormLabel>
-										<Input
-											value={formData.nutrition.fiber}
-											onChange={(e) =>
-												handleNutritionChange(
-													"fiber",
-													e.target.value,
-												)
-											}
-											placeholder="e.g., 5g"
-										/>
-									</FormControl>
-								</GridItem>
-								<GridItem>
-									<FormControl>
-										<FormLabel>Sugar</FormLabel>
-										<Input
-											value={formData.nutrition.sugar}
-											onChange={(e) =>
-												handleNutritionChange(
-													"sugar",
-													e.target.value,
-												)
-											}
-											placeholder="e.g., 8g"
+													value,
+												);
+											}}
+											placeholder="0"
 										/>
 									</FormControl>
 								</GridItem>
@@ -1061,7 +1062,9 @@ const RecipeFormModal = ({
 						colorScheme="purple"
 						onClick={handleSubmit}
 						isLoading={isLoading}
-						loadingText={editingRecipe ? "Updating..." : "Saving..."}>
+						loadingText={
+							editingRecipe ? "Updating..." : "Saving..."
+						}>
 						{editingRecipe ? "Update Recipe" : "Add to my recipes"}
 					</Button>
 				</ModalFooter>
