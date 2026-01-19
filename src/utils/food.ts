@@ -1,4 +1,12 @@
-import type { Food, Recipe, DailyMenu, MealType, TodayMealsResponse } from "@/types";
+import type {
+	Food,
+	Recipe,
+	DailyMenu,
+	MealType,
+	TodayMealsResponse,
+	DietaryPreferenceTag,
+} from "@/types";
+import { DIETARY_PREFERENCE_TAGS } from "@/constants";
 
 /**
  * Format meal type for display
@@ -34,7 +42,7 @@ export const convertFoodToRecipe = (food: Food): Recipe => {
 		description: food.description || "No description available",
 		cookingTime: "Varies", // API doesn't provide cooking time
 		servingSize: "1 serving", // API doesn't provide serving size
-		image: getDefaultImageForCategory(food.category),
+		image: food.imageUrl || getDefaultImageForCategory(food.category),
 		foodCategory: food.category, // Food category from API
 		category: food.meal || getCategoryFromMealType(food.category),
 		difficulty: "medium" as const,
@@ -192,7 +200,9 @@ export const convertRecommendationsToDailyMenu = (recommendations: {
  * @param {TodayMealsResponse} todayMealsData - Today's meals data from API
  * @returns {DailyMenu} Daily menu object
  */
-export const convertTodayMealsToDailyMenu = (todayMealsData: TodayMealsResponse): DailyMenu => {
+export const convertTodayMealsToDailyMenu = (
+	todayMealsData: TodayMealsResponse,
+): DailyMenu => {
 	const { meals, date } = todayMealsData;
 
 	const breakfastRecipe = meals.breakfast?.[0]
@@ -312,9 +322,7 @@ export const convertWeeklyMenuToDailyMenus = (weeklyData: any): DailyMenu[] => {
 		const snackArray = Array.isArray(day.meals?.snack)
 			? day.meals.snack
 			: [];
-		const snackRecipes = snackArray
-			.slice(0, 2)
-			.map(convertFoodToRecipe);
+		const snackRecipes = snackArray.slice(0, 2).map(convertFoodToRecipe);
 
 		// Calculate totals
 		const allRecipes = [

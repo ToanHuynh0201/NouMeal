@@ -99,6 +99,7 @@ const MenuSuggestionPage = () => {
 		setError(null);
 
 		const result = await foodService.getTodayMeals();
+		console.log(result);
 
 		if (result.success) {
 			setTodayMealsData(result.data);
@@ -128,7 +129,8 @@ const MenuSuggestionPage = () => {
 
 				toast({
 					title: "Menu reset successfully",
-					description: "Your today's meals have been refreshed with new suggestions",
+					description:
+						"Your today's meals have been refreshed with new suggestions",
 					status: "success",
 					duration: 3000,
 					isClosable: true,
@@ -190,6 +192,8 @@ const MenuSuggestionPage = () => {
 	// Convert API today's meals to DailyMenu format
 	const todayMenu = useMemo(() => {
 		if (!todayMealsData) return null;
+		console.log(convertTodayMealsToDailyMenu(todayMealsData));
+
 		return convertTodayMealsToDailyMenu(todayMealsData);
 	}, [todayMealsData]);
 
@@ -469,7 +473,9 @@ const MenuSuggestionPage = () => {
 										{/* Reset Menu Button */}
 										<HStack justify="flex-end">
 											<Button
-												leftIcon={<Icon as={FiRefreshCw} />}
+												leftIcon={
+													<Icon as={FiRefreshCw} />
+												}
 												colorScheme="purple"
 												variant="outline"
 												size="md"
@@ -477,7 +483,8 @@ const MenuSuggestionPage = () => {
 												isLoading={isLoading}
 												_hover={{
 													bg: "purple.50",
-													transform: "translateY(-2px)",
+													transform:
+														"translateY(-2px)",
 													shadow: "md",
 												}}
 												transition="all 0.2s">

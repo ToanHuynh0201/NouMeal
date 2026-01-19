@@ -71,6 +71,10 @@ export const useMyRecipes = () => {
 	// Convert RecipeFormData to CreateFoodRequest
 	const convertRecipeToFoodRequest = useCallback(
 		(recipeData: RecipeFormData): CreateFoodRequest => {
+			// Check if image is base64 (new upload) or URL (existing image)
+			const isBase64Image =
+				recipeData.image && recipeData.image.startsWith("data:image/");
+
 			return {
 				id: recipeData._id!,
 				name: recipeData.title,
@@ -79,7 +83,12 @@ export const useMyRecipes = () => {
 					step: index + 1,
 					description: desc,
 				})),
-				image: recipeData.image,
+				// Only send image if it's a new base64 upload
+				...(isBase64Image ? { image: recipeData.image } : {}),
+				// Send imageUrl if keeping the existing image
+				...(!isBase64Image && recipeData.image
+					? { imageUrl: recipeData.image }
+					: {}),
 				category: recipeData.foodCategory,
 				meal: recipeData.category,
 				ingredients: recipeData.ingredients,
@@ -267,13 +276,12 @@ export const useMyRecipes = () => {
 		async (recipeId: string, recipeData: RecipeFormData) => {
 			try {
 				const foodRequest = convertRecipeToFoodRequest(recipeData);
+
+				console.log("Sending foodData to API:", foodRequest);
 				const response = await foodService.updateUserFood(
 					recipeId,
 					foodRequest,
 				);
-
-				console.log(foodRequest);
-
 				console.log(response);
 
 				if (response.success) {

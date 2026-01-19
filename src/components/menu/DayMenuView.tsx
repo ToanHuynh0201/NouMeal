@@ -304,7 +304,7 @@ const DayMenuView = ({ dailyMenu, onRecipeClick, onLogFood, onChangeMeal, disabl
 												variant="outline"
 												leftIcon={<Icon as={FiRefreshCw} />}
 												w="full"
-												isDisabled={disabledMealChanges.includes(mealType)}
+												isDisabled={disabledMealChanges.includes(mealType) || !isMealRemaining(mealType)}
 												onClick={(e) => {
 													e.stopPropagation();
 													onChangeMeal(mealType, recipe.id);
@@ -314,7 +314,9 @@ const DayMenuView = ({ dailyMenu, onRecipeClick, onLogFood, onChangeMeal, disabl
 													shadow: "md",
 												}}
 												transition="all 0.2s">
-												{disabledMealChanges.includes(mealType)
+												{!isMealRemaining(mealType)
+													? "Already Logged"
+													: disabledMealChanges.includes(mealType)
 													? "Changed Today"
 													: "Change Meal"}
 											</Button>
@@ -595,7 +597,7 @@ const DayMenuView = ({ dailyMenu, onRecipeClick, onLogFood, onChangeMeal, disabl
 																variant="outline"
 																leftIcon={<Icon as={FiRefreshCw} />}
 																w="full"
-																isDisabled={disabledMealChanges.includes("snack")}
+																isDisabled={disabledMealChanges.includes("snack") || !isMealRemaining("snack")}
 																onClick={(e) => {
 																	e.stopPropagation();
 																	onChangeMeal("snack", snack.id);
@@ -605,7 +607,9 @@ const DayMenuView = ({ dailyMenu, onRecipeClick, onLogFood, onChangeMeal, disabl
 																	shadow: "md",
 																}}
 																transition="all 0.2s">
-																{disabledMealChanges.includes("snack")
+																{!isMealRemaining("snack")
+																	? "Already Logged"
+																	: disabledMealChanges.includes("snack")
 																	? "Changed Today"
 																	: "Change Snack"}
 															</Button>

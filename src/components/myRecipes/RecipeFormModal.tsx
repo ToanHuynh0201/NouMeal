@@ -80,6 +80,7 @@ const RecipeFormModal = ({
 
 	const [formData, setFormData] = useState<RecipeFormData>(initialFormData);
 	const [imagePreview, setImagePreview] = useState<string>("");
+	const [isLoading, setIsLoading] = useState(false);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	// Load editing recipe data
@@ -335,13 +336,24 @@ const RecipeFormModal = ({
 			return;
 		}
 
+		setIsLoading(true);
 		try {
 			await onSave(cleanedData);
-			console.log("RecipeFormModal - onSave completed");
+			// Chỉ đóng modal khi onSave thành công
+			handleClose();
 		} catch (error) {
 			console.error("RecipeFormModal - onSave error:", error);
+			// Modal sẽ không đóng khi có lỗi
+			toast({
+				title: "Error",
+				description: "Failed to save recipe. Please try again.",
+				status: "error",
+				duration: 3000,
+				isClosable: true,
+			});
+		} finally {
+			setIsLoading(false);
 		}
-		handleClose();
 	};
 
 	const handleClose = () => {
@@ -1041,13 +1053,16 @@ const RecipeFormModal = ({
 					<Button
 						variant="ghost"
 						mr={3}
-						onClick={handleClose}>
+						onClick={handleClose}
+						isDisabled={isLoading}>
 						Cancel
 					</Button>
 					<Button
 						colorScheme="purple"
-						onClick={handleSubmit}>
-						Add to my recipes
+						onClick={handleSubmit}
+						isLoading={isLoading}
+						loadingText={editingRecipe ? "Updating..." : "Saving..."}>
+						{editingRecipe ? "Update Recipe" : "Add to my recipes"}
 					</Button>
 				</ModalFooter>
 			</ModalContent>

@@ -88,8 +88,6 @@ const FoodsManagementPage = () => {
 
 			// Fetch all foods with a large limit to get everything
 			const response = await foodService.getAdminFoods(1, 1000);
-			console.log(response);
-
 			if (response && response.success) {
 				const foodsData = response.data;
 
@@ -178,14 +176,22 @@ const FoodsManagementPage = () => {
 		recipeData: RecipeFormData,
 	) => {
 		try {
-			console.log("handleSaveEdit called with:", { foodId, recipeData });
 			setLoading(true);
+
+			// Check if image is base64 (new upload) or URL (existing image)
+			const isBase64Image =
+				recipeData.image && recipeData.image.startsWith("data:image/");
 
 			// Convert RecipeFormData back to CreateFoodRequest format
 			const foodData = {
 				name: recipeData.title,
 				description: recipeData.description,
-				image: recipeData.image,
+				// Only send image if it's a new base64 upload
+				...(isBase64Image ? { image: recipeData.image } : {}),
+				// Send imageUrl if keeping the existing image
+				...(!isBase64Image && recipeData.image
+					? { imageUrl: recipeData.image }
+					: {}),
 				category: recipeData.foodCategory,
 				meal: recipeData.category,
 				ingredients: recipeData.ingredients,
@@ -213,7 +219,8 @@ const FoodsManagementPage = () => {
 				foodId,
 				foodData,
 			);
-			console.log("API Response:", response);
+
+			console.log(response);
 
 			if (response && response.success) {
 				// Update the food in allFoods
@@ -225,6 +232,10 @@ const FoodsManagementPage = () => {
 				if (selectedFood?._id === foodId) {
 					setSelectedFood(response.data);
 				}
+
+				// Close edit modal on success
+				setEditModalOpen(false);
+				setEditingFood(null);
 
 				toast({
 					title: "Success",
