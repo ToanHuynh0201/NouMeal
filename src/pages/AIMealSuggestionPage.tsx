@@ -26,6 +26,7 @@ import { aiService } from "@/services";
 import type { Recipe } from "@/types/recipe";
 import type { MealSuggestion } from "@/types/ai";
 import type { ApiMeal } from "@/types/ai";
+import { normalizeAITags } from "@/utils/food";
 
 // Helper function to convert API meal to Recipe format
 const convertApiMealToRecipe = (meal: ApiMeal, index: number): Recipe => {
@@ -52,7 +53,7 @@ const convertApiMealToRecipe = (meal: ApiMeal, index: number): Recipe => {
 		},
 		ingredients: meal.ingredients,
 		instructions: meal.instructions,
-		tags: meal.tags,
+		tags: normalizeAITags(meal.tags), // Normalize AI tags to standard format
 	};
 };
 
@@ -79,6 +80,8 @@ const AIMealSuggestionPage = () => {
 			const response = await aiService.getMealSuggestions({
 				query: prompt,
 			});
+
+			console.log(response);
 
 			if (response.success && response.data.meals) {
 				const mealSuggestions: MealSuggestion[] =

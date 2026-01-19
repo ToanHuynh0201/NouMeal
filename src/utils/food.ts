@@ -24,6 +24,108 @@ export const formatMealType = (mealType: MealType): string => {
 };
 
 /**
+ * Normalize AI-generated tags to standard dietary preference tags
+ * Maps various tag formats and synonyms to the 16 predefined dietary preference tags
+ * @param {string[]} aiTags - Tags from AI response
+ * @returns {DietaryPreferenceTag[]} Normalized tags matching DIETARY_PREFERENCE_TAGS
+ */
+export const normalizeAITags = (aiTags: string[]): DietaryPreferenceTag[] => {
+	const normalizedTags = new Set<DietaryPreferenceTag>();
+
+	aiTags.forEach((tag) => {
+		// Normalize the tag: lowercase, trim, replace spaces/hyphens with underscores
+		const normalizedTag = tag
+			.toLowerCase()
+			.trim()
+			.replace(/[-\s]/g, "_") as DietaryPreferenceTag;
+
+		// Check if normalized tag is a valid standard tag
+		if (DIETARY_PREFERENCE_TAGS.includes(normalizedTag)) {
+			normalizedTags.add(normalizedTag);
+		}
+		// Additional mapping for common synonyms and variations
+		else {
+			const tagLower = tag.toLowerCase().trim();
+
+			// Mapping synonyms to standard tags
+			if (tagLower.includes("veggie") || tagLower === "plant-based") {
+				normalizedTags.add("vegetarian");
+			} else if (tagLower === "plant based") {
+				normalizedTags.add("vegan");
+			} else if (
+				tagLower === "pescetarian" ||
+				tagLower === "fish-based" ||
+				tagLower === "fish_based"
+			) {
+				normalizedTags.add("pescatarian");
+			} else if (tagLower === "ketogenic") {
+				normalizedTags.add("keto");
+			} else if (
+				tagLower === "paleolithic" ||
+				tagLower === "primal"
+			) {
+				normalizedTags.add("paleo");
+			} else if (
+				tagLower === "lowcarb" ||
+				tagLower.replace(/[-\s_]/g, "") === "lowcarb"
+			) {
+				normalizedTags.add("low_carb");
+			} else if (
+				tagLower === "lowfat" ||
+				tagLower.replace(/[-\s_]/g, "") === "lowfat"
+			) {
+				normalizedTags.add("low_fat");
+			} else if (
+				tagLower === "highprotein" ||
+				tagLower === "protein" ||
+				tagLower.replace(/[-\s_]/g, "") === "highprotein"
+			) {
+				normalizedTags.add("high_protein");
+			} else if (
+				tagLower === "glutenfree" ||
+				tagLower === "no gluten" ||
+				tagLower.replace(/[-\s_]/g, "") === "glutenfree"
+			) {
+				normalizedTags.add("gluten_free");
+			} else if (
+				tagLower === "dairyfree" ||
+				tagLower === "no dairy" ||
+				tagLower === "lactose" ||
+				tagLower === "lactose-free" ||
+				tagLower === "lactose_free" ||
+				tagLower.replace(/[-\s_]/g, "") === "dairyfree"
+			) {
+				normalizedTags.add("dairy_free");
+			} else if (tagLower === "natural") {
+				normalizedTags.add("organic");
+			} else if (
+				tagLower === "lowsodium" ||
+				tagLower === "low salt" ||
+				tagLower === "low_salt" ||
+				tagLower.replace(/[-\s_]/g, "") === "lowsodium"
+			) {
+				normalizedTags.add("low_sodium");
+			} else if (
+				tagLower === "diabetic" ||
+				tagLower === "sugar-free" ||
+				tagLower === "sugar_free" ||
+				tagLower === "sugarfree"
+			) {
+				normalizedTags.add("diabetic_friendly");
+			} else if (
+				tagLower === "heart-friendly" ||
+				tagLower === "heart_friendly" ||
+				tagLower === "cardiovascular"
+			) {
+				normalizedTags.add("heart_healthy");
+			}
+		}
+	});
+
+	return Array.from(normalizedTags);
+};
+
+/**
  * Convert a Food object from the API to a Recipe object for UI
  * @param {Food} food - Food object from API
  * @returns {Recipe} Recipe object for UI components
