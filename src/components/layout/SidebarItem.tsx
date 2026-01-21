@@ -6,6 +6,7 @@ import {
 	Text,
 	Tooltip,
 	useColorModeValue,
+	Box,
 } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
 import type { navItem } from "@/types/layout";
@@ -87,19 +88,61 @@ export const SidebarItem = ({
 							  }
 							: {}
 					}>
-					<Icon
-						as={item.icon}
-						boxSize={isCollapsed ? 6 : 5}
-						color={isActive ? "white" : "currentColor"}
-						transition={transitions.smooth}
-					/>
+					<Box position="relative">
+						<Icon
+							as={item.icon}
+							boxSize={isCollapsed ? 6 : 5}
+							color={isActive ? "white" : "currentColor"}
+							transition={transitions.smooth}
+						/>
+						{item.badge && item.badge > 0 && (
+							<Box
+								position="absolute"
+								top="-6px"
+								right="-6px"
+								bg="red.500"
+								color="white"
+								borderRadius="full"
+								minW="16px"
+								h="16px"
+								display="flex"
+								alignItems="center"
+								justifyContent="center"
+								fontSize="9px"
+								fontWeight="bold"
+								border="2px solid"
+								borderColor={isActive ? "white" : "rgba(255, 255, 255, 0.5)"}
+								zIndex={1}
+							>
+								{item.badge > 99 ? "99+" : item.badge}
+							</Box>
+						)}
+					</Box>
 					{!isCollapsed && (
 						<Text
 							fontSize="sm"
 							fontWeight={isActive ? "bold" : "semibold"}
-							letterSpacing="wide">
+							letterSpacing="wide"
+							flex={1}>
 							{item.label}
 						</Text>
+					)}
+					{!isCollapsed && item.badge && item.badge > 0 && (
+						<Box
+							bg="red.500"
+							color="white"
+							borderRadius="full"
+							minW="20px"
+							h="20px"
+							display="flex"
+							alignItems="center"
+							justifyContent="center"
+							fontSize="10px"
+							fontWeight="bold"
+							px={1.5}
+						>
+							{item.badge > 99 ? "99+" : item.badge}
+						</Box>
 					)}
 				</HStack>
 			</Link>

@@ -3,4 +3,5 @@ export type navItem = {
     label: string;
     path: string;
     icon: IconType;
+    badge?: number;
 };

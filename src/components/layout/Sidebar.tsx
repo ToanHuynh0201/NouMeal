@@ -13,6 +13,7 @@ import type { navItem } from "@/types/layout";
 import { ROUTES } from "@/constants";
 import { useAuth } from "@/hooks/useAuth";
 import { useRole } from "@/hooks/useRole";
+import { useNotification } from "@/hooks/useNotification";
 import { SidebarLogo } from "./SidebarLogo";
 import { SidebarItem } from "./SidebarItem";
 import { SidebarUserProfile } from "./SidebarUserProfile";
@@ -25,6 +26,7 @@ function Sidebar() {
 	const location = useLocation();
 	const { user, logout } = useAuth();
 	const { isAdmin } = useRole();
+	const { unreadCount } = useNotification();
 	const [isCollapsed, setIsCollapsed] = useState(false);
 
 	const toggleSidebar = () => setIsCollapsed(!isCollapsed);
@@ -74,7 +76,8 @@ function Sidebar() {
 		{
 			label: "Community",
 			path: ROUTES.COMMUNITY,
-			icon: FiCamera,
+			icon: FiUsers,
+			badge: unreadCount > 0 ? unreadCount : undefined,
 		},
 	];
 

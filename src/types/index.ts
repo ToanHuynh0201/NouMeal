@@ -4,6 +4,7 @@ export * from "./ai";
 export * from "./recipe";
 export * from "./myRecipe";
 export * from "./admin";
+export * from "./notification";
 // Export specific types from profile to avoid conflict with recipe UserProfile
 export type {
 	DailyCalorieNeeds,

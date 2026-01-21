@@ -17,6 +17,7 @@ import {
 	useDisclosure,
 } from "@chakra-ui/react";
 import { FiSearch } from "react-icons/fi";
+import { useSearchParams } from "react-router-dom";
 import type { Post, PaginationInfo } from "../../types/community";
 import { communityService } from "../../services/communityService";
 import { PostCard } from "./PostCard";
@@ -24,6 +25,7 @@ import LoadingSpinner from "../common/LoadingSpinner";
 import PostDetailModal from "./PostDetailModal";
 
 export const PostList = () => {
+	const [searchParams, setSearchParams] = useSearchParams();
 	const [posts, setPosts] = useState<Post[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
@@ -45,6 +47,17 @@ export const PostList = () => {
 	// Post Detail Modal
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
+
+	// Check for postId in URL query params and open modal
+	useEffect(() => {
+		const postId = searchParams.get("postId");
+		if (postId) {
+			setSelectedPostId(postId);
+			onOpen();
+			// Remove postId from URL after opening modal
+			setSearchParams({});
+		}
+	}, [searchParams, setSearchParams, onOpen]);
 
 	useEffect(() => {
 		loadPosts();

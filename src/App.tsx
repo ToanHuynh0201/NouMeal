@@ -13,6 +13,7 @@ import ProfilePage from "./pages/ProfilePage";
 import AdminRoute from "./components/auth/AdminRoute";
 import UserRoute from "./components/auth/UserRoute";
 import { AuthProvider } from "./contexts/AuthContext";
+import { NotificationProvider } from "./contexts/NotificationContext";
 import MenuSuggestionPage from "./pages/MenuSuggestionPage";
 import AIMealSuggestionPage from "./pages/AIMealSuggestionPage";
 import ImageRecognitionPage from "./pages/ImageRecognitionPage";
@@ -28,7 +29,8 @@ import UserPostsPage from "./pages/UserPostsPage";
 const App = () => {
 	return (
 		<AuthProvider>
-			<Router>
+			<NotificationProvider>
+				<Router>
 				<Routes>
 					{/* Public Routes */}
 					<Route
@@ -167,7 +169,8 @@ const App = () => {
 						}
 					/>
 				</Routes>
-			</Router>
+				</Router>
+			</NotificationProvider>
 		</AuthProvider>
 	);
 };

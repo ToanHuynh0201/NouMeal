@@ -4,6 +4,7 @@ import type { AppHeaderProps } from "@/types";
 import { getInitials } from "@/utils";
 import { ChevronDownIcon, LockIcon } from "@chakra-ui/icons";
 import { CgProfile } from "react-icons/cg";
+import { FiBell } from "react-icons/fi";
 import {
 	Avatar,
 	Box,
@@ -20,17 +21,27 @@ import {
 	useColorModeValue,
 	useDisclosure,
 	VStack,
+	IconButton,
+	Icon,
 } from "@chakra-ui/react";
 import ChangePasswordModal from "../auth/ChangePasswordModal";
+import NotificationModal from "../notifications/NotificationModal";
 import { ROUTES } from "@/constants";
 import { useNavigate } from "react-router-dom";
 import { useRole } from "@/hooks/useRole";
+import { useNotification } from "@/hooks/useNotification";
 
 const AppHeader = ({ onLogout, showAuthButtons = false }: AppHeaderProps) => {
 	const { user, isAuthenticated } = useAuth();
 	const { isOpen, onOpen, onClose } = useDisclosure();
+	const {
+		isOpen: isNotificationOpen,
+		onOpen: onNotificationOpen,
+		onClose: onNotificationClose,
+	} = useDisclosure();
 	const navigate = useNavigate();
 	const { isAdmin } = useRole();
+	const { unreadCount } = useNotification();
 	const borderColor = useColorModeValue("gray.200", "gray.600");
 
 	// Get current date info
@@ -125,6 +136,46 @@ const AppHeader = ({ onLogout, showAuthButtons = false }: AppHeaderProps) => {
 						<HStack
 							spacing={4}
 							ml="auto">
+							{/* Notification Bell Icon */}
+							<Box position="relative">
+								<IconButton
+									aria-label="Notifications"
+									icon={<Icon as={FiBell} boxSize={5} />}
+									variant="ghost"
+									colorScheme="purple"
+									size="md"
+									borderRadius="full"
+									_hover={{
+										bg: "purple.50",
+										transform: "translateY(-2px)",
+									}}
+									transition={transitions.normal}
+									onClick={onNotificationOpen}
+								/>
+								{unreadCount > 0 && (
+									<Box
+										position="absolute"
+										top="6px"
+										right="6px"
+										bg="red.500"
+										color="white"
+										borderRadius="full"
+										minW="18px"
+										h="18px"
+										display="flex"
+										alignItems="center"
+										justifyContent="center"
+										fontSize="10px"
+										fontWeight="bold"
+										border="2px solid"
+										borderColor="white"
+										zIndex={1}
+									>
+										{unreadCount > 99 ? "99+" : unreadCount}
+									</Box>
+								)}
+							</Box>
+
 							{/* User Profile Menu */}
 							<Menu>
 								<MenuButton
@@ -237,6 +288,12 @@ const AppHeader = ({ onLogout, showAuthButtons = false }: AppHeaderProps) => {
 			<ChangePasswordModal
 				isOpen={isOpen}
 				onClose={onClose}
+			/>
+
+			{/* Notification Modal */}
+			<NotificationModal
+				isOpen={isNotificationOpen}
+				onClose={onNotificationClose}
 			/>
 		</Box>
 	);
