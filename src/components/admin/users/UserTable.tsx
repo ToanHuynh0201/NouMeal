@@ -6,12 +6,14 @@ import {
 	Th,
 	Td,
 	Box,
-	Button,
+	IconButton,
+	HStack,
 	useBreakpointValue,
 	Badge,
+	Tooltip,
 } from "@chakra-ui/react";
 import type { User } from "@/types";
-import { FiEye } from "react-icons/fi";
+import { FiEye, FiUserX, FiUserCheck } from "react-icons/fi";
 
 interface UserTableProps {
 	users: User[];
@@ -71,28 +73,31 @@ export const UserTable = ({
 									{user.isActive ? "Active" : "Inactive"}
 								</Badge>
 							</Td>
-							<Td textAlign="center">
-								<Button
-									size="sm"
-									leftIcon={<FiEye />}
-									variant="outline"
-									colorScheme="blue"
-									mr={2}
-									onClick={() => onView(user)}>
-									View Detail
-								</Button>
-								<Button
-									size="sm"
-									minW={{ base: "100%", sm: "100px" }}
-									variant={
-										user.isActive ? "outline" : "solid"
-									}
-									colorScheme={
-										user.isActive ? "red" : "green"
-									}
-									onClick={() => onToggleStatus(user)}>
-									{user.isActive ? "Deactivate" : "Activate"}
-								</Button>
+							<Td>
+								<HStack
+									spacing={2}
+									justify="center">
+									<Tooltip label="View Details">
+										<IconButton
+											aria-label="View user"
+											icon={<FiEye />}
+											size="sm"
+											colorScheme="blue"
+											variant="ghost"
+											onClick={() => onView(user)}
+										/>
+									</Tooltip>
+									<Tooltip label={user.isActive ? "Deactivate User" : "Activate User"}>
+										<IconButton
+											aria-label={user.isActive ? "Deactivate user" : "Activate user"}
+											icon={user.isActive ? <FiUserX /> : <FiUserCheck />}
+											size="sm"
+											colorScheme={user.isActive ? "red" : "green"}
+											variant="ghost"
+											onClick={() => onToggleStatus(user)}
+										/>
+									</Tooltip>
+								</HStack>
 							</Td>
 						</Tr>
 					))}

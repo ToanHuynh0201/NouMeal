@@ -29,16 +29,10 @@ import {
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { ROUTES } from "@/constants";
-import { useAuth } from "@/hooks/useAuth";
-import { useEffect } from "react";
 
 function HomePage() {
 	const navigate = useNavigate();
 
-	const { user } = useAuth();
-	useEffect(() => {
-		console.log(user);
-	}, [user]);
 	// Scroll animation refs
 	const featuresSection = useScrollAnimation({ threshold: 0.15 });
 	const whyChooseSection = useScrollAnimation({ threshold: 0.15 });
@@ -548,8 +542,8 @@ function HomePage() {
 									howItWorksSection.isVisible
 										? "translateX(0)"
 										: index % 2 === 0
-										? "translateX(-40px)"
-										: "translateX(40px)"
+											? "translateX(-40px)"
+											: "translateX(40px)"
 								}
 								transition="all 0.6s ease-out"
 								style={{

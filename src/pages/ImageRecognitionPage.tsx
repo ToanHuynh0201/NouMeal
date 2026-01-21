@@ -152,49 +152,6 @@ const ImageRecognitionPage = () => {
 		fileInputRef.current?.click();
 	};
 
-	// const convertImageUrlToBase64 = async (
-	// 	imageUrl: string,
-	// ): Promise<string> => {
-	// 	try {
-	// 		const response = await fetch(imageUrl);
-	// 		const blob = await response.blob();
-
-	// 		return new Promise((resolve, reject) => {
-	// 			const reader = new FileReader();
-	// 			reader.onloadend = () => resolve(reader.result as string);
-	// 			reader.onerror = reject;
-	// 			reader.readAsDataURL(blob);
-	// 		});
-	// 	} catch (error) {
-	// 		console.error("Error converting image to base64:", error);
-	// 		throw error;
-	// 	}
-	// };
-
-	// const handleExampleImageClick = async (imageUrl: string) => {
-	// 	try {
-	// 		toast({
-	// 			title: "Loading image...",
-	// 			description: "Converting image to base64",
-	// 			status: "info",
-	// 			duration: 1000,
-	// 			isClosable: true,
-	// 		});
-
-	// 		const base64Image = await convertImageUrlToBase64(imageUrl);
-	// 		setSelectedImage(base64Image);
-	// 		setResult(null);
-	// 	} catch (error) {
-	// 		toast({
-	// 			title: "Error loading image",
-	// 			description: "Failed to convert image. Please try again.",
-	// 			status: "error",
-	// 			duration: 3000,
-	// 			isClosable: true,
-	// 		});
-	// 	}
-	// };
-
 	return (
 		<MainLayout
 			showHeader={true}
@@ -213,6 +170,7 @@ const ImageRecognitionPage = () => {
 							size="2xl"
 							bgGradient="linear(to-r, blue.500, teal.500)"
 							bgClip="text"
+							p={2}
 							mb={3}>
 							Food Image Recognition
 						</Heading>
@@ -285,17 +243,6 @@ const ImageRecognitionPage = () => {
 											</Button>
 										</VStack>
 									</Center>
-
-									{/* Example Images Section */}
-									<Box width="100%">
-										<Text
-											fontSize="sm"
-											color="gray.600"
-											mb={3}
-											fontWeight="semibold">
-											Or try with example images:
-										</Text>
-									</Box>
 								</VStack>
 							</CardBody>
 						</Card>

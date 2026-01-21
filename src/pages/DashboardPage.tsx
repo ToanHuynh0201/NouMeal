@@ -114,7 +114,7 @@ function DashboardPage() {
 							100,
 					),
 				},
-		  ]
+			]
 		: [];
 
 	// Get remaining meals count
@@ -236,8 +236,8 @@ function DashboardPage() {
 													stat.progress >= 80
 														? "green"
 														: stat.progress >= 50
-														? "yellow"
-														: "red"
+															? "yellow"
+															: "red"
 												}>
 												{stat.progress}%
 											</Badge>
