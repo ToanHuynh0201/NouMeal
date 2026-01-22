@@ -4,8 +4,6 @@ import {
 	CardBody,
 	CardHeader,
 	Divider,
-	Grid,
-	GridItem,
 	Heading,
 	HStack,
 	Progress,
@@ -36,9 +34,6 @@ import {
 	Tooltip,
 	Legend,
 	ResponsiveContainer,
-	PieChart,
-	Pie,
-	Cell,
 } from "recharts";
 import {
 	FaFire,
@@ -143,16 +138,6 @@ const TrackingSection = () => {
 			100,
 		fats: (progressData.consumed.fat / progressData.macroProfile.fat) * 100,
 	};
-
-	const macroDistribution = [
-		{
-			name: "Protein",
-			value: progressData.consumed.protein,
-			color: "#3182CE",
-		},
-		{ name: "Carbs", value: progressData.consumed.carbs, color: "#38A169" },
-		{ name: "Fats", value: progressData.consumed.fat, color: "#D69E2E" },
-	];
 
 	// Transform daily data for charts
 	const dailyChartData = dailyData.map((item) => ({
@@ -336,7 +321,6 @@ const TrackingSection = () => {
 						<TabList>
 							<Tab>Daily Tracking</Tab>
 							<Tab>Weekly Average</Tab>
-							<Tab>Macro Distribution</Tab>
 						</TabList>
 
 						<TabPanels>
@@ -518,153 +502,6 @@ const TrackingSection = () => {
 										</ResponsiveContainer>
 									</Box>
 								</VStack>
-							</TabPanel>
-
-							{/* Macro Distribution Tab */}
-							<TabPanel>
-								<Grid
-									templateColumns={{
-										base: "1fr",
-										lg: "repeat(2, 1fr)",
-									}}
-									gap={8}>
-									<GridItem>
-										<Box>
-											<Text
-												fontWeight="semibold"
-												mb={4}
-												textAlign="center">
-												Today's Macro Distribution
-											</Text>
-											<ResponsiveContainer
-												width="100%"
-												height={300}>
-												<PieChart>
-													<Pie
-														data={macroDistribution}
-														cx="50%"
-														cy="50%"
-														labelLine={false}
-														label={({
-															name,
-															percent,
-														}) =>
-															`${name}: ${(
-																Number(
-																	percent,
-																) * 100
-															).toFixed(0)}%`
-														}
-														outerRadius={100}
-														fill="#8884d8"
-														dataKey="value">
-														{macroDistribution.map(
-															(entry, index) => (
-																<Cell
-																	key={`cell-${index}`}
-																	fill={
-																		entry.color
-																	}
-																/>
-															),
-														)}
-													</Pie>
-													<Tooltip />
-												</PieChart>
-											</ResponsiveContainer>
-										</Box>
-									</GridItem>
-
-									<GridItem>
-										<VStack
-											spacing={4}
-											align="stretch"
-											justify="center"
-											h="full">
-											<Heading
-												size="sm"
-												mb={2}>
-												Macro Breakdown
-											</Heading>
-											{macroDistribution.map((macro) => (
-												<Box key={macro.name}>
-													<HStack
-														justify="space-between"
-														mb={2}>
-														<HStack>
-															<Box
-																w={4}
-																h={4}
-																bg={macro.color}
-																borderRadius="sm"
-															/>
-															<Text fontWeight="medium">
-																{macro.name}
-															</Text>
-														</HStack>
-														<Text color="gray.600">
-															{macro.value}g (
-															{macro.value *
-																(macro.name ===
-																"Fats"
-																	? 9
-																	: 4)}{" "}
-															cal)
-														</Text>
-													</HStack>
-													<Progress
-														value={
-															(macro.value /
-																(progressData
-																	.consumed
-																	.protein +
-																	progressData
-																		.consumed
-																		.carbs +
-																	progressData
-																		.consumed
-																		.fat)) *
-															100
-														}
-														colorScheme={
-															macro.color.split(
-																".",
-															)[0]
-														}
-														size="sm"
-														borderRadius="full"
-													/>
-												</Box>
-											))}
-
-											<Divider my={2} />
-
-											<Box>
-												<HStack justify="space-between">
-													<Text fontWeight="bold">
-														Total
-													</Text>
-													<Text fontWeight="bold">
-														{progressData.consumed
-															.protein +
-															progressData
-																.consumed
-																.carbs +
-															progressData
-																.consumed.fat}
-														g (
-														{
-															progressData
-																.consumed
-																.calories
-														}{" "}
-														cal)
-													</Text>
-												</HStack>
-											</Box>
-										</VStack>
-									</GridItem>
-								</Grid>
 							</TabPanel>
 						</TabPanels>
 					</Tabs>
