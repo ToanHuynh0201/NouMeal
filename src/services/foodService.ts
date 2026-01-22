@@ -181,6 +181,7 @@ class FoodService {
 	 */
 	createAdminFood = withErrorHandling(async (foodData: CreateFoodRequest) => {
 		return await api.post("/foods/admin", foodData);
+	
 	});
 
 	/**
